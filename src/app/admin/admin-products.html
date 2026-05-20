@@ -1,0 +1,141 @@
+<section class="page">
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+       
+        <h1 class="page-title">Προϊόντα</h1>
+        
+      </div>
+
+      <div class="header-actions">
+        <a routerLink="/admin" class="back-button">
+          <span>← Πίσω στον πίνακα διαχειριστή</span>
+        </a>
+
+        <a routerLink="/admin/products/new" class="btn btn-primary">
+          + Νέο προϊόν
+        </a>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="panel">
+      <div class="panel-title">Φόρτωση προϊόντων...</div>
+      <div class="skeleton-lines">
+        <div class="sk"></div>
+        <div class="sk"></div>
+        <div class="sk short"></div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="panel alert alert-error">
+      <div class="alert-text">{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadProducts()">
+        Επανάληψη
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !error" class="panel">
+
+      <!-- Empty -->
+      <div *ngIf="products.length === 0" class="empty">
+        <div class="empty-icon">📦</div>
+        <h3>Δεν βρέθηκαν προϊόντα</h3>
+        <p>Ξεκίνα προσθέτοντας το πρώτο σου προϊόν.</p>
+        <a routerLink="/admin/products/new" class="btn btn-primary">
+          + Προσθήκη προϊόντος
+        </a>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="products.length > 0" class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="mono">ID</th>
+              <th>Εικόνα</th>
+              <th>Όνομα</th>
+              <th>Κατηγορία</th>
+              <th class="right">Τιμή</th>
+              <th class="right">Απόθεμα</th>
+              <th class="right">Ενέργειες</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let product of products">
+              <td class="mono">#{{ product.id }}</td>
+
+              <td>
+                <div class="thumb">
+                  <img
+                    *ngIf="product.image_url"
+                    [src]="product.image_url"
+                    [alt]="product.name"
+                  />
+                  <div *ngIf="!product.image_url" class="thumb-placeholder">
+                    No image
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="name-cell">
+                  <div class="name"><strong>{{ product.name }}</strong></div>
+                </div>
+              </td>
+
+              <td class="muted">
+                {{ product.category_name || '—' }}
+              </td>
+
+              <td class="right">
+                <strong>{{ product.price | number:'1.2-2' }}€</strong>
+              </td>
+
+              <td class="right">
+                <span
+                  class="stock-pill"
+                  [ngClass]="{
+                    'stock-ok': product.stock >= 5,
+                    'stock-low': product.stock > 0 && product.stock < 5,
+                    'stock-out': product.stock === 0
+                  }">
+                  <ng-container *ngIf="product.stock >= 5">✅ {{ product.stock }}</ng-container>
+                  <ng-container *ngIf="product.stock > 0 && product.stock < 5">⚠️ {{ product.stock }}</ng-container>
+                  <ng-container *ngIf="product.stock === 0">❌ 0</ng-container>
+                </span>
+              </td>
+
+              <td class="right">
+                <div class="action-buttons">
+                  <a
+                    [routerLink]="['/admin/products/edit', product.id]"
+                    class="icon-btn"
+                    title="Επεξεργασία">
+                    ✏️
+                  </a>
+
+                  <button
+                    type="button"
+                    (click)="deleteProduct(product.id, product.name)"
+                    class="icon-btn icon-danger"
+                    title="Διαγραφή">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</section>

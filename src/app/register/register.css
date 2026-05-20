@@ -1,0 +1,116 @@
+/* Κεντράρισμα σελίδας */
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background:
+    radial-gradient(1200px 600px at 20% 0%, rgba(99, 102, 241, 0.15), transparent 60%),
+    radial-gradient(900px 500px at 100% 30%, rgba(16, 185, 129, 0.12), transparent 55%),
+    #f5f7fb;
+  padding: 20px;
+}
+
+/* Card */
+.register-container form,
+.register-container > h2,
+.register-container > p {
+  width: 100%;
+  max-width: 420px;
+}
+
+.register-container {
+  flex-direction: column;
+}
+
+.register-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-align: center;
+}
+
+/* Card box */
+.register-container form {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Field container */
+.register-container form div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Labels */
+.register-container label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Inputs */
+.register-container input {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.register-container input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Button - ΜΠΛΕ */
+.register-container button {
+  margin-top: 10px;
+  height: 45px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb; /* καθαρό μπλε */
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.register-container button:hover {
+  background: #1d4ed8; /* πιο σκούρο στο hover */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+.register-container button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+/* Footer text */
+.register-container p {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #475569;
+  text-align: center;
+}
+
+.register-container a {
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-container a:hover {
+  text-decoration: underline;
+}

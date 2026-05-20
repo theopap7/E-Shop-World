@@ -1,0 +1,72 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface Review {
+  id: number;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  first_name?: string;
+  last_name?: string;
+  user_id: number;
+  product_id?: number;
+  product_name?: string;
+  product_image?: string | null;
+}
+
+export interface ReviewsResponse {
+  success: boolean;
+  reviews: Review[];
+  average: number;
+  total: number;
+}
+
+export interface MyReviewsResponse {
+  success: boolean;
+  reviews: Review[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReviewService {
+  private readonly baseUrl = 'http://localhost:3000/api';
+
+  constructor(private http: HttpClient) {}
+
+  // Πάρε reviews για ένα product
+  getReviews(productId: number): Observable<ReviewsResponse> {
+    return this.http.get<ReviewsResponse>(
+      `${this.baseUrl}/reviews/${productId}`
+    );
+  }
+
+  // Πάρε τις κριτικές του logged-in χρήστη
+  getMyReviews(): Observable<MyReviewsResponse> {
+    return this.http.get<MyReviewsResponse>(
+      `${this.baseUrl}/reviews/my`
+    );
+  }
+
+  // Γράψε review
+  submitReview(productId: number, rating: number, comment: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/reviews/${productId}`,
+      { rating, comment }
+    );
+  }
+
+  // Διάγραψε review
+  deleteReview(reviewId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/reviews/${reviewId}`);
+  }
+
+  // Ενημέρωσε review
+  updateReview(reviewId: number, rating: number, comment: string): Observable<any> {
+    return this.http.put(
+      `${this.baseUrl}/reviews/${reviewId}`,
+      { rating, comment }
+    );
+  }
+}

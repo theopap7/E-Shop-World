@@ -1,0 +1,66 @@
+<div class="skeleton-wrapper" [ngClass]="{ 'skeleton-wrapper--grid': type === 'card' }">
+
+  <!-- CARD -->
+  <ng-container *ngIf="type === 'card'">
+    <div
+      class="skeleton-card skeleton-item"
+      *ngFor="let i of items"
+      [ngClass]="'skeleton-' + i">
+
+      <div class="skeleton-image"></div>
+
+      <div class="skeleton-content">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-text"></div>
+        <div class="skeleton-line skeleton-text short"></div>
+
+        <div class="skeleton-footer">
+          <div class="skeleton-line skeleton-price"></div>
+          <div class="skeleton-button"></div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- TEXT -->
+  <ng-container *ngIf="type === 'text'">
+    <div
+      class="skeleton-line"
+      *ngFor="let i of items"
+      [style.width]="width"
+      [style.height]="height || '16px'">
+    </div>
+  </ng-container>
+
+  <!-- TITLE -->
+  <ng-container *ngIf="type === 'title'">
+    <div
+      class="skeleton-line skeleton-title-large"
+      *ngFor="let i of items"
+      [style.width]="width || '200px'"
+      [style.height]="height || '24px'">
+    </div>
+  </ng-container>
+
+  <!-- IMAGE -->
+  <ng-container *ngIf="type === 'image'">
+    <div
+      class="skeleton-image-box"
+      *ngFor="let i of items"
+      [style.width]="width || '100%'"
+      [style.height]="height || '200px'">
+    </div>
+  </ng-container>
+
+  <!-- CIRCLE -->
+  <ng-container *ngIf="type === 'circle'">
+    <div
+      class="skeleton-circle"
+      *ngFor="let i of items"
+      [style.width]="width || '48px'"
+      [style.height]="height || '48px'">
+    </div>
+  </ng-container>
+
+</div>

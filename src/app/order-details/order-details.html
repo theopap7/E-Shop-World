@@ -1,0 +1,254 @@
+<section class="page">
+  <div class="container">
+
+    <!-- Header / Hero -->
+    <header class="details-hero">
+
+      <a [routerLink]="isAdminPage ? '/admin/orders' : '/profile/orders'" class="back-button">
+        <span class="back-icon">←</span>
+
+        <span>
+          {{ isAdminPage ? 'Πίσω στις παραγγελίες' : 'Πίσω στις παραγγελίες μου' }}
+        </span>
+      </a>
+
+      <div class="hero-title">
+
+        <h2 class="title">Παραγγελία #{{ orderId }}</h2>
+
+    <div class="export-buttons">
+
+        <!-- PDF για όλους -->
+       <button class="btn btn-primary" (click)="downloadPDF(orderId)">
+           📄 Κατέβασμα PDF
+          </button>
+
+            <!-- CSV μόνο για admin -->
+          <button 
+         *ngIf="isAdminPage"
+         class="btn btn-secondary"
+         (click)="downloadCSV(orderId)"
+             >
+          📊 Κατέβασμα CSV
+           </button>
+
+</div>    
+
+        <div class="meta" *ngIf="order">
+          <span class="meta-text">{{ order.created_at | date:'short' }}</span>
+          <span class="dot">•</span>
+
+          <span
+            class="pill"
+            [ngClass]="'pill--' + order.status"
+          >
+            {{ statusLabel(order.status) }}
+          </span>
+
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="card">
+      Φόρτωση...
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="card alert alert-error">
+      <div>{{ error }}</div>
+
+      <button
+        class="btn btn-primary"
+        type="button"
+        (click)="loadDetails()"
+      >
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <!-- Content -->
+    <ng-container *ngIf="!isLoading && !error && order">
+
+      <div class="grid">
+
+        <!-- Στοιχεία Παραλήπτη -->
+        <div class="card">
+
+          <h3 class="h3">Στοιχεία Παραλήπτη</h3>
+
+          <div class="row">
+            <span>Ονοματεπώνυμο</span>
+            <strong>{{ order.recipient_name }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Τηλέφωνο</span>
+            <strong>{{ order.phone }}</strong>
+          </div>
+
+        </div>
+
+        <!-- Διεύθυνση Αποστολής -->
+        <div class="card">
+
+          <h3 class="h3">Διεύθυνση Αποστολής</h3>
+
+          <div class="row">
+            <span>Χώρα</span>
+            <strong>{{ order.ship_country || 'GR' }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Πόλη</span>
+            <strong>{{ order.ship_city }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Ταχυδρομικός Κώδικας</span>
+            <strong>{{ order.ship_zip }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Διεύθυνση</span>
+            <strong>{{ order.ship_address1 }}</strong>
+          </div>
+
+          <div class="row" *ngIf="order.floor">
+            <span>Όροφος</span>
+            <strong>{{ order.floor }}</strong>
+          </div>
+
+          <div class="row" *ngIf="order.ship_notes">
+            <span>Σημειώσεις</span>
+            <strong>{{ order.ship_notes }}</strong>
+          </div>
+
+        </div>
+
+        <!-- Αποστολή & Πληρωμή -->
+        <div class="card">
+
+          <h3 class="h3">Αποστολή & Πληρωμή</h3>
+
+          <div class="row">
+            <span>Τρόπος αποστολής</span>
+            <strong>{{ shippingMethodLabel(order.shipping_method) }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Κόστος μεταφορικών</span>
+            <strong>{{ order.shipping_cost | number:'1.2-2' }} €</strong>
+          </div>
+
+          <div class="row">
+            <span>Τρόπος πληρωμής</span>
+            <strong>{{ paymentMethodLabel(order.payment_method) }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Κατάσταση πληρωμής</span>
+
+            <span
+              class="pill"
+              [ngClass]="order.payment_status === 'PAID'
+                ? 'pill--paid'
+                : 'pill--pendingPay'"
+            >
+              {{ paymentStatusLabel(order.payment_status) }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- Σύνοψη Παραγγελίας -->
+        <div class="card">
+
+          <h3 class="h3">Σύνοψη Παραγγελίας</h3>
+
+          <div class="row">
+            <span>Κατάσταση</span>
+
+            <span
+              class="pill"
+              [ngClass]="'pill--' + order.status"
+            >
+              {{ statusLabel(order.status) }}
+            </span>
+
+          </div>
+
+          <div class="row">
+            <span>Κόστος Προϊόντων</span>
+            <strong>{{ order.subtotal | number:'1.2-2' }} €</strong>
+          </div>
+
+          <div class="row">
+            <span>Μεταφορικά</span>
+            <strong>{{ order.shipping_cost | number:'1.2-2' }} €</strong>
+          </div>
+
+          <div
+            class="row discount-row"
+            *ngIf="order.discount_amount && order.discount_amount > 0"
+          >
+            <span>
+              Έκπτωση ({{ order.discount_code }})
+            </span>
+
+            <strong class="discount-value">
+              -{{ order.discount_amount | number:'1.2-2' }} €
+            </strong>
+
+          </div>
+
+          <div class="row total-row">
+            <span><strong>Σύνολο</strong></span>
+            <strong>{{ order.total_amount | number:'1.2-2' }} €</strong>
+          </div>
+
+        </div>
+
+        <!-- Προϊόντα -->
+        <div class="card full">
+
+          <h3 class="h3">Προϊόντα</h3>
+
+          <div *ngIf="items.length === 0" class="muted">
+            Δεν βρέθηκαν προϊόντα.
+          </div>
+
+          <div *ngIf="items.length > 0" class="items">
+
+            <div
+              class="item"
+              *ngFor="let it of items"
+            >
+
+              <div>
+                <div class="name">{{ it.product_name }}</div>
+
+                <div class="muted">
+                  Ποσότητα: {{ it.quantity }}
+                  × {{ it.unit_price | number:'1.2-2' }} €
+                </div>
+              </div>
+
+              <div class="line">
+                {{ it.line_total | number:'1.2-2' }} €
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </ng-container>
+
+  </div>
+</section>

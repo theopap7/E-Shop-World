@@ -1,0 +1,29 @@
+<div class="timeline" [class.cancelled]="currentStatus === 'cancelled'">
+  
+  <div 
+    *ngFor="let step of steps; let i = index; let last = last"
+    class="timeline-item">
+    
+    <!-- Step Circle -->
+    <div class="step-circle"
+         [class.completed]="step.completed"
+         [class.active]="step.active">
+      <span class="step-icon">{{ step.icon }}</span>
+    </div>
+    
+    <!-- Connector Line (not for last item) -->
+    <div *ngIf="!last" 
+         class="step-line"
+         [class.completed]="step.completed">
+    </div>
+    
+    <!-- Step Label -->
+    <div class="step-label"
+         [class.completed]="step.completed"
+         [class.active]="step.active">
+      {{ step.label }}
+    </div>
+    
+  </div>
+  
+</div>

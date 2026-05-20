@@ -1,0 +1,106 @@
+<section class="page">
+  <div class="container">
+
+
+
+    <!-- Back button -->
+    <a routerLink="/dashboard" class="back-button">
+      <span class="back-icon">←</span>
+      <span>Πίσω στο κατάστημα</span>
+    </a>
+
+    <!-- ✅ LOADING SKELETON -->
+    <div *ngIf="isLoading" class="product-detail-skeleton">
+      <div class="skeleton-layout">
+
+        <!-- Image Skeleton -->
+        <div class="skeleton-image-section">
+          <app-skeleton type="image" height="400px"></app-skeleton>
+        </div>
+
+        <!-- Info Skeleton -->
+        <div class="skeleton-info-section">
+          <app-skeleton type="title" width="300px"></app-skeleton>
+
+          <div style="margin-top:10px">
+            <app-skeleton type="text" width="120px"></app-skeleton>
+          </div>
+
+          <div style="margin-top:20px">
+           <app-skeleton type="text" [count]="3"></app-skeleton>
+          </div>
+
+          <div style="margin-top:20px">
+            <app-skeleton type="image" height="48px" width="180px"></app-skeleton>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="!isLoading && error" class="error-card">
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- ✅ REAL PRODUCT -->
+    <div *ngIf="!isLoading && !error && product" class="product-detail">
+
+      <!-- Left: Image -->
+      <div class="product-image-wrap">
+        <img
+          [src]="product.image_url || 'https://via.placeholder.com/500x500?text=No+Image'"
+          [alt]="product.name"
+          class="product-image"
+        />
+      </div>
+
+      <!-- Right: Info -->
+      <div class="product-info">
+
+        <span class="badge">
+          {{ product.category_name || 'Χωρίς κατηγορία' }}
+        </span>
+
+        <h1 class="product-name">{{ product.name }}</h1>
+
+        <div class="product-price">
+          {{ product.price | number:'1.2-2' }}€
+        </div>
+
+        <div class="stock-status">
+          <span *ngIf="product.stock > 0" class="in-stock">
+            ✅ Διαθέσιμο ({{ product.stock }} τεμάχια)
+          </span>
+
+          <span *ngIf="product.stock === 0" class="out-of-stock">
+            ❌ Εξαντλήθηκε
+          </span>
+        </div>
+
+        <p class="product-description">
+          {{ product.description || 'Δεν υπάρχει περιγραφή.' }}
+        </p>
+
+        <button
+          class="btn btn-primary btn-large"
+          type="button"
+          (click)="addToCart()"
+          [disabled]="product.stock === 0 || addedToCart">
+
+          {{ addedToCart ? '✅ Προστέθηκε!' : 'Προσθήκη στο καλάθι' }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- Reviews -->
+    <app-reviews
+      *ngIf="!isLoading && product"
+      [productId]="product.id">
+    </app-reviews>
+
+  </div>
+</section>

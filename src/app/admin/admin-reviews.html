@@ -1,0 +1,131 @@
+<section class="page">
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+  
+        <h1 class="page-title">Κριτικές</h1>
+       
+      </div>
+
+      <div class="header-actions">
+        <a [routerLink]="['/admin']" class="back-button">
+          <span>← Πίσω στον πίνακα διαχειριστή</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="panel">
+      <div class="panel-title">Φόρτωση κριτικών...</div>
+      <div class="skeleton-lines">
+        <div class="sk"></div>
+        <div class="sk"></div>
+        <div class="sk short"></div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="panel alert alert-error">
+      <div class="alert-text">{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadReviews()">
+        Επανάληψη
+      </button>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && !error && reviews.length === 0" class="panel empty">
+      <div class="empty-icon">📝</div>
+      <h3>Δεν υπάρχουν κριτικές ακόμα</h3>
+      <p>Όταν οι χρήστες αφήσουν κριτικές, θα εμφανιστούν εδώ.</p>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading && !error && reviews.length > 0" class="panel table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ΠΡΟΪΟΝ</th>
+            <th>ΧΡΗΣΤΗΣ</th>
+            <th>ΒΑΘΜΟΛΟΓΙΑ</th>
+            <th>ΣΧΟΛΙΟ</th>
+            <th>ΗΜΕΡΟΜΗΝΙΑ</th>
+            <th class="right">ΕΝΕΡΓΕΙΕΣ</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let review of reviews">
+
+            <!-- Product -->
+            <td>
+              <div class="product-cell">
+                <div class="thumb">
+                  <img
+                    *ngIf="review.product_image; else noImg"
+                    [src]="review.product_image"
+                    [alt]="review.product_name"
+                  />
+                  <ng-template #noImg>
+                    <div class="noimg">No image</div>
+                  </ng-template>
+                </div>
+
+                <div class="product-meta">
+                  <div class="product-name">{{ review.product_name }}</div>
+                  <div class="muted small">ID: {{ review.product_id }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- User -->
+            <td>
+              <div class="user-cell">
+                <div class="user-name">{{ review.first_name }} {{ review.last_name }}</div>
+                <div class="muted small">{{ review.email }}</div>
+              </div>
+            </td>
+
+            <!-- Rating -->
+            <td>
+              <div class="rating-cell">
+                <span class="stars">{{ getStars(review.rating) }}</span>
+                <span class="muted small">{{ review.rating }}/5</span>
+              </div>
+            </td>
+
+            <!-- Comment -->
+            <td>
+              <div class="comment-cell" [class.is-empty]="!review.comment">
+                {{ review.comment || '—' }}
+              </div>
+            </td>
+
+            <!-- Date -->
+            <td>
+              <div class="date-cell">
+                <div>{{ review.created_at | date:'dd/MM/yyyy' }}</div>
+                <div class="muted small">{{ review.created_at | date:'HH:mm' }}</div>
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="right">
+              <button
+                class="icon-btn danger"
+                type="button"
+                (click)="deleteReview(review.id, review.product_name)"
+                title="Διαγραφή">
+                🗑️
+              </button>
+             
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,221 @@
+<section class="page">
+  <div class="container">
+
+    <a routerLink="/dashboard" class="back-button">
+      <span class="back-icon">←</span>
+      <span>Πίσω στο κατάστημα</span>
+    </a>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>👤 Το Προφίλ μου</h2>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      Φόρτωση...
+    </div>
+
+    <!-- Profile Content -->
+    <div *ngIf="!loading && user" class="profile-layout">
+
+      <!-- Left: Profile Card -->
+      <div class="profile-card">
+
+        <div class="avatar">
+          <span class="avatar-icon">👤</span>
+        </div>
+
+        <div class="user-info">
+          <h3 class="user-name">{{ user.firstName }} {{ user.lastName }}</h3>
+          <p class="user-email">{{ user.email }}</p>
+          <p class="user-meta">Μέλος του καταστήματος</p>
+        </div>
+
+        <div class="role-badge" *ngIf="user.role === 'admin'">
+          ⭐ Διαχειριστής
+        </div>
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="profile-actions">
+
+        <!-- Quick Actions -->
+        <div class="actions-section">
+          <h3 class="section-title">Γρήγορες Ενέργειες</h3>
+
+          <a routerLink="/profile/orders" class="action-link">
+            <span class="action-icon">📋</span>
+            <div class="action-content">
+              <div class="action-title">Οι Παραγγελίες μου</div>
+              <div class="action-desc">Δες το ιστορικό παραγγελιών</div>
+            </div>
+            <span class="action-arrow">→</span>
+          </a>
+
+          <a routerLink="/wishlist" class="action-link">
+            <span class="action-icon">❤️</span>
+            <div class="action-content">
+              <div class="action-title">Τα Αγαπημένα μου</div>
+              <div class="action-desc">Προϊόντα που σου αρέσουν</div>
+            </div>
+            <span class="action-arrow">→</span>
+          </a>
+
+          <a routerLink="/profile/reviews" class="action-link">
+            <span class="action-icon">⭐</span>
+            <div class="action-content">
+              <div class="action-title">Οι Κριτικές μου</div>
+              <div class="action-desc">Δες τις αξιολογήσεις που έχεις γράψει</div>
+            </div>
+            <span class="action-arrow">→</span>
+          </a>
+
+          <div *ngIf="user.role === 'admin'" class="divider"></div>
+
+          <a *ngIf="user.role === 'admin'" routerLink="/admin" class="action-link admin-link">
+            <span class="action-icon">⚙️</span>
+            <div class="action-content">
+              <div class="action-title">Πίνακας Διαχειριστή</div>
+              <div class="action-desc">Διαχείριση καταστήματος</div>
+            </div>
+            <span class="action-arrow">→</span>
+          </a>
+        </div>
+
+        <!-- Password Change Section -->
+        <div class="password-section">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Ασφάλεια Λογαριασμού</h3>
+              <p class="section-subtitle">Αλλαγή κωδικού πρόσβασης</p>
+            </div>
+            <span class="security-icon">🔒</span>
+          </div>
+
+          <form class="password-form">
+
+            <!-- Current Password -->
+            <div class="form-group">
+              <label class="form-label">
+                Τρέχων κωδικός
+                <span class="required">*</span>
+              </label>
+
+              <div class="input-with-toggle">
+                <input
+                  [type]="showCurrentPassword ? 'text' : 'password'"
+                  class="form-input"
+                  placeholder="Εισάγετε τον τρέχοντα κωδικό"
+                  [(ngModel)]="currentPassword"
+                  name="currentPassword"
+                />
+                <button
+                  type="button"
+                  class="toggle-btn"
+                  (click)="showCurrentPassword = !showCurrentPassword">
+                  {{ showCurrentPassword ? '🙈' : '👁️' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- New Password -->
+            <div class="form-group">
+              <label class="form-label">
+                Νέος κωδικός
+                <span class="required">*</span>
+              </label>
+
+              <div class="input-with-toggle">
+                <input
+                  [type]="showNewPassword ? 'text' : 'password'"
+                  class="form-input"
+                  placeholder="Τουλάχιστον 6 χαρακτήρες"
+                  [(ngModel)]="newPassword"
+                  name="newPassword"
+                />
+                <button
+                  type="button"
+                  class="toggle-btn"
+                  (click)="showNewPassword = !showNewPassword">
+                  {{ showNewPassword ? '🙈' : '👁️' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+              <label class="form-label">
+                Επιβεβαίωση νέου κωδικού
+                <span class="required">*</span>
+              </label>
+
+              <div class="input-with-toggle">
+                <input
+                  [type]="showConfirmPassword ? 'text' : 'password'"
+                  class="form-input"
+                  placeholder="Ξαναγράψτε τον νέο κωδικό"
+                  [(ngModel)]="confirmPassword"
+                  name="confirmPassword"
+                />
+                <button
+                  type="button"
+                  class="toggle-btn"
+                  (click)="showConfirmPassword = !showConfirmPassword">
+                  {{ showConfirmPassword ? '🙈' : '👁️' }}
+                </button>
+              </div>
+
+              <p
+                class="form-hint"
+                *ngIf="confirmPassword && newPassword !== confirmPassword">
+                ⚠️ Οι κωδικοί δεν ταιριάζουν
+              </p>
+            </div>
+
+            <!-- Alerts -->
+            <div *ngIf="passwordError" class="alert alert-error">
+              <span class="alert-icon">⚠️</span>
+              {{ passwordError }}
+            </div>
+
+            <div *ngIf="passwordSuccess" class="alert alert-success">
+              <span class="alert-icon">✓</span>
+              {{ passwordSuccess }}
+            </div>
+
+            <!-- Submit -->
+            <button
+              class="btn btn-primary btn-block"
+              type="button"
+              (click)="changePassword()"
+              [disabled]="
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword ||
+                newPassword !== confirmPassword ||
+                changingPassword
+              ">
+              <span *ngIf="!changingPassword">🔐 Ενημέρωση κωδικού</span>
+              <span *ngIf="changingPassword">Ενημέρωση...</span>
+            </button>
+
+          </form>
+        </div>
+
+        <!-- Logout -->
+        <div class="logout-section">
+          <button
+            class="btn btn-outline btn-block logout-btn"
+            type="button"
+            (click)="logout()">
+            <span class="logout-icon">🚪</span>
+            Αποσύνδεση
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

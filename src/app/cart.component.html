@@ -1,0 +1,68 @@
+<section class="page">
+  <div class="container">
+
+    <a routerLink="/dashboard" class="back-button">
+      <span class="back-icon">←</span>
+      <span>Πίσω στα προϊόντα</span>
+    </a>
+
+    <header class="topbar">
+      <div>
+        <h2 class="title">Καλάθι</h2>
+        <p class="subtitle">Έλεγξε ποσότητες και συνέχισε στο checkout</p>
+      </div>
+
+      <div class="top-actions">
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="clear()"
+          [disabled]="items.length === 0"
+        >
+          Καθάρισμα
+        </button>
+      </div>
+    </header>
+
+    <p *ngIf="orderError" class="alert alert-error">{{ orderError }}</p>
+
+    <div *ngIf="items.length === 0" class="empty-card">
+      <p class="empty-title">Το καλάθι είναι άδειο.</p>
+      <a class="btn btn-primary" routerLink="/dashboard">Πήγαινε στα προϊόντα</a>
+    </div>
+
+    <div *ngIf="items.length > 0" class="cart-card">
+      <div class="row" *ngFor="let item of items">
+        <div class="left">
+          <div class="name">{{ item.name }}</div>
+          <div class="muted">{{ item.price }} € / τεμ</div>
+        </div>
+
+        <div class="right">
+          <div class="qty">
+            <button class="qty-btn" type="button" (click)="decrease(item.productId)">−</button>
+            <span class="qty-num">{{ item.quantity }}</span>
+            <button class="qty-btn" type="button" (click)="increase(item.productId)">+</button>
+          </div>
+
+          <div class="line-total">{{ item.quantity * item.price }} €</div>
+
+          <button class="btn btn-danger" type="button" (click)="remove(item.productId)">
+            Αφαίρεση
+          </button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="summary-left">
+          <span>Σύνολο</span>
+          <strong>{{ total }} €</strong>
+        </div>
+
+        <button class="btn btn-primary" type="button" (click)="goToCheckout()">
+          Συνέχεια στο Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

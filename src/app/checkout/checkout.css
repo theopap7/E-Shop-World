@@ -1,0 +1,285 @@
+/* ===== Layout ===== */
+.page {
+  padding: 24px;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 24px;
+}
+
+
+/* ===== Back Button ===== */
+.back-button-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.back-button:hover {
+  background: #e5e7eb;
+  transform: translateX(-2px);
+}
+
+.back-icon {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.back-button:hover .back-icon {
+  transform: translateX(-3px);
+}
+
+/* ===== Page Header ===== */
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+.muted {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* ===== Alerts ===== */
+.alert {
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background: #fdecea;
+  color: #b71c1c;
+}
+
+.alert-success {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+/* ===== Grid ===== */
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Cards ===== */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Headings ===== */
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+/* ===== Form ===== */
+form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+input[type="text"],
+input:not([type]),
+input[type="tel"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+/* ===== Radio / Checkbox ===== */
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+label input[type="radio"],
+label input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+label {
+  cursor: pointer;
+}
+
+/* ===== Errors ===== */
+.err {
+  color: #c62828;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* ===== Summary ===== */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.row.total {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  background: #1976d2;
+  color: #fff;
+}
+
+.btn:hover {
+  background: #1565c0;
+}
+
+.btn:disabled {
+  background: #90caf9;
+  cursor: not-allowed;
+}
+
+/* ===== Links ===== */
+.link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* ===== HR ===== */
+hr {
+  margin: 18px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+.discount-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.discount-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.discount-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.discount-input-group .form-input {
+  flex: 1;
+  text-transform: uppercase;
+}
+
+.discount-input-group .btn {
+  white-space: nowrap;
+}
+
+.discount-error {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #991b1b;
+  font-size: 13px;
+}
+
+.discount-row {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.discount-amount {
+  color: #10b981;
+}
+
+.remove-discount-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 8px;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.remove-discount-btn:hover {
+  color: #dc2626;
+}
+
+.discount-codes-hint {
+  margin-top: 20px;
+  padding: 16px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+}
+
+.discount-codes-hint h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #1e40af;
+}
+
+.hint-text {
+  margin: 0;
+  font-size: 13px;
+  color: #3b82f6;
+}

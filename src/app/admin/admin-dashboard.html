@@ -1,0 +1,137 @@
+<section class="page">
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="kicker">Διαχείριση</div>
+        <h1 class="page-title">Πίνακας Διαχειριστή</h1>
+        <p class="page-subtitle">Διαχείριση του ηλεκτρονικού καταστήματος</p>
+      </div>
+
+      <div class="header-actions">
+        <a routerLink="/profile" class="back-button">
+          <span>← Πίσω στο προφίλ μου</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="panel">
+      <div class="panel-title">Φόρτωση...</div>
+      <div class="skeleton-lines">
+        <div class="sk"></div>
+        <div class="sk"></div>
+        <div class="sk short"></div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="panel alert alert-error">
+      <div class="alert-text">{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadStats()">
+        Επανάληψη
+      </button>
+    </div>
+
+    <!-- Content -->
+    <ng-container *ngIf="!isLoading && !error && stats">
+
+      <!-- Γρήγορες Ενέργειες -->
+      <div class="section">
+        <div class="section-head">
+          <h2 class="section-title">Γρήγορες Ενέργειες</h2>
+          <p class="section-subtitle">Συντομεύσεις διαχείρισης</p>
+        </div>
+
+        <div class="quick-grid">
+
+          <a routerLink="/admin/products" class="quick-card">
+            <div class="quick-icon">📦</div>
+            <div class="quick-body">
+              <div class="quick-title">Προϊόντα</div>
+              <div class="quick-desc">Διαχείριση προϊόντων & αποθέματος</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </a>
+
+          <a routerLink="/admin/orders" class="quick-card">
+            <div class="quick-icon">🛒</div>
+            <div class="quick-body">
+              <div class="quick-title">Παραγγελίες</div>
+              <div class="quick-desc">Προβολή και διαχείριση παραγγελιών</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </a>
+
+          <a routerLink="/admin/reviews" class="quick-card">
+            <div class="quick-icon">📝</div>
+            <div class="quick-body">
+              <div class="quick-title">Κριτικές</div>
+              <div class="quick-desc">Διαχείριση αξιολογήσεων πελατών</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </a>
+
+          <a routerLink="/admin/discounts" class="quick-card">
+            <div class="quick-icon">🎟️</div>
+            <div class="quick-body">
+              <div class="quick-title">Κωδικοί Έκπτωσης</div>
+              <div class="quick-desc">Διαχείριση κουπονιών και προσφορών</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Στατιστικά -->
+      <div class="section">
+        <div class="section-head">
+          <h2 class="section-title">Επισκόπηση Καταστήματος</h2>
+          <p class="section-subtitle">Βασικά Στατιστικά</p>
+        </div>
+
+        <div class="stats-grid">
+
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-label">Σύνολο Προϊόντων</div>
+              <div class="stat-badge">📦</div>
+            </div>
+            <div class="stat-value">{{ stats.totalProducts }}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-label">Σύνολο Παραγγελιών</div>
+              <div class="stat-badge">🛒</div>
+            </div>
+            <div class="stat-value">{{ stats.totalOrders }}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-label">Συνολικά Έσοδα</div>
+              <div class="stat-badge">💰</div>
+            </div>
+            <div class="stat-value">
+              {{ stats.totalRevenue | number:'1.2-2' }}€
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-label">Σύνολο Χρηστών</div>
+              <div class="stat-badge">👥</div>
+            </div>
+            <div class="stat-value">{{ stats.totalUsers }}</div>
+          </div>
+
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+</section>

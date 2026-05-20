@@ -1,0 +1,225 @@
+<section class="page">
+    <div class="container">
+
+      <div class="header-actions">
+        <a [routerLink]="['/admin']" class="back-button">
+          <span>← Πίσω στον πίνακα διαχειριστή</span>
+        </a>
+      </div>
+
+      <!-- Header -->
+      <div class="page-header">
+        <h2>🎟️ Κωδικοί Έκπτωσης</h2>
+        <button class="btn btn-primary" type="button" (click)="openCreateModal()">
+          + Νέος Κωδικός
+        </button>
+      </div>  
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="card">
+      Φόρτωση...
+    </div>
+
+    <!-- Codes List -->
+    <div *ngIf="!isLoading" class="card table-wrap">
+
+      <div *ngIf="codes.length === 0" class="empty-state">
+        Δεν υπάρχουν κωδικοί έκπτωσης
+      </div>
+
+      <table *ngIf="codes.length > 0" class="table">
+        <thead>
+          <tr>
+            <th>Κωδικός</th>
+            <th>Τύπος</th>
+            <th>Αξία</th>
+            <th>Ελάχ. Ποσό</th>
+            <th>Χρήσεις</th>
+            <th>Λήξη</th>
+            <th>Κατάσταση</th>
+            <th>Ενέργειες</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let code of codes">
+
+            <td class="mono">{{ code.code }}</td>
+
+            <td>{{ getTypeLabel(code.type) }}</td>
+
+            <td><strong>{{ getValueDisplay(code) }}</strong></td>
+
+            <td>
+              <span *ngIf="code.min_order_amount > 0">
+                {{ code.min_order_amount }}€
+              </span>
+              <span *ngIf="code.min_order_amount === 0" class="muted">—</span>
+            </td>
+
+            <td>
+              <span>{{ code.used_count }}</span>
+              <span *ngIf="code.max_uses" class="muted">
+                / {{ code.max_uses }}
+              </span>
+              <span *ngIf="!code.max_uses" class="muted">
+                / ∞
+              </span>
+            </td>
+
+            <td>
+              <span *ngIf="code.expires_at">
+                {{ code.expires_at | date:'dd/MM/yyyy' }}
+              </span>
+              <span *ngIf="!code.expires_at" class="muted">—</span>
+            </td>
+
+            <td>
+              <span
+                class="pill"
+                [class.pill--active]="code.active && !isExpired(code.expires_at) && !isExhausted(code)"
+                [class.pill--inactive]="!code.active"
+                [class.pill--expired]="isExpired(code.expires_at)"
+                [class.pill--exhausted]="isExhausted(code)">
+
+                <span *ngIf="code.active && !isExpired(code.expires_at) && !isExhausted(code)">
+                  Ενεργός
+                </span>
+                <span *ngIf="!code.active">Ανενεργός</span>
+                <span *ngIf="isExpired(code.expires_at)">Έληξε</span>
+                <span *ngIf="isExhausted(code)">Εξαντλήθηκε</span>
+              </span>
+            </td>
+
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="btn-icon"
+                  (click)="openEditModal(code)"
+                  title="Επεξεργασία">
+                  ✏️
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-icon"
+                  (click)="toggleActive(code)"
+                  [title]="code.active ? 'Απενεργοποίηση' : 'Ενεργοποίηση'">
+                  {{ code.active ? '🔴' : '🟢' }}
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-icon"
+                  (click)="deleteCode(code.id)"
+                  title="Διαγραφή">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Επεξεργασία Κωδικού Έκπτωσης' : 'Νέος Κωδικός Έκπτωσης' }}</h3>
+      <button type="button" class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <label class="form-label">
+        Κωδικός *
+        <input
+          type="text"
+          class="form-input"
+          placeholder="π.χ. SAVE10"
+          [(ngModel)]="form.code"
+          style="text-transform: uppercase;"
+        />
+      </label>
+
+      <label class="form-label">
+        Τύπος *
+        <select class="form-input" [(ngModel)]="form.type">
+          <option value="percentage">Ποσοστό (%)</option>
+          <option value="fixed">Σταθερό (€)</option>
+        </select>
+      </label>
+
+      <label class="form-label">
+        Αξία *
+        <input
+          type="number"
+          class="form-input"
+          [placeholder]="form.type === 'percentage' ? '10 = 10%' : '50 = 50€'"
+          [(ngModel)]="form.value"
+          min="0"
+          [max]="form.type === 'percentage' ? 100 : 999999"
+        />
+      </label>
+
+      <label class="form-label">
+        Ελάχιστο Ποσό Παραγγελίας (€)
+        <input
+          type="number"
+          class="form-input"
+          placeholder="0 = Χωρίς όριο"
+          [(ngModel)]="form.minOrderAmount"
+          min="0"
+        />
+        <small class="hint">Ο κωδικός θα ισχύει μόνο για παραγγελίες άνω αυτού του ποσού</small>
+      </label>
+
+      <label class="form-label">
+        Μέγιστες Χρήσεις
+        <input
+          type="number"
+          class="form-input"
+          placeholder="Κενό = Απεριόριστες"
+          [(ngModel)]="form.maxUses"
+          min="1"
+        />
+        <small class="hint">Πόσες φορές μπορεί να χρησιμοποιηθεί συνολικά</small>
+      </label>
+
+      <label class="form-label">
+        Ημερομηνία Λήξης
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="form.expiresAt"
+        />
+        <small class="hint">Κενό = Χωρίς λήξη</small>
+      </label>
+
+      <label class="form-label" *ngIf="isEditMode">
+        <input
+          type="checkbox"
+          [(ngModel)]="form.active"
+          style="margin-right: 8px;"
+        />
+        Ενεργός
+      </label>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="closeModal()">
+        Ακύρωση
+      </button>
+      <button type="button" class="btn btn-primary" (click)="saveCode()">
+        {{ isEditMode ? 'Αποθήκευση' : 'Δημιουργία' }}
+      </button>
+    </div>
+
+  </div>
+</div>

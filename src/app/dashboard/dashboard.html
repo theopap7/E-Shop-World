@@ -1,0 +1,52 @@
+<section class="page">
+  <div class="container">
+  <header class="topbar">
+  <!-- Left: Brand / Title -->
+  <div class="brand">
+    <span class="brand-mark">🛍️</span>
+    <span class="brand-title">Shop</span>
+  </div>
+
+  <!-- Right: Actions -->
+  <div class="top-actions">
+
+    <!-- Favorites -->
+    <a routerLink="/wishlist" class="action-chip">
+      <span class="chip-icon">❤️</span>
+      <span class="chip-text">Αγαπημένα</span>
+      <span class="chip-badge" *ngIf="wishlistCount > 0">{{ wishlistCount }}</span>
+    </a>
+
+    <!-- Cart -->
+    <button class="action-chip" type="button" (click)="toggleCart()">
+      <span class="chip-icon">🛒</span>
+      <span class="chip-text">Καλάθι</span>
+      <span class="chip-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+    </button>
+
+    <!-- Auth -->
+    <ng-container *ngIf="isLoggedIn; else loginLink">
+      <a routerLink="/profile" class="action-chip">
+        <span class="chip-icon">👤</span>
+        <span class="chip-text">Προφίλ</span>
+      </a>
+
+      <button class="action-chip danger" type="button" (click)="logout()">
+        <span class="chip-icon">↩</span>
+        <span class="chip-text">Logout</span>
+      </button>
+    </ng-container>
+
+    <ng-template #loginLink>
+      <a routerLink="/login" class="action-chip primary">
+        <span class="chip-icon">🔑</span>
+        <span class="chip-text">Login</span>
+      </a>
+    </ng-template>
+
+  </div>
+</header>
+
+    <app-product-list></app-product-list>
+  </div>
+</section>

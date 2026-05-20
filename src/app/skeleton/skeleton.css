@@ -1,0 +1,147 @@
+/* Skeleton Wrapper */
+.skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Grid layout ONLY for card skeletons (product list / wishlist) */
+.skeleton-wrapper--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* Base Skeleton Styles */
+.skeleton-line,
+.skeleton-image,
+.skeleton-image-box,
+.skeleton-circle,
+.skeleton-button {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #f8f8f8 50%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Card Skeleton */
+.skeleton-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Staggered fade-in */
+.skeleton-0 { animation-delay: 0s; }
+.skeleton-1 { animation-delay: 0.1s; }
+.skeleton-2 { animation-delay: 0.2s; }
+.skeleton-3 { animation-delay: 0.3s; }
+.skeleton-4 { animation-delay: 0.4s; }
+.skeleton-5 { animation-delay: 0.5s; }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Image Skeleton */
+.skeleton-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+}
+
+.skeleton-image-box {
+  border-radius: 8px;
+}
+
+/* Content Area */
+.skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Line Variations */
+.skeleton-line {
+  height: 16px;
+  border-radius: 4px;
+}
+
+.skeleton-title {
+  height: 20px;
+  width: 70%;
+}
+
+.skeleton-title-large {
+  height: 24px;
+}
+
+.skeleton-text {
+  width: 90%;
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+.skeleton-price {
+  width: 80px;
+  height: 24px;
+}
+
+/* Footer */
+.skeleton-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.skeleton-button {
+  width: 100px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* Circle Skeleton */
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .skeleton-card {
+    padding: 12px;
+  }
+
+  .skeleton-image {
+    height: 150px;
+  }
+}

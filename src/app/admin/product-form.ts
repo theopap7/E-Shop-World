@@ -1,0 +1,329 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AdminService } from '../admin.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ToastService } from '../toast.service';
+import { environment } from '../../environments/environment';
+
+@Component({
+  selector: 'app-product-form',
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, HttpClientModule],
+  templateUrl: './product-form.html',
+  styleUrl: './product-form.css',
+})
+export class ProductFormComponent implements OnInit {
+
+  form: FormGroup;
+
+  isEditMode = false;
+  productId: number | null = null;
+
+  isLoading = false;
+  error: string | null = null;
+
+  categories: any[] = [];
+
+  // upload state
+  uploading = false;
+  uploadError = '';
+  imagePreview = '';
+  selectedFile: File | null = null;
+
+  // drag state
+  isDragging = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private adminService: AdminService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private toastService: ToastService
+  ) {
+
+    this.form = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      description: [''],
+      price: [0, [Validators.required, Validators.min(0)]],
+      stock: [0, [Validators.required, Validators.min(0)]],
+      category_id: [null],
+      image_url: [''],
+    });
+
+  }
+
+  ngOnInit(): void {
+    this.loadCategories();
+
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.isEditMode = true;
+      this.productId = Number(id);
+      this.loadProduct(this.productId);
+    }
+  }
+
+  // =========================
+  // LOAD DATA
+  // =========================
+
+  loadCategories(): void {
+
+    this.http.get<any>(`${environment.apiUrl}/categories`).subscribe({
+
+      next: (res) => {
+        if (res.success) {
+          this.categories = res.categories;
+        }
+      },
+
+      error: (err) => console.error('Load categories error:', err),
+
+    });
+
+  }
+
+  loadProduct(id: number): void {
+
+    this.isLoading = true;
+
+    this.adminService.getProduct(id).subscribe({
+
+      next: (res) => {
+
+        if (res.success) {
+
+          const p = res.product;
+
+          this.form.patchValue({
+            name: p.name,
+            description: p.description || '',
+            price: p.price,
+            stock: p.stock,
+            category_id: p.category_id,
+            image_url: p.image_url || '',
+          });
+
+          this.imagePreview = '';
+          this.selectedFile = null;
+          this.uploadError = '';
+          this.uploading = false;
+        }
+
+        this.isLoading = false;
+      },
+
+      error: (err) => {
+        console.error('Load product error:', err);
+        this.error = 'Failed to load product';
+        this.isLoading = false;
+      }
+
+    });
+
+  }
+
+  // =========================
+  // SAVE PRODUCT
+  // =========================
+
+  submit(): void {
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading = true;
+    this.error = null;
+
+    const productData = {
+      ...this.form.value,
+      category_id: this.form.value.category_id || null,
+    };
+
+    const request = this.isEditMode
+      ? this.adminService.updateProduct(this.productId!, productData)
+      : this.adminService.createProduct(productData);
+
+    request.subscribe({
+
+      next: (res) => {
+
+        if (res.success) {
+          this.toastService.success(this.isEditMode ? 'Προϊόν ενημερώθηκε!' : 'Προϊόν δημιουργήθηκε!');
+          this.router.navigate(['/admin/products']);
+        }
+
+        this.isLoading = false;
+      },
+
+      error: (err) => {
+        console.error('Save product error:', err);
+        this.error = err?.error?.message || 'Failed to save product';
+        this.isLoading = false;
+      }
+
+    });
+
+  }
+
+  // =========================
+  // DRAG & DROP
+  // =========================
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+
+    event.preventDefault();
+    this.isDragging = false;
+
+    const file = event.dataTransfer?.files?.[0];
+
+    if (!file) return;
+
+    this.handleFile(file);
+
+  }
+
+  // =========================
+  // FILE SELECT
+  // =========================
+
+  onFileSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    this.handleFile(file);
+
+  }
+
+  // =========================
+  // HANDLE FILE
+  // =========================
+
+  handleFile(file: File) {
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      this.uploadError = 'Μόνο εικόνες επιτρέπονται (JPG, PNG, GIF, WEBP)';
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      this.uploadError = 'Η εικόνα πρέπει να είναι μικρότερη από 5MB';
+      return;
+    }
+
+    this.selectedFile = file;
+    this.uploadError = '';
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.imagePreview = String(reader.result || '');
+    };
+
+    reader.readAsDataURL(file);
+
+    this.uploadImage();
+
+  }
+
+  // =========================
+  // UPLOAD IMAGE
+  // =========================
+
+  uploadImage(): void {
+
+    if (!this.selectedFile) return;
+
+    this.uploading = true;
+    this.uploadError = '';
+
+    const formData = new FormData();
+    formData.append('image', this.selectedFile);
+
+    this.http.post<any>(
+      `${environment.apiUrl}/upload-image`,
+      formData
+    ).subscribe({
+
+      next: (res) => {
+
+        if (res?.success) {
+
+          const fullUrl = `${environment.baseUrl}${res.imageUrl}`;
+
+          this.form.get('image_url')?.setValue(fullUrl);
+
+        } else {
+
+          this.uploadError = res?.message || 'Upload failed';
+
+        }
+
+        this.uploading = false;
+
+      },
+
+      error: (err) => {
+        this.uploadError = err?.error?.message || 'Σφάλμα ανεβάσματος εικόνας';
+        this.uploading = false;
+      }
+
+    });
+
+  }
+
+  // =========================
+  // REMOVE IMAGE
+  // =========================
+
+  removeImage(): void {
+
+    this.form.get('image_url')?.setValue('');
+
+    this.imagePreview = '';
+    this.selectedFile = null;
+    this.uploadError = '';
+
+  }
+
+  // =========================
+  // IMAGE FALLBACK
+  // =========================
+
+  onImgError(event: Event) {
+
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/no-image.png';
+
+  }
+
+}

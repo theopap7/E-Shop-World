@@ -1,0 +1,245 @@
+<section class="page">
+  <div class="container">
+    
+        <a routerLink="/cart" class="back-button">
+            <span class="back-icon">←</span>
+      <span>Πίσω στο καλάθι</span>
+      </a>
+    <div class="page-header">
+      <h2>Checkout</h2>
+      <p class="muted">Συμπλήρωσε στοιχεία αποστολής και πληρωμής</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+    <div class="grid">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="card">
+        <h3>Στοιχεία παραλήπτη</h3>
+
+        <label>
+          Ονοματεπώνυμο
+          <input formControlName="recipientName" />
+        </label>
+        <small class="err" *ngIf="form.get('recipientName')?.touched && form.get('recipientName')?.invalid">
+          Υποχρεωτικό πεδίο
+        </small>
+
+        <label>
+          Τηλέφωνο
+          <input formControlName="phone" />
+        </label>
+        <small class="err" *ngIf="form.get('phone')?.touched && form.get('phone')?.invalid">
+          Υποχρεωτικό πεδίο
+        </small>
+
+        <hr />
+
+        <div formGroupName="shipping">
+          <h3>Διεύθυνση αποστολής</h3>
+
+          <label>
+            Χώρα
+          <input formControlName="country" readonly />
+
+          </label>
+
+          <label>
+            Πόλη
+            <input formControlName="city" />
+          </label>
+          <small class="err" *ngIf="form.get('shipping.city')?.touched && form.get('shipping.city')?.invalid">
+            Υποχρεωτικό πεδίο
+          </small>
+
+          <label>
+            ΤΚ
+            <input formControlName="zip" />
+          </label>
+          <small class="err" *ngIf="form.get('shipping.zip')?.touched && form.get('shipping.zip')?.invalid">
+            Υποχρεωτικό πεδίο
+          </small>
+
+          <label>
+            Διεύθυνση
+            <input formControlName="address1" />
+          </label>
+          <small class="err" *ngIf="form.get('shipping.address1')?.touched && form.get('shipping.address1')?.invalid">
+            Υποχρεωτικό πεδίο
+          </small>
+
+          <label>
+  Όροφος 
+  <input formControlName="floor"  />
+</label>
+
+          <label>
+            Σημειώσεις (προαιρετικό)
+            <input formControlName="notes" />
+          </label>
+        </div>
+
+        <hr />
+
+        <h3>Αποστολή</h3>
+        <label>
+          <input type="radio" value="courier_standard" formControlName="shippingMethod" />
+          Τυπική Αποστολή(+3€)
+        </label>
+        <label>
+          <input type="radio" value="courier_express" formControlName="shippingMethod" />
+          Γρήγορη Αποστολή (+6€)
+        </label>
+        <label>
+          <input type="radio" value="pickup" formControlName="shippingMethod" />
+          Παραλαβή από κατάστημα (+0€)
+        </label>
+
+        <hr />
+
+        <h3>Πληρωμή</h3>
+        <label>
+          <input type="radio" value="cod" formControlName="paymentMethod" />
+          Αντικαταβολή
+        </label>
+        <label>
+          <input type="radio" value="card_mock" formControlName="paymentMethod" />
+          Κάρτα (Mock)
+        </label>
+        <label>
+          <input type="radio" value="bank_transfer" formControlName="paymentMethod" />
+          Τραπεζική κατάθεση
+        </label>
+
+        <!-- Bank transfer -->
+        <div *ngIf="form.get('paymentMethod')?.value === 'bank_transfer'"
+             formGroupName="paymentDetails"
+             style="margin-top: 10px;">
+          <label>
+            IBAN
+            <input formControlName="iban" />
+          </label>
+          <small class="err" *ngIf="form.get('paymentDetails.iban')?.touched && form.get('paymentDetails.iban')?.invalid">
+            <span *ngIf="form.get('paymentDetails.iban')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
+            <span *ngIf="form.get('paymentDetails.iban')?.errors?.['pattern']">Βάλε έγκυρο IBAN</span>
+          </small>
+        </div>
+
+        <!-- Card mock -->
+        <div *ngIf="form.get('paymentMethod')?.value === 'card_mock'"
+             formGroupName="paymentDetails"
+             style="margin-top: 10px;">
+
+          <label>
+            Αριθμός κάρτας
+            <input formControlName="cardNumber" />
+          </label>
+          <small class="err" *ngIf="form.get('paymentDetails.cardNumber')?.touched && form.get('paymentDetails.cardNumber')?.invalid">
+            <span *ngIf="form.get('paymentDetails.cardNumber')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
+            <span *ngIf="form.get('paymentDetails.cardNumber')?.errors?.['pattern']">Η κάρτα πρέπει να έχει ακριβώς 16 ψηφία</span>
+          </small>
+
+          <label>
+            Ονοματεπώνυμο κατόχου
+            <input formControlName="cardHolder" />
+          </label>
+          <small class="err" *ngIf="form.get('paymentDetails.cardHolder')?.touched && form.get('paymentDetails.cardHolder')?.invalid">
+            <span *ngIf="form.get('paymentDetails.cardHolder')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
+            <span *ngIf="form.get('paymentDetails.cardHolder')?.errors?.['pattern']">Μόνο γράμματα και κενά (όχι αριθμοί)</span>
+          </small>
+
+          <label>
+            Λήξη (MM/YY)
+            <input formControlName="cardExp" />
+          </label>
+          <small class="err" *ngIf="form.get('paymentDetails.cardExp')?.touched && form.get('paymentDetails.cardExp')?.invalid">
+            <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
+            <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['pattern']">Μορφή: MM/YY (π.χ. 12/21)</span>
+          </small>
+
+          <label>
+            CVV
+            <input formControlName="cardCvv" />
+          </label>
+          <small class="err" *ngIf="form.get('paymentDetails.cardCvv')?.touched && form.get('paymentDetails.cardCvv')?.invalid">
+            <span *ngIf="form.get('paymentDetails.cardCvv')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
+            <span *ngIf="form.get('paymentDetails.cardCvv')?.errors?.['pattern']">Το CVV πρέπει να είναι ακριβώς 3 ψηφία</span>
+          </small>
+        </div>
+
+        <hr />
+
+        <label class="terms">
+          <input type="checkbox" formControlName="acceptTerms" />
+          Αποδέχομαι τους όρους χρήσης
+        </label>
+        <small class="err" *ngIf="form.get('acceptTerms')?.touched && form.get('acceptTerms')?.invalid">
+          Πρέπει να αποδεχτείς τους όρους
+        </small>
+
+        <button type="submit" [disabled]="isSubmitting || form.invalid || items.length === 0" class="btn">
+          {{ isSubmitting ? 'Γίνεται καταχώρηση...' : 'Ολοκλήρωση παραγγελίας' }}
+        </button>
+      </form>
+
+      <div class="card">
+        <h3>Σύνοψη</h3>
+
+        <div *ngIf="items.length === 0" class="muted">Δεν υπάρχουν προϊόντα.</div>
+
+        <div *ngFor="let it of items" class="row">
+          <div>
+            <strong>{{ it.name }}</strong>
+            <div class="muted">x{{ it.quantity }}</div>
+          </div>
+          <div>{{ (it.price * it.quantity) | number:'1.2-2' }}€</div>
+        </div>
+
+        <hr />
+
+        <div class="row"><span>Subtotal</span><span>{{ subtotal | number:'1.2-2' }}€</span></div>
+        <div class="row"><span>Μεταφορικά</span><span>{{ shippingCost | number:'1.2-2' }}€</span></div>
+        <div class="row total"><span>Σύνολο</span><span>{{ total | number:'1.2-2' }}€</span></div>
+
+        <!-- ✅ ΠΡΟΣΘΕΣΕ ΜΕΤΑ ΤΟ total row: -->
+<div class="discount-section">
+  <h4>Έχεις κωδικό έκπτωσης;</h4>
+  
+  <div class="discount-input-group">
+    <input
+      type="text"
+      placeholder="Π.χ. SAVE10"
+      [(ngModel)]="discountCode"
+      [disabled]="!!appliedDiscount"
+      (keyup.enter)="applyDiscount()"
+      style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase;"
+    />
+    <button
+      type="button"
+      (click)="applyDiscount()"
+      [disabled]="applyingDiscount || !!appliedDiscount"
+      class="btn"
+      style="width: auto; margin: 0; padding: 8px 16px;">
+      {{ applyingDiscount ? 'Έλεγχος...' : 'Εφαρμογή' }}
+    </button>
+  </div>
+
+  <div *ngIf="discountError" style="color: #c62828; font-size: 0.8rem; margin-top: 8px;">
+    {{ discountError }}
+  </div>
+  
+  <div *ngIf="appliedDiscount" class="row" style="color: #10b981; margin-top: 12px;">
+    <span>
+      Έκπτωση ({{ appliedDiscount.code }})
+      <button type="button" (click)="removeDiscount()" style="background: none; border: none; color: #ef4444; cursor: pointer; margin-left: 8px;">✕</button>
+    </span>
+    <span>-{{ discountAmount | number:'1.2-2' }}€</span>
+  </div>
+</div>
+
+<hr style="margin: 18px 0;">
+
+      </div>
+    </div>
+  </div>
+</section>

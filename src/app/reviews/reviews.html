@@ -1,0 +1,180 @@
+<div class="reviews-section">
+
+  <!-- Average Rating Summary -->
+  <div class="rating-summary" *ngIf="total > 0">
+    <div class="big-rating">{{ average }}</div>
+    <div class="rating-info">
+      <div class="stars-display">
+        <span *ngFor="let star of starsArray"
+              [class]="star <= average ? 'star filled' : 'star'">
+          ★
+        </span>
+      </div>
+      <div class="total-reviews">{{ total }} κριτικές</div>
+    </div>
+  </div>
+
+  <h3>Κριτικές Πελατών</h3>
+
+  <!-- Submit Review Form -->
+  <div class="review-form" *ngIf="isLoggedIn && !hasExistingReview">
+    <h4>Γράψε κριτική</h4>
+
+    <!-- Star Rating Input -->
+    <div class="star-input" (mouseleave)="clearHovered()">
+      <span
+        *ngFor="let star of starsArray"
+        [class]="getStarClass(star)"
+        (mouseenter)="setHovered(star)"
+        (click)="setRating(star)">
+        ★
+      </span>
+      <span class="rating-label" *ngIf="newRating > 0">
+        {{ newRating }}/5
+      </span>
+    </div>
+
+    <!-- Comment -->
+    <textarea
+      [(ngModel)]="newComment"
+      placeholder="Γράψε ένα σχόλιο... (προαιρετικό)"
+      rows="3"
+      class="comment-input">
+    </textarea>
+
+    <!-- Messages -->
+    <div *ngIf="submitError" class="alert alert-error">
+      {{ submitError }}
+    </div>
+    <div *ngIf="submitSuccess" class="alert alert-success">
+      {{ submitSuccess }}
+    </div>
+
+    <!-- Submit Button -->
+    <button
+      class="btn btn-primary"
+      type="button"
+      (click)="submitReview()"
+      [disabled]="isSubmitting || newRating === 0">
+      {{ isSubmitting ? 'Υποβολή...' : 'Υποβολή Κριτικής' }}
+    </button>
+  </div>
+
+  <!-- Already Reviewed Message -->
+  <div *ngIf="isLoggedIn && hasExistingReview" class="already-reviewed">
+    <p>✅ Έχεις ήδη γράψει κριτική για αυτό το προϊόν.</p>
+    <p>Μπορείς να την επεξεργαστείς ή να τη διαγράψεις παρακάτω.</p>
+  </div>
+
+  <!-- Not logged in message -->
+  <div *ngIf="!isLoggedIn" class="login-prompt">
+    <a routerLink="/login">Συνδέσου</a> για να γράψεις κριτική.
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">Φόρτωση κριτικών...</div>
+
+  <!-- No reviews -->
+  <div *ngIf="!isLoading && reviews.length === 0" class="no-reviews">
+    Δεν υπάρχουν κριτικές ακόμα. Γίνε ο πρώτος!
+  </div>
+
+  <!-- Reviews List -->
+  <div class="reviews-list">
+    <div class="review-card" *ngFor="let review of reviews">
+      
+      <!-- NOT EDITING MODE -->
+      <div *ngIf="editingReviewId !== review.id">
+        
+        <div class="review-header">
+          <div class="reviewer-name">
+            {{ review.first_name }} {{ review.last_name }}
+          </div>
+          <div class="review-stars">
+            {{ getReviewStars(review.rating) }}
+          </div>
+          <div class="review-date">
+            {{ review.created_at | date:'dd/MM/yyyy' }}
+          </div>
+        </div>
+
+        <p class="review-comment" *ngIf="review.comment">
+          {{ review.comment }}
+        </p>
+        <p class="no-comment" *ngIf="!review.comment">
+          <em>Χωρίς σχόλιο</em>
+        </p>
+
+        <!-- Edit/Delete buttons (μόνο για own reviews) -->
+        <div class="review-actions" *ngIf="isOwnReview(review)">
+          <button 
+            class="btn-link btn-edit"
+            type="button"
+            (click)="startEdit(review)">
+            ✏️ Επεξεργασία
+          </button>
+          <button 
+            class="btn-link btn-delete"
+            type="button"
+            (click)="deleteReview(review.id)">
+            🗑️ Διαγραφή
+          </button>
+        </div>
+
+      </div>
+
+      <!-- EDITING MODE -->
+      <div *ngIf="editingReviewId === review.id" class="edit-mode">
+        
+        <h4>Επεξεργασία Review</h4>
+
+        <!-- Star Rating Input -->
+        <div class="star-input" (mouseleave)="clearEditHovered()">
+          <span
+            *ngFor="let star of starsArray"
+            [class]="getEditStarClass(star)"
+            (mouseenter)="setEditHovered(star)"
+            (click)="setEditRating(star)">
+            ★
+          </span>
+          <span class="rating-label" *ngIf="editRating > 0">
+            {{ editRating }}/5
+          </span>
+        </div>
+
+        <!-- Comment -->
+        <textarea
+          [(ngModel)]="editComment"
+          placeholder="Γράψε την εμπειρία σου... (προαιρετικό)"
+          rows="3"
+          class="comment-input">
+        </textarea>
+
+        <!-- Error -->
+        <div *ngIf="updateError" class="alert alert-error">
+          {{ updateError }}
+        </div>
+
+        <!-- Action buttons -->
+        <div class="edit-actions">
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="updateReview()"
+            [disabled]="isUpdating || editRating === 0">
+            {{ isUpdating ? 'Αποθήκευση...' : 'Αποθήκευση' }}
+          </button>
+          <button
+            class="btn btn-outline"
+            type="button"
+            (click)="cancelEdit()"
+            [disabled]="isUpdating">
+            Ακύρωση
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

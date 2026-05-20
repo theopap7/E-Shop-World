@@ -1,0 +1,118 @@
+<section class="page">
+  <div class="container">
+
+    <!-- Header -->
+    <header class="orders-header orders-hero">
+     <!-- Back Button -->
+    <a routerLink="/profile" class="back-button">
+      <span class="back-icon">←</span>
+      <span>Πίσω στο προφίλ μου</span>
+    </a>
+
+      <div class="header-title">
+        <h2 class="title">Οι παραγγελίες μου</h2>
+        <p class="subtitle">Δες όλες τις παραγγελίες που έχεις κάνει</p>
+      </div>
+
+      <div class="header-actions">
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="loadOrders()"
+          [disabled]="isLoading">
+          Ανανέωση
+        </button>
+      </div>
+    </header>
+
+    <!-- ✅ LOADING SKELETONS -->
+    <div *ngIf="isLoading" class="orders-skeleton">
+      <div class="skeleton-order-card" *ngFor="let i of [1,2,3]">
+        <div class="skeleton-order-header">
+          <app-skeleton type="text" width="100px"></app-skeleton>
+          <app-skeleton type="text" width="150px"></app-skeleton>
+          <app-skeleton type="text" width="80px"></app-skeleton>
+        </div>
+
+        <!-- timeline placeholder -->
+        <app-skeleton type="image" height="60px"></app-skeleton>
+
+        <!-- details button placeholder -->
+        <div style="margin-top: 12px;">
+          <app-skeleton type="text" width="180px" height="36px"></app-skeleton>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="card alert alert-error">
+      <div>{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadOrders()">
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && !error && orders.length === 0" class="card">
+      Δεν έχεις κάνει ακόμα παραγγελίες.
+      <div class="spacer"></div>
+      <a class="btn btn-primary" routerLink="/dashboard">Πήγαινε στα προϊόντα</a>
+    </div>
+
+    <!-- ✅ REAL ORDERS -->
+    <div *ngIf="!isLoading && !error && orders.length > 0" class="orders-list">
+
+      <div *ngFor="let o of orders" class="order-card">
+
+        <!-- ORDER HEADER -->
+        <div class="order-header">
+
+          <div class="order-left">
+            <div class="order-top">
+              <span class="order-label">ΠΑΡΑΓΓΕΛΙΑ</span>
+              <span class="order-id mono">#{{ o.id }}</span>
+
+              <span class="status-badge" [ngClass]="'status-badge--' + o.status">
+                {{ statusLabel(o.status) }}
+              </span>
+            </div>
+
+            <div class="order-date">
+              {{ o.created_at | date:'dd/MM/yyyy HH:mm' }}
+            </div>
+          </div>
+
+          <div class="order-right">
+            <div class="order-total">
+              {{ o.total_amount | number:'1.2-2' }} €
+            </div>
+
+            <button
+              type="button"
+              class="expand-btn"
+              (click)="toggleOrderDetails(o.id)">
+              {{ expandedOrderId === o.id ? '▲' : '▼' }}
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Timeline -->
+        <div class="order-timeline-section">
+          <app-order-timeline [currentStatus]="normalizeStatus(o.status)"></app-order-timeline>
+        </div>
+
+        <!-- SOFT DETAILS BUTTON -->
+        <div *ngIf="expandedOrderId === o.id" class="order-details">
+          <a class="btn btn-soft" [routerLink]="['/profile/orders', o.id]">
+            Λεπτομέρειες παραγγελίας
+            <span class="arrow">→</span>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>

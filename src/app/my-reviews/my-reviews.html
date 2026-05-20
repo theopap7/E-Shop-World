@@ -1,0 +1,132 @@
+<section class="page">
+  <div class="container">
+    <a routerLink="/profile" class="back-button">
+      <span class="back-icon">←</span>
+      <span>Πίσω στο προφίλ μου</span>
+    </a>
+
+    <div class="page-header">
+      <h2>Οι Κριτικές μου</h2>
+      <p class="muted">Δες τις αξιολογήσεις που έχεις γράψει</p>
+    </div>
+
+    <div *ngIf="isLoading" class="empty-card">
+      Φόρτωση κριτικών...
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!isLoading && !error && reviews.length === 0" class="empty-card">
+      Δεν έχεις γράψει ακόμα κριτικές.
+    </div>
+
+    <div *ngFor="let review of reviews" class="review-card">
+      <div class="review-top">
+        <div class="review-product-block">
+          <img
+            *ngIf="review.product_image"
+            [src]="review.product_image"
+            [alt]="review.product_name || 'Προϊόν'"
+            class="product-image"
+          />
+
+          <div>
+            <a class="product-name" [routerLink]="['/products', review.product_id]">
+              {{ review.product_name || ('Προϊόν #' + review.product_id) }}
+            </a>
+
+            <div class="review-date">
+              {{ review.created_at | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="rating-text" *ngIf="editingReviewId !== review.id">
+          {{ getReviewStars(review.rating) }} {{ review.rating }}/5
+        </div>
+      </div>
+
+      <ng-container *ngIf="editingReviewId !== review.id; else editMode">
+        <p class="review-comment muted-comment">
+          {{ review.comment || 'Χωρίς σχόλιο' }}
+        </p>
+
+        <div class="review-actions">
+          <button
+            class="btn btn-outline"
+            type="button"
+            (click)="startEdit(review)"
+          >
+            Επεξεργασία
+          </button>
+
+          <button
+            class="btn btn-danger"
+            type="button"
+            (click)="deleteReview(review.id)"
+          >
+            Διαγραφή
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #editMode>
+        <div class="edit-box">
+          <div class="edit-group">
+            <label class="edit-label">Βαθμολογία</label>
+
+            <div class="edit-stars">
+              <button
+                *ngFor="let star of [1,2,3,4,5]"
+                type="button"
+                class="star-btn"
+                [class.filled]="star <= editRating"
+                (click)="setEditRating(star)"
+              >
+                ★
+              </button>
+
+              <span class="edit-rating-value">{{ editRating }}/5</span>
+            </div>
+          </div>
+
+          <div class="edit-group">
+            <label class="edit-label">Σχόλιο</label>
+            <textarea
+              [(ngModel)]="editComment"
+              class="edit-textarea"
+              rows="4"
+              placeholder="Γράψε το σχόλιό σου..."
+            ></textarea>
+          </div>
+
+          <div *ngIf="updateError" class="alert alert-error small-alert">
+            {{ updateError }}
+          </div>
+
+          <div class="review-actions">
+            <button
+              class="btn btn-primary"
+              type="button"
+              [disabled]="isUpdating"
+              (click)="updateReview(review.id)"
+            >
+              {{ isUpdating ? 'Αποθήκευση...' : 'Αποθήκευση' }}
+            </button>
+
+            <button
+              class="btn btn-outline"
+              type="button"
+              [disabled]="isUpdating"
+              (click)="cancelEdit()"
+            >
+              Ακύρωση
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</section>

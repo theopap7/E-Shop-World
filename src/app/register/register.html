@@ -1,0 +1,35 @@
+<div class="register-container">
+  <h2>Εγγραφή Χρήστη</h2>
+  <form (ngSubmit)="onSubmit()" [formGroup]="registerForm">
+    <div>
+      <label for="firstName">Όνομα</label>
+      <input id="firstName" formControlName="firstName" type="text" />
+    </div>
+
+    <div>
+      <label for="lastName">Επώνυμο</label>
+      <input id="lastName" formControlName="lastName" type="text" />
+    </div>
+
+    <div>
+      <label for="email">Email</label>
+      <input id="email" formControlName="email" type="email" />
+    </div>
+
+    <div>
+      <label for="password">Κωδικός</label>
+      <input id="password" formControlName="password" type="password" />
+    </div>
+
+    <div>
+      <label for="confirmPassword">Επιβεβαίωση Κωδικού</label>
+      <input id="confirmPassword" formControlName="confirmPassword" type="password" />
+    </div>
+
+    <button  type="submit" class="btn btn-primary">Εγγραφή</button>
+    </form>
+  
+  <p>
+    Έχεις ήδη λογαριασμό; <a routerLink="/login">Σύνδεση</a>
+  </p>
+</div>

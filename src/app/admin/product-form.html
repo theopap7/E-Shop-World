@@ -1,0 +1,252 @@
+<section class="page">
+  <div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+     <div class="header-left">
+        <h1 class="page-title">
+          {{ isEditMode ? 'Επεξεργασία Προϊόντος' : 'Προσθήκη Νέου Προϊόντος' }}
+        </h1>
+      </div>
+
+      <div class="header-actions">
+        <a routerLink="/admin/products" class="back-button">
+          <span>← Πίσω στη διαχείριση προϊόντων</span>
+        </a>
+      </div>
+
+    </header>
+
+
+    <!-- ERROR -->
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+
+    <!-- FORM -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="card">
+
+      <!-- ΟΝΟΜΑ -->
+      <div class="form-group">
+        <label>Όνομα Προϊόντος *</label>
+
+        <input formControlName="name"/>
+
+        <small
+          class="err"
+          *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+
+          Το όνομα προϊόντος είναι υποχρεωτικό (τουλάχιστον 2 χαρακτήρες)
+
+        </small>
+      </div>
+
+
+      <!-- ΠΕΡΙΓΡΑΦΗ -->
+      <div class="form-group">
+        <label>Περιγραφή</label>
+
+        <textarea
+          formControlName="description"
+          rows="4">
+        </textarea>
+      </div>
+
+
+      <!-- PRICE + STOCK -->
+      <div class="row-2">
+
+        <div class="form-group">
+
+          <label>Τιμή (€) *</label>
+
+          <input
+            type="number"
+            formControlName="price"
+            step="0.01"
+            min="0"
+          />
+
+          <small
+            class="err"
+            *ngIf="form.get('price')?.touched && form.get('price')?.invalid">
+
+            Η τιμή πρέπει να είναι ≥ 0
+
+          </small>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Απόθεμα *</label>
+
+          <input
+            type="number"
+            formControlName="stock"
+            min="0"
+          />
+
+          <small
+            class="err"
+            *ngIf="form.get('stock')?.touched && form.get('stock')?.invalid">
+
+            Το απόθεμα πρέπει να είναι ≥ 0
+
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- CATEGORY -->
+      <div class="form-group">
+
+        <label>Κατηγορία</label>
+
+        <select formControlName="category_id">
+
+          <option [ngValue]="null">
+            -- Χωρίς κατηγορία --
+          </option>
+
+          <option
+            *ngFor="let cat of categories"
+            [ngValue]="cat.id">
+
+            {{ cat.name }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- IMAGE UPLOAD -->
+      <div class="image-block">
+
+        <div class="image-block-head">
+          <label class="image-title">Εικόνα</label>
+
+          <small class="image-hint">
+            JPG / PNG / GIF / WEBP • έως 5MB
+          </small>
+        </div>
+
+        <!-- hidden input -->
+        <input
+          type="file"
+          #fileInput
+          accept="image/*"
+          (change)="onFileSelected($event)"
+          class="file-hidden"
+        />
+
+        <!-- DROP ZONE -->
+        <div
+          class="drop-zone"
+          (click)="fileInput.click()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          [class.dragging]="isDragging"
+        >
+
+          <ng-container *ngIf="!imagePreview && !form.get('image_url')?.value">
+
+            <p class="drop-text">
+              Σύρε εικόνα εδώ
+            </p>
+
+            <span class="drop-or">
+              ή
+            </span>
+
+            <button
+              type="button"
+              class="btn btn-outline"
+              [disabled]="uploading || isLoading">
+
+              Επιλογή εικόνας
+
+            </button>
+
+          </ng-container>
+
+          <!-- PREVIEW -->
+          <div
+            *ngIf="imagePreview || form.get('image_url')?.value"
+            class="preview">
+
+            <img
+              [src]="imagePreview || form.get('image_url')?.value"
+              alt="Preview"
+              (error)="onImgError($event)"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- REMOVE -->
+        <div
+          *ngIf="form.get('image_url')?.value"
+          class="image-actions">
+
+          <button
+            type="button"
+            class="btn btn-outline danger"
+            (click)="removeImage()">
+
+            Αφαίρεση εικόνας
+
+          </button>
+
+        </div>
+
+        <!-- UPLOAD ERROR -->
+        <div *ngIf="uploadError" class="upload-error">
+          {{ uploadError }}
+        </div>
+
+      </div>
+
+
+
+      <!-- BUTTONS -->
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="btn btn-outline"
+          routerLink="/admin/products"
+          [disabled]="isLoading || uploading">
+
+          Ακύρωση
+
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || uploading || form.invalid">
+
+          {{
+            isLoading
+              ? 'Αποθήκευση...'
+              : (isEditMode ? 'Ενημέρωση Προϊόντος' : 'Δημιουργία Προϊόντος')
+          }}
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+</section>

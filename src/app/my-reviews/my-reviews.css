@@ -1,0 +1,268 @@
+.page {
+  min-height: 100vh;
+  background: #f6f7fb;
+  padding: 28px 16px;
+  color: #111827;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.back-button{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:24px;
+  padding:8px 14px;
+  border-radius:8px;
+  background:#f3f4f6;
+  color:#374151;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:600;
+  transition:all .2s ease;
+}
+
+.back-button:hover{
+  background:#e5e7eb;
+  transform:translateX(-2px);
+}
+
+.back-icon{
+  font-size:16px;
+  transition:transform .2s ease;
+}
+
+.back-button:hover .back-icon{
+  transform:translateX(-3px);
+}
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-header h2 {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+  margin-bottom: 14px;
+}
+
+.small-alert {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.empty-card,
+.review-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 22px rgba(17, 24, 39, 0.06);
+}
+
+.review-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.review-product-block {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.product-image {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.product-name {
+  font-weight: 700;
+  color: #111827;
+  text-decoration: none;
+}
+
+.product-name:hover {
+  text-decoration: underline;
+}
+
+.review-date {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.rating-text {
+  color: #f59e0b;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.review-comment {
+  margin: 0 0 16px 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.muted-comment {
+  color: #4b5563;
+}
+
+.review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-outline {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.edit-box {
+  margin-top: 8px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 16px;
+}
+
+.edit-group {
+  margin-bottom: 14px;
+}
+
+.edit-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.edit-textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  outline: none;
+}
+
+.edit-textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.edit-stars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.star-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  color: #d1d5db;
+  padding: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.08);
+}
+
+.star-btn.filled {
+  color: #f59e0b;
+}
+
+.edit-rating-value {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+@media (max-width: 640px) {
+  .review-top {
+    flex-direction: column;
+  }
+
+  .review-product-block {
+    align-items: flex-start;
+  }
+
+  .review-actions {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,118 @@
+<section class="page">
+  <div class="container">
+
+     <!-- Back Button -->
+    <a routerLink="/profile" class="back-button">
+      <span class="back-icon">←</span>
+      <span>Πίσω στο προφίλ μου</span>
+    </a>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>❤️ Τα Αγαπημένα μου</h2>
+      <p>Προϊόντα που σου αρέσουν</p>
+    </div>
+    
+
+    <!-- ✅ LOADING SKELETONS -->
+    <div *ngIf="isLoading" class="wishlist-grid">
+      <app-skeleton type="card" [count]="4"></app-skeleton>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && items.length === 0" class="empty-state">
+      <div class="empty-icon">🤍</div>
+      <h3>Δεν έχεις αγαπημένα προϊόντα</h3>
+      <p>Πάτησε την καρδιά στα προϊόντα που σου αρέσουν για να τα προσθέσεις εδώ!</p>
+    </div>
+
+    <!-- ✅ REAL WISHLIST -->
+    <div *ngIf="!isLoading && items.length > 0">
+
+      <!-- Actions Bar -->
+      <div class="actions-bar">
+        <span class="count">{{ items.length }} προϊόντα</span>
+        <button
+          class="btn btn-outline btn-sm"
+          type="button"
+          (click)="clearAll()">
+          🗑️ Καθαρισμός όλων
+        </button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="wishlist-grid">
+        <article class="wishlist-card" *ngFor="let item of items">
+
+          <!-- Remove Button -->
+          <button
+            class="remove-btn"
+            type="button"
+            (click)="remove(item.id)"
+            aria-label="Αφαίρεση">
+            ✕
+          </button>
+
+          <!-- Product Image -->
+          <a [routerLink]="['/products', item.id]" class="product-link">
+            <img
+              [src]="item.image_url || 'https://via.placeholder.com/200x200?text=No+Image'"
+              [alt]="item.name"
+              class="wishlist-image"
+            />
+          </a>
+
+          <!-- Product Info -->
+          <div class="wishlist-info">
+
+            <span class="category-badge">
+              {{ item.category_name || 'Χωρίς κατηγορία' }}
+            </span>
+
+            <a [routerLink]="['/products', item.id]" class="product-name-link">
+              <h3 class="product-name">{{ item.name }}</h3>
+            </a>
+
+            <!-- Reviews -->
+            <div class="product-reviews" *ngIf="item.review_count > 0">
+              <div class="stars-mini">
+                <span *ngFor="let star of [1,2,3,4,5]"
+                      [class]="star <= (item.average_rating || 0) ? 'star-filled' : 'star-empty'">
+                  ★
+                </span>
+              </div>
+              <span class="rating-text">
+                {{ item.average_rating | number:'1.1-1' }}
+              </span>
+              <span class="review-count">({{ item.review_count }})</span>
+            </div>
+
+            <p class="product-description">
+              {{ item.description }}
+            </p>
+
+            <!-- Stock Status -->
+            <div class="stock-badge" [class.in-stock]="item.stock > 0">
+              <span *ngIf="item.stock > 0">✅ Διαθέσιμο</span>
+              <span *ngIf="item.stock === 0">❌ Μη διαθέσιμο</span>
+            </div>
+
+            <!-- Price & Actions -->
+            <div class="wishlist-footer">
+              <div class="price">{{ item.price | number:'1.2-2' }}€</div>
+              <button
+                class="btn btn-primary"
+                type="button"
+                (click)="addToCart(item)"
+                [disabled]="item.stock === 0">
+                {{ item.stock > 0 ? '🛒 Προσθήκη' : 'Μη διαθέσιμο' }}
+              </button>
+            </div>
+
+          </div>
+        </article>
+      </div>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,177 @@
+<section class="page">
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">     
+        <h1 class="page-title">Παραγγελίες</h1>      
+      </div>
+
+      <div class="header-actions">
+        <a routerLink="/admin" class="back-button">
+         <span>← Πίσω στον πίνακα διαχειριστή</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="panel">
+      <div class="panel-title">Φόρτωση παραγγελιών...</div>
+      <div class="skeleton-lines">
+        <div class="sk"></div>
+        <div class="sk"></div>
+        <div class="sk short"></div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="panel alert alert-error">
+      <div class="alert-text">{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadOrders()">
+        Επανάληψη
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !error" class="panel">
+
+      <div *ngIf="orders.length === 0" class="empty">
+        <div class="empty-icon">🧾</div>
+        <h3>Δεν βρέθηκαν παραγγελίες</h3>
+        <p>Όταν γίνουν αγορές, θα εμφανιστούν εδώ.</p>
+      </div>
+
+      <div *ngIf="orders.length > 0" class="table-wrap">
+        <table class="table">
+
+          <thead>
+            <tr>
+              <th class="mono">Παραγγελία</th>
+              <th>Πελάτης</th>
+              <th>Ημερομηνία</th>
+              <th class="right">Σύνολο</th>
+              <th>Κατάσταση</th>
+              <th>Πληρωμή</th>
+              <th class="right">Ενέργειες</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let order of orders"
+              class="clickable-row"
+              (click)="goToOrder(order.id)"
+            >
+
+              <td class="mono">
+                <strong>#{{ order.id }}</strong>
+              </td>
+
+              <td>
+                <div class="customer">
+                  <div class="customer-name">
+                    {{ order.first_name }} {{ order.last_name }}
+                  </div>
+                  <div class="customer-email">
+                    {{ order.user_email }}
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                {{ order.created_at | date:'short' }}
+              </td>
+
+              <td class="right">
+                <strong>
+                  {{ order.total_amount | number:'1.2-2' }}€
+                </strong>
+              </td>
+
+              <td>
+                <span
+                  class="pill"
+                  [ngClass]="{
+                    'pill--pending': order.status === 'pending',
+                    'pill--processing': order.status === 'processing',
+                    'pill--shipped': order.status === 'shipped',
+                    'pill--delivered': order.status === 'delivered',
+                    'pill--cancelled': order.status === 'cancelled'
+                  }"
+                >
+                  {{ statusLabel(order.status) }}
+                </span>
+              </td>
+
+              <td>
+                <span
+                  class="pill"
+                  [ngClass]="{
+                    'pill--paid': order.payment_status === 'PAID',
+                    'pill--pendingPay': order.payment_status === 'PENDING'
+                  }"
+                >
+                  {{ order.payment_status === 'PAID'
+                    ? 'ΠΛΗΡΩΘΗΚΕ'
+                    : 'ΕΚΚΡΕΜΕΙ' }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td class="right">
+
+                <div
+                  class="action-cell"
+                  (click)="$event.stopPropagation()"
+                >
+
+            <select
+  class="select"
+  [value]="order.status"
+  (change)="updateStatus(order.id, $any($event.target).value)"
+  [disabled]="order.status === 'delivered' || order.status === 'cancelled'"
+>
+
+  <option value="pending">
+    Σε αναμονή
+  </option>
+
+  <option
+    value="processing"
+    [disabled]="order.status !== 'pending'"
+  >
+    Σε επεξεργασία
+  </option>
+
+  <option
+    value="shipped"
+    [disabled]="order.status !== 'processing'"
+  >
+    Απεστάλη
+  </option>
+
+  <option
+    value="delivered"
+    [disabled]="order.status !== 'shipped'"
+  >
+    Παραδόθηκε
+  </option>
+
+  <option
+    value="cancelled"
+    [disabled]="order.status === 'delivered'"
+  >
+    Ακυρώθηκε
+  </option>
+
+</select>
+                </div>
+              </td>
+           </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

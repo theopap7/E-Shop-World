@@ -1,0 +1,79 @@
+<!-- Overlay (σκοτεινό background) -->
+<div
+  class="overlay"
+  *ngIf="isOpen"
+  (click)="close()">
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" [class.open]="isOpen">
+
+  <!-- Header -->
+  <div class="sidebar-header">
+    <h3>🛒 Καλάθι ({{ items.length }})</h3>
+    <button class="close-btn" type="button" (click)="close()">✕</button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="items.length === 0" class="empty-cart">
+    <p>🛒</p>
+    <p>Το καλάθι σου είναι άδειο</p>
+    <button class="btn btn-outline" type="button" (click)="close()">
+      Συνέχεια αγορών
+    </button>
+  </div>
+
+  <!-- Items -->
+  <div class="sidebar-items" *ngIf="items.length > 0">
+    <div class="cart-item" *ngFor="let item of items">
+      <div class="item-info">
+        <div class="item-name">{{ item.name }}</div>
+        <div class="item-price">{{ item.price | number:'1.2-2' }}€</div>
+      </div>
+
+      <!-- Quantity controls -->
+      <div class="item-controls">
+        <button
+          class="qty-btn"
+          type="button"
+          (click)="decrease(item.productId)">
+          −
+        </button>
+        <span class="qty">{{ item.quantity }}</span>
+        <button
+          class="qty-btn"
+          type="button"
+          (click)="increase(item.productId)">
+          +
+        </button>
+        <button
+          class="remove-btn"
+          type="button"
+          (click)="remove(item.productId)">
+          🗑️
+        </button>
+      </div>
+
+      <!-- Item subtotal -->
+      <div class="item-subtotal">
+        {{ (item.price * item.quantity) | number:'1.2-2' }}€
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="sidebar-footer" *ngIf="items.length > 0">
+    <div class="total-row">
+      <span>Σύνολο:</span>
+      <strong>{{ total | number:'1.2-2' }}€</strong>
+    </div>
+
+    <button
+      class="btn btn-outline view-cart-btn"
+      type="button"
+      routerLink="/cart"
+      (click)="close()">
+      Προβολή Καλαθιού
+    </button>
+  </div>
+</div>

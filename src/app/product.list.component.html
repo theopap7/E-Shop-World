@@ -1,0 +1,154 @@
+<section class="page">
+  <div class="page-header">
+    <h2>Προϊόντα</h2>
+  </div>
+
+  <!-- Filters Bar -->
+  <div class="filters-bar">
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Αναζήτηση προϊόντος..."
+        [(ngModel)]="searchTerm"
+      />
+      <button
+        *ngIf="searchTerm"
+        class="clear-btn"
+        type="button"
+        (click)="searchTerm = ''">
+        ✕
+      </button>
+    </div>
+
+    <!-- Category -->
+    <select class="filter-select" [(ngModel)]="selectedCategory">
+      <option value="all">Όλες οι κατηγορίες</option>
+      <option *ngFor="let cat of categories" [value]="cat.name">
+        {{ cat.name }}
+      </option>
+    </select>
+
+    <!-- Price Range -->
+    <div class="price-wrap">
+      <label class="price-label">Μέχρι: {{ priceMax }}€</label>
+      <input
+        type="range"
+        class="price-range"
+        min="0"
+        max="2000"
+        step="50"
+        [(ngModel)]="priceMax"
+      />
+    </div>
+
+    <!-- Sort -->
+    <select class="filter-select" [(ngModel)]="sortBy">
+      <option value="newest">Νεότερα πρώτα</option>
+      <option value="price_asc">Τιμή: Χαμηλή → Υψηλή</option>
+      <option value="price_desc">Τιμή: Υψηλή → Χαμηλή</option>
+      <option value="name_asc">Όνομα: Α → Ω</option>
+    </select>
+
+    <!-- Reset -->
+    <button
+      class="btn-outline reset-btn"
+      type="button"
+      (click)="resetFilters()">
+      🔄 Reset
+    </button>
+  </div>
+
+  <!-- Results count -->
+  <div class="results-info" *ngIf="!isLoading && !errorMessage">
+    <span>{{ filteredProducts.length }} προϊόντα βρέθηκαν</span>
+    <span *ngIf="filteredProducts.length !== allProducts.length" class="filter-active">
+      (από {{ allProducts.length }} συνολικά)
+    </span>
+  </div>
+
+  <!-- ✅ LOADING SKELETONS -->
+  <div *ngIf="isLoading" class="grid">
+    <app-skeleton type="card" [count]="6"></app-skeleton>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!isLoading && errorMessage" class="error">
+    {{ errorMessage }}
+    <button class="btn-outline" type="button" (click)="fetchProducts()">
+      Ξαναδοκίμασε
+    </button>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0" class="empty">
+    <p>😕 Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα.</p>
+    <button class="btn-outline" type="button" (click)="resetFilters()">
+      Καθαρισμός φίλτρων
+    </button>
+  </div>
+
+  <!-- Products -->
+  <div *ngIf="!isLoading && !errorMessage && filteredProducts.length > 0" class="grid">
+
+    <article
+      class="card clickable"
+      *ngFor="let p of filteredProducts"
+      [routerLink]="['/products', p.id]">
+
+      <button
+        class="wishlist-btn"
+        type="button"
+        (click)="toggleWishlist(p, $event)"
+        [class.active]="isInWishlist(p.id)"
+        [attr.aria-label]="isInWishlist(p.id) ? 'Αφαίρεση από αγαπημένα' : 'Προσθήκη στα αγαπημένα'">
+        <span class="heart-icon">{{ isInWishlist(p.id) ? '❤️' : '🤍' }}</span>
+      </button>
+
+      <img
+        [src]="p.image_url || 'https://via.placeholder.com/300x300?text=No+Image'"
+        [alt]="p.name"
+        class="product-image"
+      />
+
+      <div class="product-details">
+        <span class="category-badge">
+          {{ p.category_name || 'Χωρίς κατηγορία' }}
+        </span>
+
+        <h3 class="product-name">{{ p.name }}</h3>
+
+        <div class="product-reviews" *ngIf="p.review_count > 0">
+          <div class="stars-mini">
+            <span *ngFor="let star of [1,2,3,4,5]"
+                  [class]="getStarClass(star, p.average_rating || 0)">
+              ★
+            </span>
+          </div>
+          <span class="rating-text">{{ p.average_rating | number:'1.1-1' }}</span>
+          <span class="review-count">({{ p.review_count }})</span>
+        </div>
+
+        <div class="product-reviews no-reviews" *ngIf="p.review_count === 0">
+          <span class="no-reviews-text">Δεν υπάρχουν κριτικές ακόμα</span>
+        </div>
+
+        <p class="product-description">
+          {{ p.description }}
+        </p>
+
+        <div class="product-footer">
+          <div class="stock-badge" [class.in-stock]="p.stock > 0">
+            {{ p.stock > 0 ? 'Διαθέσιμο (' + p.stock + ' τεμάχια)' : 'Μη διαθέσιμο' }}
+          </div>
+          <div class="product-price">{{ p.price | number:'1.2-2' }}€</div>
+        </div>
+      </div>
+
+    </article>
+
+  </div>
+</section>

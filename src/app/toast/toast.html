@@ -1,0 +1,22 @@
+<div class="toast-container">
+  <div 
+    *ngFor="let toast of toasts"
+    [class]="getToastClass(toast.type)"
+    >
+    
+    <!-- Icon -->
+    <span class="toast-icon">{{ getIcon(toast.type) }}</span>
+    
+    <!-- Message -->
+    <span class="toast-message">{{ toast.message }}</span>
+    
+    <!-- Close Button -->
+    <button 
+      class="toast-close"
+      type="button"
+      (click)="close(toast.id)"
+      aria-label="Close">
+      ✕
+    </button>
+  </div>
+</div>
