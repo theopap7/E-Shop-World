@@ -1,4 +1,4 @@
-# E-Commerce App
+# E-Shop-World
 
 Full-stack e-commerce application built with Angular 20, Node.js/Express 5, and MySQL. Users can browse products, manage a cart and wishlist, complete a multi-step checkout with discount codes, and track their orders. Admins get a dedicated dashboard for managing products, orders, reviews, and discount codes. Authentication is JWT-based with role-based access control.
 
