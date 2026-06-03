@@ -56,11 +56,10 @@ export class MyOrdersComponent implements OnInit {
   
   statusLabel(s: string): string {
     const x = (s || '').toLowerCase();
-    if (x === 'pending') return 'Σε Επεξεργασία';
-    if (x === 'paid') return 'Πληρωμένη';
+    if (x === 'pending') return 'Σε Αναμονή';
+    if (x === 'processing') return 'Σε Επεξεργασία';
     if (x === 'shipped') return 'Αποστολή';
     if (x === 'delivered') return 'Παραδόθηκε';
-    if (x === 'completed') return 'Ολοκληρωμένη';
     if (x === 'cancelled') return 'Ακυρώθηκε';
     return s || '—';
   }
