@@ -108,12 +108,13 @@
                 <span
                   class="pill"
                   [ngClass]="{
-                    'pill--paid': order.payment_status === 'PAID',
-                    'pill--pendingPay': order.payment_status === 'PENDING'
+                    'pill--paid': order.payment_status === 'paid',
+                    'pill--pendingPay': order.payment_status === 'pending',
+                    'pill--cancelled': order.payment_status === 'refunded'
                   }"
                 >
-                  {{ order.payment_status === 'PAID'
-                    ? 'ΠΛΗΡΩΘΗΚΕ'
+                  {{ order.payment_status === 'paid' ? 'ΠΛΗΡΩΘΗΚΕ'
+                    : order.payment_status === 'refunded' ? 'ΕΠΙΣΤΡΟΦΗ'
                     : 'ΕΚΚΡΕΜΕΙ' }}
                 </span>
               </td>
