@@ -41,6 +41,9 @@ __screenshots__/
 # Environment variables
 backend/.env
 
+# Uploaded files
+backend/uploads/
+
 # System files
 .DS_Store
 Thumbs.db
