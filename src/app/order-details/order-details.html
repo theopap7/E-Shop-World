@@ -161,7 +161,7 @@
 
           </div>
 
-          <div class="row" *ngIf="isAdminPage && order.payment_status === 'pending' && order.status !== 'cancelled'">
+          <div class="row" *ngIf="isAdminPage && order.payment_status === 'pending' && order.payment_method === 'bank_transfer' && order.status !== 'cancelled'">
             <span></span>
             <button class="btn btn-primary" (click)="confirmPayment()">
               ✅ Επιβεβαίωση Πληρωμής
