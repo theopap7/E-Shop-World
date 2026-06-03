@@ -34,6 +34,23 @@ Full-stack e-commerce application built with Angular 20, Node.js/Express 5, and 
 
 ---
 
+## Screenshots
+
+### User
+| | |
+|---|---|
+| ![Products](screenshots/home.png) | ![Product Details](screenshots/product-details.png) |
+| ![Checkout](screenshots/checkout.png) | ![Orders](screenshots/orders.png) |
+
+### Admin
+| | |
+|---|---|
+| ![Dashboard](screenshots/admin-dashboard.png) | ![Orders](screenshots/admin-orders.png) |
+
+> Full screenshots in [`screenshots/`](screenshots/)
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
