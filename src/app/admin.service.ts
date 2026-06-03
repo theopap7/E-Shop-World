@@ -82,6 +82,10 @@ export class AdminService {
     return this.http.patch(`${this.baseUrl}/orders/${orderId}/status`, { status });
   }
 
+  confirmPayment(orderId: number): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/orders/${orderId}/confirm-payment`, {});
+  }
+
   // ========== STATS ==========
   
   getStats(): Observable<any> {

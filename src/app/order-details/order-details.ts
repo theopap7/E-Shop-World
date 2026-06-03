@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { OrderService } from '../order.service';
 import { AdminService } from '../admin.service';
+import { ToastService } from '../toast.service';
 
 type OrderDto = {
   id: number;
@@ -58,7 +59,8 @@ export class OrderDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private orderService: OrderService,
     private router: Router,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -156,6 +158,18 @@ downloadCSV(orderId: number) {
 
 }
 
+
+  confirmPayment(): void {
+    this.adminService.confirmPayment(this.orderId).subscribe({
+      next: () => {
+        this.toastService.success('Η πληρωμή επιβεβαιώθηκε!');
+        this.loadDetails();
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message || 'Αποτυχία επιβεβαίωσης');
+      }
+    });
+  }
 
 downloadPDF(orderId: number) {
 

@@ -1058,6 +1058,39 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
   }
 });
 /**
+ * ✅ Admin: Confirm payment for bank transfer orders
+ */
+app.patch('/api/admin/orders/:id/confirm-payment', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const orderId = Number(req.params.id);
+
+    const [rows] = await db.query(
+      'SELECT payment_status FROM orders WHERE id = ?',
+      [orderId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (rows[0].payment_status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Η πληρωμή δεν είναι σε εκκρεμότητα' });
+    }
+
+    await db.query(
+      `UPDATE orders SET payment_status = 'paid' WHERE id = ?`,
+      [orderId]
+    );
+
+    res.json({ success: true, message: 'Η πληρωμή επιβεβαιώθηκε' });
+
+  } catch (error) {
+    console.error('Confirm payment error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+/**
  * ✅ Admin: Dashboard stats
  */
 app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
