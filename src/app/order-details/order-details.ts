@@ -131,6 +131,7 @@ export class OrderDetailsComponent implements OnInit {
     const x = (status || '').toUpperCase();
     if (x === 'PAID') return 'Πληρωμένη';
     if (x === 'PENDING') return 'Σε εκκρεμότητα';
+    if (x === 'REFUNDED') return 'Επιστροφή χρημάτων';
     if (x === 'FAILED') return 'Αποτυχία';
     return status || '—';
   }

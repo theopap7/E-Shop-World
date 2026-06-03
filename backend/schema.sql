@@ -47,7 +47,7 @@ CREATE TABLE orders (
   shipping_method ENUM('courier_standard', 'courier_express', 'pickup') NOT NULL,
   shipping_cost DECIMAL(10,2) NOT NULL DEFAULT 0,
   payment_method ENUM('cod', 'card_mock', 'bank_transfer') NOT NULL,
-  payment_status ENUM('pending', 'paid') DEFAULT 'pending',
+  payment_status ENUM('pending', 'paid', 'refunded') DEFAULT 'pending',
   discount_code VARCHAR(100),
   discount_amount DECIMAL(10,2) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -152,8 +152,8 @@
 
             <span
               class="pill"
-              [ngClass]="order.payment_status === 'PAID'
-                ? 'pill--paid'
+              [ngClass]="order.payment_status === 'paid' ? 'pill--paid'
+                : order.payment_status === 'refunded' ? 'pill--cancelled'
                 : 'pill--pendingPay'"
             >
               {{ paymentStatusLabel(order.payment_status) }}

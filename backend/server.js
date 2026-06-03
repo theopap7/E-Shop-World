@@ -997,7 +997,7 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
 
     // Βρίσκουμε το current status
     const [rows] = await db.query(
-      'SELECT status, payment_method FROM orders WHERE id = ?',
+      'SELECT status, payment_method, payment_status FROM orders WHERE id = ?',
       [orderId]
     );
 
@@ -1007,6 +1007,7 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
 
     const currentStatus = rows[0].status;
     const paymentMethod = rows[0].payment_method;
+    const currentPaymentStatus = rows[0].payment_status;
 
     // Επιτρεπόμενες μεταβάσεις
     const allowedTransitions = {
@@ -1027,14 +1028,22 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
     // Αν γίνει delivered + αντικαταβολή → πληρωμένη
     if (status === 'delivered' && paymentMethod === 'cod') {
       await db.query(
-        `UPDATE orders 
+        `UPDATE orders
          SET status = ?, payment_status = 'paid'
+         WHERE id = ?`,
+        [status, orderId]
+      );
+    // Αν γίνει cancelled + ήταν πληρωμένη → επιστροφή χρημάτων
+    } else if (status === 'cancelled' && currentPaymentStatus === 'paid') {
+      await db.query(
+        `UPDATE orders
+         SET status = ?, payment_status = 'refunded'
          WHERE id = ?`,
         [status, orderId]
       );
     } else {
       await db.query(
-        `UPDATE orders 
+        `UPDATE orders
          SET status = ?
          WHERE id = ?`,
         [status, orderId]
