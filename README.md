@@ -100,8 +100,8 @@ Backend: `http://localhost:3000` · Frontend: `http://localhost:4200`
 ## Git
 
 ```bash
-git clone https://github.com/theopap7/e-commerce.git
-cd e-commerce
+git clone https://github.com/theopap7/E-Shop-World.git
+cd E-Shop-World
 
 git add .
 git commit -m "your message"
