@@ -41,8 +41,9 @@ __screenshots__/
 # Environment variables
 backend/.env
 
-# Uploaded files
-backend/uploads/
+# Uploaded files (keep folder, ignore contents)
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # System files
 .DS_Store
