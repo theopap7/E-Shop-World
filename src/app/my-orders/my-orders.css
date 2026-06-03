@@ -192,6 +192,11 @@
   color: #92400e;
 }
 
+.status-badge--processing {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
 .status-badge--shipped {
   background: #dbeafe;
   color: #1d4ed8;
