@@ -70,8 +70,8 @@ Full-stack e-commerce application built with Angular 20, Node.js/Express 5, and 
 ## Getting Started
 
 ```sql
--- 1. Create database
-CREATE DATABASE ecommerce;
+-- 1. Import schema (creates DB + all tables)
+mysql -u root -p < backend/schema.sql
 ```
 
 ```bash
