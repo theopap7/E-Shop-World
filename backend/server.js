@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const db = require('./db');
 const PDFDocument = require('pdfkit');
@@ -13,6 +14,14 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { success: false, message: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * ✅ JWT middleware (protect routes)
@@ -93,7 +102,7 @@ const upload = multer({
 app.use('/uploads', express.static('uploads'));
 
 // Route για εγγραφή
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', authLimiter, async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
@@ -121,7 +130,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Route για σύνδεση
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
