@@ -76,14 +76,15 @@ export class MyOrdersComponent implements OnInit {
     return 'status-pending';
   }
 
-  normalizeStatus(status: string): 'pending' | 'shipped' | 'delivered' | 'cancelled' {
+  normalizeStatus(status: string): 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' {
     const x = (status || '').toLowerCase();
- 
+
     if (x === 'pending' || x === 'paid') return 'pending';
+    if (x === 'processing') return 'processing';
     if (x === 'shipped') return 'shipped';
     if (x === 'delivered' || x === 'completed') return 'delivered';
     if (x === 'cancelled') return 'cancelled';
-    
-    return 'pending';  
+
+    return 'pending';
   }
 }

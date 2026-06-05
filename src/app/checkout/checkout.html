@@ -199,45 +199,44 @@
 
         <div class="row"><span>Subtotal</span><span>{{ subtotal | number:'1.2-2' }}€</span></div>
         <div class="row"><span>Μεταφορικά</span><span>{{ shippingCost | number:'1.2-2' }}€</span></div>
+
+        <div class="discount-section">
+          <h4>Έχεις κωδικό έκπτωσης;</h4>
+
+          <div class="discount-input-group">
+            <input
+              type="text"
+              placeholder="Π.χ. SAVE10"
+              [(ngModel)]="discountCode"
+              [disabled]="!!appliedDiscount"
+              (keyup.enter)="applyDiscount()"
+              style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase;"
+            />
+            <button
+              type="button"
+              (click)="applyDiscount()"
+              [disabled]="applyingDiscount || !!appliedDiscount"
+              class="btn"
+              style="width: auto; margin: 0; padding: 8px 16px;">
+              {{ applyingDiscount ? 'Έλεγχος...' : 'Εφαρμογή' }}
+            </button>
+          </div>
+
+          <div *ngIf="discountError" style="color: #c62828; font-size: 0.8rem; margin-top: 8px;">
+            {{ discountError }}
+          </div>
+
+          <div *ngIf="appliedDiscount" class="row" style="color: #10b981; margin-top: 12px;">
+            <span>
+              Έκπτωση ({{ appliedDiscount.code }})
+              <button type="button" (click)="removeDiscount()" style="background: none; border: none; color: #ef4444; cursor: pointer; margin-left: 8px;">✕</button>
+            </span>
+            <span>-{{ discountAmount | number:'1.2-2' }}€</span>
+          </div>
+        </div>
+
+        <hr style="margin: 18px 0;">
         <div class="row total"><span>Σύνολο</span><span>{{ total | number:'1.2-2' }}€</span></div>
-
-        <!-- ✅ ΠΡΟΣΘΕΣΕ ΜΕΤΑ ΤΟ total row: -->
-<div class="discount-section">
-  <h4>Έχεις κωδικό έκπτωσης;</h4>
-  
-  <div class="discount-input-group">
-    <input
-      type="text"
-      placeholder="Π.χ. SAVE10"
-      [(ngModel)]="discountCode"
-      [disabled]="!!appliedDiscount"
-      (keyup.enter)="applyDiscount()"
-      style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase;"
-    />
-    <button
-      type="button"
-      (click)="applyDiscount()"
-      [disabled]="applyingDiscount || !!appliedDiscount"
-      class="btn"
-      style="width: auto; margin: 0; padding: 8px 16px;">
-      {{ applyingDiscount ? 'Έλεγχος...' : 'Εφαρμογή' }}
-    </button>
-  </div>
-
-  <div *ngIf="discountError" style="color: #c62828; font-size: 0.8rem; margin-top: 8px;">
-    {{ discountError }}
-  </div>
-  
-  <div *ngIf="appliedDiscount" class="row" style="color: #10b981; margin-top: 12px;">
-    <span>
-      Έκπτωση ({{ appliedDiscount.code }})
-      <button type="button" (click)="removeDiscount()" style="background: none; border: none; color: #ef4444; cursor: pointer; margin-left: 8px;">✕</button>
-    </span>
-    <span>-{{ discountAmount | number:'1.2-2' }}€</span>
-  </div>
-</div>
-
-<hr style="margin: 18px 0;">
 
       </div>
     </div>

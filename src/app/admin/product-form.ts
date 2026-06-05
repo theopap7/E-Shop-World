@@ -108,7 +108,7 @@ export class ProductFormComponent implements OnInit {
             image_url: p.image_url || '',
           });
 
-          this.imagePreview = '';
+          this.imagePreview = p.image_url || '';
           this.selectedFile = null;
           this.uploadError = '';
           this.uploading = false;

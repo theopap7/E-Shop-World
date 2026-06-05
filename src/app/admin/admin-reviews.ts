@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../admin.service';
 import { RouterModule } from '@angular/router';
+import { ToastService } from '../toast.service';
 export interface AdminReview {
   id: number;
   rating: number;
@@ -29,7 +30,7 @@ export class AdminReviewsComponent implements OnInit {
   isLoading = false;
   error = '';
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private toastService: ToastService) {}
 
   ngOnInit(): void {
     this.loadReviews();
@@ -64,12 +65,12 @@ export class AdminReviewsComponent implements OnInit {
         if (res.success) {
           // Remove από τη λίστα
           this.reviews = this.reviews.filter(r => r.id !== reviewId);
-          alert('Review διαγράφηκε επιτυχώς!');
+          this.toastService.success('Review διαγράφηκε επιτυχώς!');
         }
       },
       error: (err) => {
         console.error('Delete review error:', err);
-        alert(err.error?.message || 'Σφάλμα διαγραφής review.');
+        this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής review.');
       }
     });
   }

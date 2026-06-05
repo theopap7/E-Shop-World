@@ -98,7 +98,7 @@
         </div>
 
         <!-- Timeline -->
-        <div class="order-timeline-section">
+        <div class="order-timeline-section" *ngIf="o.status !== 'cancelled'">
           <app-order-timeline [currentStatus]="normalizeStatus(o.status)"></app-order-timeline>
         </div>
 

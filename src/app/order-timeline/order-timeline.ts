@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type OrderStatus = 'pending' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
 interface TimelineStep {
   label: string;
@@ -24,7 +24,7 @@ export class OrderTimelineComponent {
   
   get steps(): TimelineStep[] {
     // Define the order flow
-    const statuses: OrderStatus[] = ['pending', 'shipped', 'delivered'];
+    const statuses: OrderStatus[] = ['pending', 'processing', 'shipped', 'delivered'];
     
     // Find current step index
     const currentIndex = statuses.indexOf(this.currentStatus);
@@ -46,7 +46,8 @@ export class OrderTimelineComponent {
   
   private getLabel(status: OrderStatus): string {
     const labels: Record<OrderStatus, string> = {
-      'pending': 'Σε Επεξεργασία',
+      'pending': 'Σε Αναμονή',
+      'processing': 'Σε Επεξεργασία',
       'shipped': 'Αποστολή',
       'delivered': 'Παραδόθηκε',
       'cancelled': 'Ακυρώθηκε'
@@ -59,6 +60,7 @@ export class OrderTimelineComponent {
     
     const icons: Record<OrderStatus, string> = {
       'pending': '📝',
+      'processing': '⚙️',
       'shipped': '🚚',
       'delivered': '✓',
       'cancelled': '✕'
