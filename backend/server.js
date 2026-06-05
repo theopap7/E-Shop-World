@@ -184,7 +184,7 @@ app.get('/api/me', authenticateToken, async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'Ο χρήστης δεν βρέθηκε' });
     }
 
     const u = rows[0];
@@ -213,23 +213,23 @@ app.post('/api/change-password', authenticateToken, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword || newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: 'Invalid password data' });
+      return res.status(400).json({ success: false, message: 'Μη έγκυρα δεδομένα κωδικού' });
     }
 
     const [rows] = await db.query('SELECT password FROM users WHERE id = ?', [userId]);
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'Ο χρήστης δεν βρέθηκε' });
     }
 
     const isOk = await bcrypt.compare(currentPassword, rows[0].password);
     if (!isOk) {
-      return res.status(401).json({ success: false, message: 'Wrong current password' });
+      return res.status(401).json({ success: false, message: 'Λάθος τρέχων κωδικός' });
     }
 
     const hashed = await bcrypt.hash(newPassword, 10);
     await db.query('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
 
-    return res.json({ success: true, message: 'Password changed successfully' });
+    return res.json({ success: true, message: 'Ο κωδικός άλλαξε επιτυχώς' });
   } catch (error) {
     console.error('Change password error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
@@ -333,7 +333,7 @@ app.get('/api/products/:id', async (req, res) => {
     if (isNaN(productId)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid product ID'
+        message: 'Μη έγκυρο ID προϊόντος'
       });
     }
 
@@ -357,7 +357,7 @@ app.get('/api/products/:id', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: 'Το προϊόν δεν βρέθηκε'
       });
     }
 
@@ -662,7 +662,7 @@ app.get('/api/my-orders/:orderId', authenticateToken, async (req, res) => {
     const orderId = Number(req.params.orderId);
 
     if (!Number.isFinite(orderId)) {
-      return res.status(400).json({ success: false, message: 'Invalid orderId' });
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο ID παραγγελίας' });
     }
 
   const [orders] = await db.query(
@@ -680,7 +680,7 @@ app.get('/api/my-orders/:orderId', authenticateToken, async (req, res) => {
 );
 
     if (orders.length === 0) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
     const order = orders[0];
@@ -751,7 +751,7 @@ app.get('/api/admin/products/:id', authenticateToken, isAdmin, async (req, res) 
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
     res.json({ success: true, product: rows[0] });
@@ -771,7 +771,7 @@ app.post('/api/admin/products', authenticateToken, isAdmin, async (req, res) => 
     if (!name || !price || stock == null) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Name, price, and stock are required' 
+        message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' 
       });
     }
 
@@ -783,7 +783,7 @@ app.post('/api/admin/products', authenticateToken, isAdmin, async (req, res) => 
 
     res.status(201).json({
       success: true,
-      message: 'Product created successfully',
+      message: 'Το προϊόν δημιουργήθηκε επιτυχώς',
       productId: result.insertId
     });
   } catch (error) {
@@ -803,7 +803,7 @@ app.put('/api/admin/products/:id', authenticateToken, isAdmin, async (req, res) 
     if (!name || !price || stock == null) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Name, price, and stock are required' 
+        message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' 
       });
     }
 
@@ -815,10 +815,10 @@ app.put('/api/admin/products/:id', authenticateToken, isAdmin, async (req, res) 
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
-    res.json({ success: true, message: 'Product updated successfully' });
+    res.json({ success: true, message: 'Το προϊόν ενημερώθηκε επιτυχώς' });
   } catch (error) {
     console.error('Admin update product error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -835,7 +835,7 @@ app.delete('/api/admin/products/:id', authenticateToken, isAdmin, async (req, re
     // Check if product exists
     const [products] = await db.query('SELECT id, name FROM products WHERE id = ?', [productId]);
     if (products.length === 0) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
     const productName = products[0].name;
@@ -849,7 +849,7 @@ app.delete('/api/admin/products/:id', authenticateToken, isAdmin, async (req, re
     if (orderItems[0].count > 0) {
       return res.status(400).json({ 
         success: false, 
-        message: `Cannot delete "${productName}". This product is used in ${orderItems[0].count} order(s). You can mark it as out of stock instead.`
+        message: `Δεν είναι δυνατή η διαγραφή του "${productName}". Χρησιμοποιείται σε ${orderItems[0].count} παραγγελία(-ές). Μπορείτε να το σημειώσετε ως εξαντλημένο.`
       });
     }
 
@@ -857,12 +857,12 @@ app.delete('/api/admin/products/:id', authenticateToken, isAdmin, async (req, re
     const [result] = await db.query('DELETE FROM products WHERE id = ?', [productId]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
     return res.json({ 
       success: true, 
-      message: `Product "${productName}" deleted successfully!` 
+      message: `Το προϊόν "${productName}" διαγράφηκε επιτυχώς!` 
     });
 
   } catch (error) {
@@ -872,13 +872,13 @@ app.delete('/api/admin/products/:id', authenticateToken, isAdmin, async (req, re
     if (error.code === 'ER_ROW_IS_REFERENCED_2' || error.errno === 1451) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Cannot delete this product because it is used in existing orders.' 
+        message: 'Δεν είναι δυνατή η διαγραφή γιατί το προϊόν χρησιμοποιείται ήδη σε υπάρχουσες παραγγελίες.' 
       });
     }
 
     return res.status(500).json({ 
       success: false, 
-      message: 'Failed to delete product. Please try again.' 
+      message: 'Αποτυχία διαγραφής προϊόντος. Παρακαλώ δοκιμάστε ξανά.' 
     });
   }
 });
@@ -952,7 +952,7 @@ app.get('/api/admin/orders/:id', authenticateToken, isAdmin, async (req, res) =>
     if (orders.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Order not found'
+        message: 'Η παραγγελία δεν βρέθηκε'
       });
     }
 
@@ -1000,7 +1000,7 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid status'
+        message: 'Μη έγκυρη κατάσταση παραγγελίας'
       });
     }
 
@@ -1011,7 +1011,7 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
     const currentStatus = rows[0].status;
@@ -1030,7 +1030,7 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
     if (!allowedTransitions[currentStatus].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: `Cannot change order from ${currentStatus} to ${status}`
+        message: `Δεν επιτρέπεται η αλλαγή κατάστασης από ${currentStatus} σε ${status}`
       });
     }
 
@@ -1059,7 +1059,7 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
       );
     }
 
-    res.json({ success: true, message: 'Order status updated' });
+    res.json({ success: true, message: 'Η κατάσταση παραγγελίας ενημερώθηκε' });
 
   } catch (error) {
     console.error('Admin update order status error:', error);
@@ -1079,7 +1079,7 @@ app.patch('/api/admin/orders/:id/confirm-payment', authenticateToken, isAdmin, a
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
     if (rows[0].payment_status !== 'pending') {
@@ -1224,7 +1224,7 @@ app.post('/api/reviews/:productId', authenticateToken, async (req, res) => {
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({
         success: false,
-        message: 'Rating must be between 1 and 5'
+        message: 'Η βαθμολογία πρέπει να είναι μεταξύ 1 και 5'
       });
     }
 
@@ -1242,7 +1242,7 @@ app.post('/api/reviews/:productId', authenticateToken, async (req, res) => {
     if (orders.length === 0) {
       return res.status(403).json({
         success: false,
-        message: 'You can only review products you have purchased and received.'
+        message: 'Μπορείτε να αξιολογήσετε μόνο προϊόντα που έχετε αγοράσει και παραλάβει.'
       });
     }
 
@@ -1255,7 +1255,7 @@ app.post('/api/reviews/:productId', authenticateToken, async (req, res) => {
     if (existing.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'You have already reviewed this product.'
+        message: 'Έχετε ήδη αξιολογήσει αυτό το προϊόν.'
       });
     }
 
@@ -1267,7 +1267,7 @@ app.post('/api/reviews/:productId', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Review submitted successfully!'
+      message: 'Η κριτική υποβλήθηκε με επιτυχία!'
     });
 
   } catch (error) {
@@ -1295,7 +1295,7 @@ app.delete('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
     if (reviews.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Review not found'
+        message: 'Η κριτική δεν βρέθηκε'
       });
     }
 
@@ -1303,13 +1303,13 @@ app.delete('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
     if (reviews[0].user_id !== userId && userRole !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized'
+        message: 'Δεν έχετε δικαίωμα διαγραφής αυτής της κριτικής'
       });
     }
 
     await db.query('DELETE FROM reviews WHERE id = ?', [reviewId]);
 
-    res.json({ success: true, message: 'Review deleted' });
+    res.json({ success: true, message: 'Η κριτική διαγράφηκε επιτυχώς' });
 
   } catch (error) {
     console.error('Delete review error:', error);
@@ -1354,7 +1354,7 @@ app.put('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({
         success: false,
-        message: 'Rating must be between 1 and 5'
+        message: 'Η βαθμολογία πρέπει να είναι μεταξύ 1 και 5'
       });
     }
 
@@ -1367,7 +1367,7 @@ app.put('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
     if (reviews.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Review not found'
+        message: 'Η κριτική δεν βρέθηκε'
       });
     }
 
@@ -1375,7 +1375,7 @@ app.put('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
     if (reviews[0].user_id !== userId) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to edit this review'
+        message: 'Δεν έχετε δικαίωμα επεξεργασίας αυτής της κριτικής'
       });
     }
 
@@ -1385,9 +1385,9 @@ app.put('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
       [rating, comment || null, reviewId]
     );
 
-    res.json({ 
-      success: true, 
-      message: 'Review updated successfully!' 
+    res.json({
+      success: true,
+      message: 'Η κριτική ενημερώθηκε επιτυχώς!'
     });
 
   } catch (error) {
@@ -1401,7 +1401,7 @@ app.put('/api/reviews/:reviewId', authenticateToken, async (req, res) => {
 app.post('/api/upload-image', authenticateToken, isAdmin, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
+      return res.status(400).json({ success: false, message: 'Δεν επιλέχθηκε αρχείο' });
     }
 
     // File uploaded successfully
@@ -1410,12 +1410,12 @@ app.post('/api/upload-image', authenticateToken, isAdmin, upload.single('image')
     res.json({
       success: true,
       imageUrl: imageUrl,
-      message: 'Image uploaded successfully'
+      message: 'Η εικόνα ανέβηκε επιτυχώς'
     });
 
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ success: false, message: 'Upload failed' });
+    res.status(500).json({ success: false, message: 'Αποτυχία ανεβάσματος αρχείου' });
   }
 });
 
