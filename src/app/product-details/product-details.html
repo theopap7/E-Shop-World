@@ -49,9 +49,10 @@
       <!-- Left: Image -->
       <div class="product-image-wrap">
         <img
-          [src]="product.image_url || 'https://via.placeholder.com/500x500?text=No+Image'"
+          [src]="product.image_url || 'no-image.svg'"
           [alt]="product.name"
           class="product-image"
+          (error)="$any($event.target).src='no-image.svg'"
         />
       </div>
 

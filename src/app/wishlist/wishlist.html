@@ -56,9 +56,10 @@
           <!-- Product Image -->
           <a [routerLink]="['/products', item.id]" class="product-link">
             <img
-              [src]="item.image_url || 'https://via.placeholder.com/200x200?text=No+Image'"
+              [src]="item.image_url || 'no-image.svg'"
               [alt]="item.name"
               class="wishlist-image"
+              (error)="$any($event.target).src='no-image.svg'"
             />
           </a>
 

@@ -220,8 +220,7 @@
 }
 
 .pill--processing,
-.pill--pending,
-.pill--paid {
+.pill--pending {
   background: #fef9c3;
   border-color: #fde68a;
   color: #854d0e;

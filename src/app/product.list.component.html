@@ -109,9 +109,10 @@
       </button>
 
       <img
-        [src]="p.image_url || 'https://via.placeholder.com/300x300?text=No+Image'"
+        [src]="p.image_url || 'no-image.svg'"
         [alt]="p.name"
         class="product-image"
+        (error)="$any($event.target).src='no-image.svg'"
       />
 
       <div class="product-details">
