@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Review, ReviewService } from '../review.service';
 import { ToastService } from '../toast.service';
+import { SkeletonComponent } from '../skeleton/skeleton';
 
 @Component({
   selector: 'app-my-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, SkeletonComponent],
   templateUrl: './my-reviews.html',
   styleUrl: './my-reviews.css'
 })

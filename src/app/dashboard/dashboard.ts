@@ -20,6 +20,7 @@ export class Dashboard implements OnInit, OnDestroy {
   isLoggedIn = false;
 
   private sub?: Subscription;
+  private wishlistSub?: Subscription;
 
   constructor(
     private cartService: CartService,
@@ -38,15 +39,16 @@ wishlistCount = 0;
 
     // 🔐 Auth state
     this.isLoggedIn = this.authService.isLoggedIn();
-      this.wishlistService.items$.subscribe(() => {
+    this.wishlistSub = this.wishlistService.items$.subscribe(() => {
+      this.wishlistCount = this.wishlistService.getCount();
+    });
     this.wishlistCount = this.wishlistService.getCount();
-  });
-  this.wishlistCount = this.wishlistService.getCount();
     
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.wishlistSub?.unsubscribe();
   }
   // Method για toggle
 toggleCart(): void {

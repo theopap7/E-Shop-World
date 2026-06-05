@@ -25,6 +25,9 @@ type OrderDto = {
   subtotal: number;
   discount_code?: string | null;
   discount_amount?: number | null;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
 };
 
 type OrderItemDto = {
@@ -44,7 +47,7 @@ type OrderItemDto = {
 })
 export class OrderDetailsComponent implements OnInit {
 
-  orderId!: number;
+  orderId = 0;
 
   isLoading = true;
   error: string | null = null;

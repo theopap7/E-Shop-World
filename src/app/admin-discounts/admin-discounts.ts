@@ -229,4 +229,11 @@ export class AdminDiscountsComponent implements OnInit {
     if (!code.max_uses) return false;
     return code.used_count >= code.max_uses;
   }
+
+  getDiscountStatus(code: DiscountCode): 'expired' | 'exhausted' | 'inactive' | 'active' {
+    if (this.isExpired(code.expires_at)) return 'expired';
+    if (this.isExhausted(code)) return 'exhausted';
+    if (!code.active) return 'inactive';
+    return 'active';
+  }
 }

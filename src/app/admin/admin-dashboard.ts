@@ -34,7 +34,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Stats error:', err);
-        this.error = 'Failed to load statistics';
+        this.error = 'Σφάλμα φόρτωσης στατιστικών';
         this.isLoading = false;
       },
     });

@@ -1,34 +1,59 @@
 <div class="register-container">
   <h2>Εγγραφή Χρήστη</h2>
   <form (ngSubmit)="onSubmit()" [formGroup]="registerForm">
+
     <div>
       <label for="firstName">Όνομα</label>
       <input id="firstName" formControlName="firstName" type="text" />
+      <small class="err" *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid">
+        Υποχρεωτικό πεδίο
+      </small>
     </div>
 
     <div>
       <label for="lastName">Επώνυμο</label>
       <input id="lastName" formControlName="lastName" type="text" />
+      <small class="err" *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid">
+        Υποχρεωτικό πεδίο
+      </small>
     </div>
 
     <div>
       <label for="email">Email</label>
       <input id="email" formControlName="email" type="email" />
+      <small class="err" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')">
+        Υποχρεωτικό πεδίο
+      </small>
+      <small class="err" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('email')">
+        Μη έγκυρο email
+      </small>
     </div>
 
     <div>
       <label for="password">Κωδικός</label>
       <input id="password" formControlName="password" type="password" />
+      <small class="err" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')">
+        Υποχρεωτικό πεδίο
+      </small>
+      <small class="err" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('minlength')">
+        Τουλάχιστον 6 χαρακτήρες
+      </small>
     </div>
 
     <div>
       <label for="confirmPassword">Επιβεβαίωση Κωδικού</label>
       <input id="confirmPassword" formControlName="confirmPassword" type="password" />
+      <small class="err" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('required')">
+        Υποχρεωτικό πεδίο
+      </small>
+      <small class="err" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.errors?.['mismatch']">
+        Οι κωδικοί δεν ταιριάζουν
+      </small>
     </div>
 
-    <button  type="submit" class="btn btn-primary">Εγγραφή</button>
-    </form>
-  
+    <button type="submit" class="btn btn-primary">Εγγραφή</button>
+  </form>
+
   <p>
     Έχεις ήδη λογαριασμό; <a routerLink="/login">Σύνδεση</a>
   </p>

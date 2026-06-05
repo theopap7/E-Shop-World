@@ -30,7 +30,7 @@ export class ProductListComponent implements OnInit {
   // ✅ ΝΕΟ: Filter state
   searchTerm = '';
   selectedCategory = 'all';
-  priceMax = 9999;
+  priceMax = 2000;
   sortBy = 'newest';
 
   constructor(
@@ -120,7 +120,7 @@ export class ProductListComponent implements OnInit {
   resetFilters(): void {
     this.searchTerm = '';
     this.selectedCategory = 'all';
-    this.priceMax = 9999;
+    this.priceMax = 2000;
     this.sortBy = 'newest';
   }
 

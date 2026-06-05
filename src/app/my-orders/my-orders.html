@@ -102,8 +102,23 @@
           <app-order-timeline [currentStatus]="normalizeStatus(o.status)"></app-order-timeline>
         </div>
 
-        <!-- SOFT DETAILS BUTTON -->
+        <!-- EXPANDED PANEL -->
         <div *ngIf="expandedOrderId === o.id" class="order-details">
+
+          <div *ngIf="loadingItems[o.id]" class="items-loading">Φόρτωση...</div>
+
+          <div *ngIf="!loadingItems[o.id] && itemsMap[o.id]">
+            <div class="order-item-row" *ngFor="let item of itemsMap[o.id]">
+              <span class="item-name">{{ item.product_name }}</span>
+              <span class="item-qty">{{ item.quantity }} τεμ.</span>
+              <span class="item-price">{{ item.line_total | number:'1.2-2' }}€</span>
+            </div>
+            <div class="order-items-total">
+              <span>Σύνολο</span>
+              <span>{{ o.total_amount | number:'1.2-2' }}€</span>
+            </div>
+          </div>
+
           <a class="btn btn-soft" [routerLink]="['/profile/orders', o.id]">
             Λεπτομέρειες παραγγελίας
             <span class="arrow">→</span>

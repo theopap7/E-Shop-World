@@ -76,17 +76,13 @@
             <td>
               <span
                 class="pill"
-                [class.pill--active]="code.active && !isExpired(code.expires_at) && !isExhausted(code)"
-                [class.pill--inactive]="!code.active"
-                [class.pill--expired]="isExpired(code.expires_at)"
-                [class.pill--exhausted]="isExhausted(code)">
-
-                <span *ngIf="code.active && !isExpired(code.expires_at) && !isExhausted(code)">
-                  Ενεργός
-                </span>
-                <span *ngIf="!code.active">Ανενεργός</span>
-                <span *ngIf="isExpired(code.expires_at)">Έληξε</span>
-                <span *ngIf="isExhausted(code)">Εξαντλήθηκε</span>
+                [class.pill--active]="getDiscountStatus(code) === 'active'"
+                [class.pill--inactive]="getDiscountStatus(code) === 'inactive'"
+                [class.pill--expired]="getDiscountStatus(code) === 'expired'"
+                [class.pill--exhausted]="getDiscountStatus(code) === 'exhausted'">
+                {{ getDiscountStatus(code) === 'active' ? 'Ενεργός' :
+                   getDiscountStatus(code) === 'inactive' ? 'Ανενεργός' :
+                   getDiscountStatus(code) === 'expired' ? 'Έληξε' : 'Εξαντλήθηκε' }}
               </span>
             </td>
 

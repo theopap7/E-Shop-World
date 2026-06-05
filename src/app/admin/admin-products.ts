@@ -38,14 +38,14 @@ export class AdminProductsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Load products error:', err);
-        this.error = 'Failed to load products';
+        this.error = 'Σφάλμα φόρτωσης προϊόντων';
         this.isLoading = false;
       },
     });
   }
 
   deleteProduct(id: number, name: string): void {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) {
+    if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το "${name}";`)) {
       return;
     }
 

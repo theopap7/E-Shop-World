@@ -12,6 +12,13 @@ type OrderRow = {
   created_at: string;
 };
 
+type OrderItem = {
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+};
+
 @Component({
   selector: 'app-my-orders',
   standalone: true,
@@ -23,7 +30,9 @@ export class MyOrdersComponent implements OnInit {
   orders: OrderRow[] = [];
   isLoading = true;
   error: string | null = null;
-  expandedOrderId: number | null = null;  // ✅ NEW: Track which order is expanded
+  expandedOrderId: number | null = null;
+  itemsMap: Record<number, OrderItem[]> = {};
+  loadingItems: Record<number, boolean> = {};
 
   constructor(private orderService: OrderService) {}
 
@@ -50,7 +59,24 @@ export class MyOrdersComponent implements OnInit {
 
  
   toggleOrderDetails(orderId: number): void {
-    this.expandedOrderId = this.expandedOrderId === orderId ? null : orderId;
+    if (this.expandedOrderId === orderId) {
+      this.expandedOrderId = null;
+      return;
+    }
+    this.expandedOrderId = orderId;
+    if (!this.itemsMap[orderId]) {
+      this.loadingItems[orderId] = true;
+      this.orderService.getOrderDetails(orderId).subscribe({
+        next: (res: any) => {
+          this.itemsMap[orderId] = res.items ?? [];
+          this.loadingItems[orderId] = false;
+        },
+        error: () => {
+          this.itemsMap[orderId] = [];
+          this.loadingItems[orderId] = false;
+        }
+      });
+    }
   }
 
   

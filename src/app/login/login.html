@@ -12,7 +12,12 @@
 
     <div class="form-group">
       <label for="password">Κωδικός</label>
-      <input id="password" formControlName="password" type="password" />
+      <div class="password-wrapper">
+        <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" />
+        <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </button>
+      </div>
       <div *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched">
         <small class="error" *ngIf="loginForm.controls['password'].hasError('required')">Ο κωδικός είναι υποχρεωτικός.</small>
         <small class="error" *ngIf="loginForm.controls['password'].hasError('minlength')">Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.</small>

@@ -15,6 +15,7 @@ import { ToastService } from '../toast.service';  // ✅ ADD
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  showPassword = false;
 
   // ✅ INJECT ToastService
   constructor(

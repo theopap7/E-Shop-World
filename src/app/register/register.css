@@ -114,3 +114,9 @@
 .register-container a:hover {
   text-decoration: underline;
 }
+
+.err {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 2px;
+}

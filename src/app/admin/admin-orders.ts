@@ -40,7 +40,7 @@ export class AdminOrdersComponent implements OnInit {
       },
       error: (err) => {
         console.error('Load orders error:', err);
-        this.error = 'Failed to load orders';
+        this.error = 'Σφάλμα φόρτωσης παραγγελιών';
         this.isLoading = false;
       },
     });

@@ -119,7 +119,7 @@ export class ProductFormComponent implements OnInit {
 
       error: (err) => {
         console.error('Load product error:', err);
-        this.error = 'Failed to load product';
+        this.error = 'Σφάλμα φόρτωσης προϊόντος';
         this.isLoading = false;
       }
 
@@ -164,7 +164,7 @@ export class ProductFormComponent implements OnInit {
 
       error: (err) => {
         console.error('Save product error:', err);
-        this.error = err?.error?.message || 'Failed to save product';
+        this.error = err?.error?.message || 'Σφάλμα αποθήκευσης προϊόντος';
         this.isLoading = false;
       }
 

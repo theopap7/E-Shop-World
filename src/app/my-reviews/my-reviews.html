@@ -10,9 +10,7 @@
       <p class="muted">Δες τις αξιολογήσεις που έχεις γράψει</p>
     </div>
 
-    <div *ngIf="isLoading" class="empty-card">
-      Φόρτωση κριτικών...
-    </div>
+    <app-skeleton *ngIf="isLoading" type="card" [count]="3"></app-skeleton>
 
     <div *ngIf="error" class="alert alert-error">
       {{ error }}

@@ -14,7 +14,7 @@
 
       <div class="hero-title">
 
-        <h2 class="title">Παραγγελία #{{ orderId }}</h2>
+        <h2 class="title">Παραγγελία{{ orderId ? ' #' + orderId : '' }}</h2>
 
     <div class="export-buttons" *ngIf="!isLoading && order">
 
@@ -71,6 +71,19 @@
     <ng-container *ngIf="!isLoading && !error && order">
 
       <div class="grid">
+
+        <!-- Στοιχεία Πελάτη (μόνο admin) -->
+        <div class="card" *ngIf="isAdminPage && (order.first_name || order.email)">
+          <h3 class="h3">Στοιχεία Πελάτη</h3>
+          <div class="row" *ngIf="order.first_name || order.last_name">
+            <span>Ονοματεπώνυμο</span>
+            <strong>{{ order.first_name }} {{ order.last_name }}</strong>
+          </div>
+          <div class="row" *ngIf="order.email">
+            <span>Email</span>
+            <strong>{{ order.email }}</strong>
+          </div>
+        </div>
 
         <!-- Στοιχεία Παραλήπτη -->
         <div class="card">
