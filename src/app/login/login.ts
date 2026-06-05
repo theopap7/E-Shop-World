@@ -40,7 +40,11 @@ export class LoginComponent {
           this.router.navigate(['/dashboard']);
         },
         error: (error: any) => {
-          this.toastService.error('Λάθος email ή κωδικός πρόσβασης');
+          if (error.status === 429) {
+            this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.');
+          } else {
+            this.toastService.error('Λάθος email ή κωδικός πρόσβασης');
+          }
         }
       });
     } else {
