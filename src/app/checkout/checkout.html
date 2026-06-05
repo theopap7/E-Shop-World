@@ -92,7 +92,7 @@
         </label>
         <label>
           <input type="radio" value="pickup" formControlName="shippingMethod" />
-          Παραλαβή από κατάστημα (+0€)
+          Παραλαβή από κατάστημα (Δωρεάν)
         </label>
 
         <hr />
@@ -154,7 +154,7 @@
           </label>
           <small class="err" *ngIf="form.get('paymentDetails.cardExp')?.touched && form.get('paymentDetails.cardExp')?.invalid">
             <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
-            <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['pattern']">Μορφή: MM/YY (π.χ. 12/21)</span>
+            <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['pattern']">Μορφή: MM/YY (π.χ. 12/27)</span>
           </small>
 
           <label>

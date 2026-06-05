@@ -31,7 +31,12 @@
 
     <div>
       <label for="password">Κωδικός</label>
-      <input id="password" formControlName="password" type="password" />
+      <div class="password-wrapper">
+        <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" />
+        <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </button>
+      </div>
       <small class="err" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')">
         Υποχρεωτικό πεδίο
       </small>
@@ -42,7 +47,12 @@
 
     <div>
       <label for="confirmPassword">Επιβεβαίωση Κωδικού</label>
-      <input id="confirmPassword" formControlName="confirmPassword" type="password" />
+      <div class="password-wrapper">
+        <input id="confirmPassword" formControlName="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" />
+        <button type="button" class="toggle-password" (click)="showConfirmPassword = !showConfirmPassword" tabindex="-1">
+          {{ showConfirmPassword ? '🙈' : '👁️' }}
+        </button>
+      </div>
       <small class="err" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('required')">
         Υποχρεωτικό πεδίο
       </small>

@@ -120,3 +120,34 @@
   font-size: 12px;
   margin-top: 2px;
 }
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 42px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  width: auto !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  line-height: 1;
+  color: #64748b;
+  margin-top: 0 !important;
+}
+
+.toggle-password:hover {
+  background: none !important;
+  transform: none;
+}

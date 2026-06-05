@@ -185,8 +185,8 @@ export class AdminDiscountsComponent implements OnInit {
     });
   }
 
-  deleteCode(id: number): void {
-    if (!confirm('Διαγραφή κωδικού;')) return;
+  deleteCode(id: number, code: string): void {
+    if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`)) return;
 
     this.http.delete<any>(`${this.apiUrl}/${id}`).subscribe({
       next: (res) => {

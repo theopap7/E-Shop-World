@@ -209,6 +209,16 @@
   text-align: center;
   text-decoration: none;
   display: block;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.checkout-btn:hover {
+  background: #1d4ed8;
 }
 
 .view-cart-btn {
