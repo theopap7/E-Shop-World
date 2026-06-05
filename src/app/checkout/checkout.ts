@@ -107,7 +107,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   get total(): number {
     const base = this.subtotal + this.shippingCost - this.discountAmount;
-    return Number(base.toFixed(2));
+    return Math.max(0, Number(base.toFixed(2)));
   }
 
   private recalcTotals(): void {

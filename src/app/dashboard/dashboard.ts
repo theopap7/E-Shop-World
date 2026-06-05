@@ -6,6 +6,7 @@ import { ProductListComponent } from '../product.list.component';
 import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { WishlistService } from '../wishlist-service';
+import { ToastService } from '../toast.service';
 
 
 @Component({
@@ -27,6 +28,7 @@ export class Dashboard implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private wishlistService: WishlistService,
+    private toastService: ToastService,
   ) {}
 
 wishlistCount = 0;  
@@ -58,6 +60,7 @@ toggleCart(): void {
   logout(): void {
     this.authService.logout();
     this.isLoggedIn = false;
+    this.toastService.info('Αποσυνδέθηκες επιτυχώς 👋');
     this.router.navigate(['/login']);
   }
 }

@@ -1815,10 +1815,13 @@ app.get('/api/orders/:id/pdf', authenticateToken, async (req, res) => {
     // Διεύθυνση αποστολής (δεξιά)
     doc.font('RobotoBold').fontSize(11).text('ΔΙΕΥΘΥΝΣΗ ΑΠΟΣΤΟΛΗΣ', 300, 120);
     doc.font('Roboto').fontSize(10)
-      .text(`Ονοματεπώνυμο: ${order.recipient_name}`, 300, 136)
-      .text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
+      .text(`Ονοματεπώνυμο: ${order.recipient_name}`, 300, 136);
 
-    if (order.floor) {
+    if (order.shipping_method === 'pickup') {
+      doc.text('Παραλαβή από το κατάστημα', 300, 151, { width: 230 });
+      doc.text(`Τηλέφωνο: ${order.phone}`, 300, 166, { width: 230, lineBreak: false });
+    } else if (order.floor) {
+      doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
       doc.text(`Όροφος: ${order.floor}`, 300, 166, { width: 230, lineBreak: false });
       doc.text(`ΤΚ: ${order.ship_zip}`, 300, 181, { width: 230, lineBreak: false });
       doc.text(`Πόλη: ${order.ship_city}`, 300, 196, { width: 230, lineBreak: false });
@@ -1826,6 +1829,7 @@ app.get('/api/orders/:id/pdf', authenticateToken, async (req, res) => {
       doc.text(`Τηλέφωνο: ${order.phone}`, 300, 226, { width: 230, lineBreak: false });
       if (order.ship_notes) doc.text(`Σημειώσεις: ${order.ship_notes}`, 300, 241, { width: 230 });
     } else {
+      doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
       doc.text(`ΤΚ: ${order.ship_zip}`, 300, 166, { width: 230, lineBreak: false });
       doc.text(`Πόλη: ${order.ship_city}`, 300, 181, { width: 230, lineBreak: false });
       doc.text(`Χώρα: ${order.ship_country}`, 300, 196, { width: 230, lineBreak: false });
@@ -1833,7 +1837,7 @@ app.get('/api/orders/:id/pdf', authenticateToken, async (req, res) => {
       if (order.ship_notes) doc.text(`Σημειώσεις: ${order.ship_notes}`, 300, 226, { width: 230 });
     }
 
-    let tableY = order.ship_notes ? 360 : (order.floor ? 320 : 305);
+    let tableY = order.shipping_method === 'pickup' ? 260 : (order.ship_notes ? 360 : (order.floor ? 320 : 305));
 
     // Table header
     const cols = { product: 60, qty: 330, price: 410, total: 490 };

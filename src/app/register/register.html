@@ -61,7 +61,9 @@
       </small>
     </div>
 
-    <button type="submit" class="btn btn-primary">Εγγραφή</button>
+    <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Εγγραφή...' : 'Εγγραφή' }}
+    </button>
   </form>
 
   <p>
