@@ -47,6 +47,15 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   updateStatus(orderId: number, newStatus: string): void {
+    if (newStatus === 'cancelled' && !confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`)) {
+      const order = this.orders.find(o => o.id === orderId);
+      if (order) {
+        const prev = order.status;
+        order.status = '';
+        setTimeout(() => order.status = prev, 0);
+      }
+      return;
+    }
     this.adminService.updateOrderStatus(orderId, newStatus).subscribe({
       next: (res) => {
         if (res.success) {

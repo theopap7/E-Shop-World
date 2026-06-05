@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, AuthUser } from './auth.service';
 import { HttpClient } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ToastService } from './toast.service';
 import { environment } from '../environments/environment';
 
@@ -31,9 +31,10 @@ export class ProfileComponent {
 
   // ✅ INJECT ToastService
   constructor(
-    private auth: AuthService, 
+    private auth: AuthService,
     private http: HttpClient,
-    private toastService: ToastService 
+    private toastService: ToastService,
+    private router: Router
   ) {
     this.user = this.auth.getUser();
   }
@@ -44,7 +45,7 @@ export class ProfileComponent {
     // ✅ Toast: Logout
     this.toastService.info('Αποσυνδέθηκες επιτυχώς 👋');
     
-    location.href = '/login';
+    this.router.navigate(['/login']);
   }
 
   changePassword() {

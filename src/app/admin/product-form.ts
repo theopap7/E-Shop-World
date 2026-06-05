@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../admin.service';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../toast.service';
 import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })

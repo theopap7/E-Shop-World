@@ -322,15 +322,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           this.cart.clear();
 
           setTimeout(() => {
+            this.isSubmitting = false;
             this.router.navigate(['/profile/orders', id]);
           }, 600);
         } else {
           this.error = res.message || 'Αποτυχία δημιουργίας παραγγελίας.';
+          this.isSubmitting = false;
         }
-        this.isSubmitting = false;
       },
       error: (err) => {
-        console.error(err);
         const message = err?.error?.message || 'Σφάλμα επικοινωνίας με τον server.';
         this.error = message;
         this.toastService.error(message);

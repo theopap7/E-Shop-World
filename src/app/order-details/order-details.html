@@ -103,7 +103,7 @@
         </div>
 
         <!-- Διεύθυνση Αποστολής -->
-        <div class="card">
+        <div class="card" *ngIf="order.shipping_method !== 'pickup'">
 
           <h3 class="h3">Διεύθυνση Αποστολής</h3>
 
@@ -137,6 +137,15 @@
             <strong>{{ order.ship_notes }}</strong>
           </div>
 
+        </div>
+
+        <!-- Pickup info -->
+        <div class="card" *ngIf="order.shipping_method === 'pickup'">
+          <h3 class="h3">Τρόπος Παραλαβής</h3>
+          <div class="row">
+            <span>Παραλαβή από το κατάστημα</span>
+            <strong>Δωρεάν</strong>
+          </div>
         </div>
 
         <!-- Αποστολή & Πληρωμή -->
