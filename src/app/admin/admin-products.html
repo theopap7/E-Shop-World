@@ -73,13 +73,10 @@
               <td>
                 <div class="thumb">
                   <img
-                    *ngIf="product.image_url"
-                    [src]="product.image_url"
+                    [src]="product.image_url || 'no-image.svg'"
                     [alt]="product.name"
+                    (error)="$any($event.target).src='no-image.svg'"
                   />
-                  <div *ngIf="!product.image_url" class="thumb-placeholder">
-                    No image
-                  </div>
                 </div>
               </td>
 
