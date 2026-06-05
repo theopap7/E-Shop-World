@@ -37,11 +37,7 @@ export class WishlistComponent implements OnInit, OnDestroy {
 
     this.sub = this.wishlistService.items$.subscribe(items => {
       this.items = items;
-
-      // μικρό delay για smooth skeleton UX
-      setTimeout(() => {
-        this.isLoading = false;
-      }, 500);
+      this.isLoading = false;
     });
 
   }

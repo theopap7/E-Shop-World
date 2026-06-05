@@ -35,7 +35,7 @@
 
         <hr />
 
-        <div formGroupName="shipping">
+        <div formGroupName="shipping" *ngIf="form.get('shippingMethod')?.value !== 'pickup'">
           <h3>Διεύθυνση αποστολής</h3>
 
           <label>

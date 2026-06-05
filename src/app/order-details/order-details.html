@@ -16,23 +16,22 @@
 
         <h2 class="title">Παραγγελία #{{ orderId }}</h2>
 
-    <div class="export-buttons">
+    <div class="export-buttons" *ngIf="!isLoading && order">
 
         <!-- PDF για όλους -->
-       <button class="btn btn-primary" (click)="downloadPDF(orderId)">
-           📄 Κατέβασμα PDF
-          </button>
+        <button class="btn btn-primary" (click)="downloadPDF(orderId)">
+          📄 Κατέβασμα PDF
+        </button>
 
-            <!-- CSV μόνο για admin -->
-          <button 
-         *ngIf="isAdminPage"
-         class="btn btn-secondary"
-         (click)="downloadCSV(orderId)"
-             >
+        <!-- CSV μόνο για admin -->
+        <button
+          *ngIf="isAdminPage"
+          class="btn btn-secondary"
+          (click)="downloadCSV(orderId)">
           📊 Κατέβασμα CSV
-           </button>
+        </button>
 
-</div>    
+    </div>    
 
         <div class="meta" *ngIf="order">
           <span class="meta-text">{{ order.created_at | date:'short' }}</span>

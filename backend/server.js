@@ -400,7 +400,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
   }
 
   const ship = shipping || {};
-  if (!ship.city || !ship.zip || !ship.address1) {
+  if (shippingMethod !== 'pickup' && (!ship.city || !ship.zip || !ship.address1)) {
     return res.status(400).json({ success: false, message: 'Λείπει διεύθυνση αποστολής (πόλη/ΤΚ/διεύθυνση)' });
   }
 
@@ -1037,26 +1037,34 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
     // Αν γίνει delivered + αντικαταβολή → πληρωμένη
     if (status === 'delivered' && paymentMethod === 'cod') {
       await db.query(
-        `UPDATE orders
-         SET status = ?, payment_status = 'paid'
-         WHERE id = ?`,
+        `UPDATE orders SET status = ?, payment_status = 'paid' WHERE id = ?`,
         [status, orderId]
       );
     // Αν γίνει cancelled + ήταν πληρωμένη → επιστροφή χρημάτων
     } else if (status === 'cancelled' && currentPaymentStatus === 'paid') {
       await db.query(
-        `UPDATE orders
-         SET status = ?, payment_status = 'refunded'
-         WHERE id = ?`,
+        `UPDATE orders SET status = ?, payment_status = 'refunded' WHERE id = ?`,
         [status, orderId]
       );
     } else {
       await db.query(
-        `UPDATE orders
-         SET status = ?
-         WHERE id = ?`,
+        `UPDATE orders SET status = ? WHERE id = ?`,
         [status, orderId]
       );
+    }
+
+    // Αν ακυρώθηκε → επιστροφή stock στα products
+    if (status === 'cancelled') {
+      const [orderItems] = await db.query(
+        'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+        [orderId]
+      );
+      for (const item of orderItems) {
+        await db.query(
+          'UPDATE products SET stock = stock + ? WHERE id = ?',
+          [item.quantity, item.product_id]
+        );
+      }
     }
 
     res.json({ success: true, message: 'Η κατάσταση παραγγελίας ενημερώθηκε' });
@@ -1773,8 +1781,7 @@ app.get('/api/orders/:id/pdf', authenticateToken, async (req, res) => {
       WHERE oi.order_id = ?
     `, [orderId]);
 
-    const PDFDocument = require('pdfkit');
-    const path = require('path');
+
 
     const paymentMethodMap = { cod: 'Αντικαταβολή', card_mock: 'Κάρτα', bank_transfer: 'Τραπεζική Μεταφορά' };
     const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };

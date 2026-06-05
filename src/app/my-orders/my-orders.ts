@@ -65,17 +65,6 @@ export class MyOrdersComponent implements OnInit {
   }
 
 
-  getStatusClass(status: string): string {
-    const x = (status || '').toLowerCase();
-    if (x === 'pending') return 'status-pending';
-    if (x === 'paid') return 'status-paid';
-    if (x === 'shipped') return 'status-shipped';
-    if (x === 'delivered') return 'status-delivered';
-    if (x === 'completed') return 'status-completed';
-    if (x === 'cancelled') return 'status-cancelled';
-    return 'status-pending';
-  }
-
   normalizeStatus(status: string): 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' {
     const x = (status || '').toLowerCase();
 

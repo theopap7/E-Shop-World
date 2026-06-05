@@ -62,7 +62,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         city: ['', [Validators.required]],
         zip: ['', [Validators.required]],
         address1: ['', [Validators.required]],
-        address2: [''],
         floor: [''],
         notes: [''],
       }),
@@ -89,9 +88,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.recalcTotals();
     });
 
-    this.form.get('shippingMethod')!.valueChanges.subscribe(() => this.recalcTotals());
+    this.form.get('shippingMethod')!.valueChanges.subscribe(() => {
+      this.recalcTotals();
+      this.applyShippingValidators();
+    });
     this.form.get('paymentMethod')!.valueChanges.subscribe(() => this.applyPaymentValidators());
     this.applyPaymentValidators();
+    this.applyShippingValidators();
 
     if (this.cart.getItems().length === 0) {
       this.router.navigate(['/cart']);
@@ -175,6 +178,27 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     cardHolder.updateValueAndValidity();
     cardExp.updateValueAndValidity();
     cardCvv.updateValueAndValidity();
+  }
+
+  private applyShippingValidators(): void {
+    const method = this.form.get('shippingMethod')!.value as ShippingMethod;
+    const city = this.form.get('shipping.city')!;
+    const zip = this.form.get('shipping.zip')!;
+    const address1 = this.form.get('shipping.address1')!;
+
+    if (method === 'pickup') {
+      city.clearValidators();
+      zip.clearValidators();
+      address1.clearValidators();
+    } else {
+      city.setValidators([Validators.required]);
+      zip.setValidators([Validators.required]);
+      address1.setValidators([Validators.required]);
+    }
+
+    city.updateValueAndValidity();
+    zip.updateValueAndValidity();
+    address1.updateValueAndValidity();
   }
 
   applyDiscount(): void {
@@ -263,7 +287,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         city: String(v.shipping?.city || '').trim(),
         zip: String(v.shipping?.zip || '').trim(),
         address1: String(v.shipping?.address1 || '').trim(),
-        address2: String(v.shipping?.address2 || '').trim() || undefined,
         floor: String(v.shipping?.floor || '').trim() || undefined,
         notes: String(v.shipping?.notes || '').trim() || undefined,
       },

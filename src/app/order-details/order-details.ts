@@ -171,19 +171,16 @@ downloadCSV(orderId: number) {
   }
 
 downloadPDF(orderId: number) {
-
-  this.adminService.downloadOrderPDF(orderId).subscribe(blob => {
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `order-${orderId}.pdf`;
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-
+  this.orderService.downloadOrderPDF(orderId).subscribe({
+    next: blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `order-${orderId}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
+    error: () => this.toastService.error('Αποτυχία λήψης PDF')
   });
-
 }
 }

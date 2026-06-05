@@ -35,7 +35,7 @@
       <div class="row" *ngFor="let item of items">
         <div class="left">
           <div class="name">{{ item.name }}</div>
-          <div class="muted">{{ item.price }} € / τεμ</div>
+          <div class="muted">{{ item.price | number:'1.2-2' }} € / τεμ</div>
         </div>
 
         <div class="right">

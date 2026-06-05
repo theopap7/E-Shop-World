@@ -9,6 +9,7 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  stock: number;
 }
 
 const GUEST_KEY = 'ecom_cart_guest';
@@ -78,6 +79,10 @@ export class CartService implements OnDestroy {
     const existing = items.find(i => i.productId === product.id);
 
     if (existing) {
+      if (existing.quantity >= product.stock) {
+        this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα για "${product.name}"`);
+        return;
+      }
       existing.quantity += 1;
     } else {
       items.push({
@@ -85,12 +90,11 @@ export class CartService implements OnDestroy {
         name: product.name,
         price: product.price,
         quantity: 1,
+        stock: product.stock,
       });
     }
 
     this.setItems(items);
-    
-    // ✅ ADD THIS LINE
     this.toastService.success(`${product.name} προστέθηκε στο καλάθι!`);
   }
 
@@ -98,6 +102,10 @@ export class CartService implements OnDestroy {
     const items = [...this.itemsSubject.value];
     const item = items.find(i => i.productId === productId);
     if (!item) return;
+    if (item.quantity >= item.stock) {
+      this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα`);
+      return;
+    }
     item.quantity += 1;
     this.setItems(items);
   }

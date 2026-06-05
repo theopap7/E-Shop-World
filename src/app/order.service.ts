@@ -13,8 +13,7 @@ export interface ShippingDto {
   city: string;
   zip: string;
   address1: string;
-  address2?: string;
-  floor?: string;  // ✅ ΠΡΟΣΘΗΚΗ: Όροφος
+  floor?: string;
   notes?: string;
 }
 
@@ -71,8 +70,12 @@ export class OrderService {
     return this.http.get(`${this.baseUrl}/my-orders/${orderId}`);
   }
   getAdminOrderDetails(orderId: number): Observable<any> {
-  return this.http.get(`${this.baseUrl}/admin/orders/${orderId}`);
-}
+    return this.http.get(`${this.baseUrl}/admin/orders/${orderId}`);
+  }
+
+  downloadOrderPDF(orderId: number) {
+    return this.http.get(`${this.baseUrl}/orders/${orderId}/pdf`, { responseType: 'blob' });
+  }
 }
 
 
