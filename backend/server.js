@@ -1762,7 +1762,7 @@ app.get('/api/orders/:id/pdf', authenticateToken, async (req, res) => {
     if (role !== 'admin') { query += ' AND o.user_id = ?'; params.push(userId); }
 
     const [orders] = await db.query(query, params);
-    if (!orders.length) return res.status(403).json({ message: 'Not allowed' });
+    if (!orders.length) return res.status(403).json({ message: 'Δεν επιτρέπεται η πρόσβαση σε αυτή την παραγγελία' });
 
     const order = orders[0];
 
