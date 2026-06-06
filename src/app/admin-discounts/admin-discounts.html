@@ -212,8 +212,8 @@
       <button type="button" class="btn btn-outline" (click)="closeModal()">
         Ακύρωση
       </button>
-      <button type="button" class="btn btn-primary" (click)="saveCode()">
-        {{ isEditMode ? 'Αποθήκευση' : 'Δημιουργία' }}
+      <button type="button" class="btn btn-primary" (click)="saveCode()" [disabled]="isSaving">
+        {{ isSaving ? 'Αποθήκευση...' : (isEditMode ? 'Αποθήκευση' : 'Δημιουργία') }}
       </button>
     </div>
 

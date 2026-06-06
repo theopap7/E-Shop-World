@@ -24,7 +24,9 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="!loginForm.valid">Σύνδεση</button>
+    <button type="submit" [disabled]="!loginForm.valid || isSubmitting">
+      {{ isSubmitting ? 'Σύνδεση...' : 'Σύνδεση' }}
+    </button>
   </form>
   <p>
     Δεν έχεις λογαριασμό; <a routerLink="/register">Εγγραφή</a>

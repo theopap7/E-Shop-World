@@ -16,6 +16,7 @@ export class AdminOrdersComponent implements OnInit {
   orders: AdminOrder[] = [];
   isLoading = true;
   error: string | null = null;
+  updatingId: number | null = null;
 
   constructor(
     private adminService: AdminService,
@@ -47,6 +48,8 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   updateStatus(orderId: number, newStatus: string): void {
+    if (this.updatingId === orderId) return;
+
     if (newStatus === 'cancelled' && !confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`)) {
       const order = this.orders.find(o => o.id === orderId);
       if (order) {
@@ -56,6 +59,8 @@ export class AdminOrdersComponent implements OnInit {
       }
       return;
     }
+
+    this.updatingId = orderId;
     this.adminService.updateOrderStatus(orderId, newStatus).subscribe({
       next: (res) => {
         if (res.success) {
@@ -63,10 +68,11 @@ export class AdminOrdersComponent implements OnInit {
           if (order) order.status = newStatus;
           this.toastService.success('Κατάσταση παραγγελίας ενημερώθηκε!');
         }
+        this.updatingId = null;
       },
       error: (err) => {
-        console.error('Update status error:', err);
         this.toastService.error(err?.error?.message || 'Αποτυχία ενημέρωσης κατάστασης');
+        this.updatingId = null;
       },
     });
   }

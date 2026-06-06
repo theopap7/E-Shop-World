@@ -33,6 +33,7 @@ export class AdminDiscountsComponent implements OnInit {
   showModal = false;
   isEditMode = false;
   editingCodeId: number | null = null;
+  isSaving = false;
 
   form = {
     code: '',
@@ -119,6 +120,8 @@ export class AdminDiscountsComponent implements OnInit {
       this.toastService.warning('Συμπλήρωσε όλα τα υποχρεωτικά πεδία');
       return;
     }
+    if (this.isSaving) return;
+    this.isSaving = true;
 
     const payload = {
       code: this.form.code.toUpperCase(),
@@ -136,6 +139,7 @@ export class AdminDiscountsComponent implements OnInit {
         payload
       ).subscribe({
         next: (res) => {
+          this.isSaving = false;
           if (res.success) {
             this.toastService.success('Ο κωδικός ενημερώθηκε ✏️');
             this.closeModal();
@@ -143,6 +147,7 @@ export class AdminDiscountsComponent implements OnInit {
           }
         },
         error: (err) => {
+          this.isSaving = false;
           this.toastService.error(err.error?.message || 'Σφάλμα ενημέρωσης');
         }
       });
@@ -151,6 +156,7 @@ export class AdminDiscountsComponent implements OnInit {
 
     this.http.post<any>(this.apiUrl, payload).subscribe({
       next: (res) => {
+        this.isSaving = false;
         if (res.success) {
           this.toastService.success('Κωδικός δημιουργήθηκε! 🎟️');
           this.closeModal();
@@ -158,6 +164,7 @@ export class AdminDiscountsComponent implements OnInit {
         }
       },
       error: (err) => {
+        this.isSaving = false;
         this.toastService.error(err.error?.message || 'Σφάλμα δημιουργίας');
       }
     });

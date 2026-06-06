@@ -65,6 +65,7 @@ export class OrderDetailsComponent implements OnInit {
 
   isAdminPage = false;
   isCancelling = false;
+  isConfirmingPayment = false;
 
   showReturnForm = false;
   returnReason = '';
@@ -256,13 +257,17 @@ downloadCSV(orderId: number) {
 
 
   confirmPayment(): void {
+    if (this.isConfirmingPayment) return;
+    this.isConfirmingPayment = true;
     this.adminService.confirmPayment(this.orderId).subscribe({
       next: () => {
         this.toastService.success('Η πληρωμή επιβεβαιώθηκε!');
+        this.isConfirmingPayment = false;
         this.loadDetails();
       },
       error: (err) => {
         this.toastService.error(err?.error?.message || 'Αποτυχία επιβεβαίωσης');
+        this.isConfirmingPayment = false;
       }
     });
   }

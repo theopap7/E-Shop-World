@@ -16,6 +16,7 @@ import { ToastService } from '../toast.service';  // ✅ ADD
 export class LoginComponent {
   loginForm: FormGroup;
   showPassword = false;
+  isSubmitting = false;
 
   // ✅ INJECT ToastService
   constructor(
@@ -31,16 +32,17 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const { email, password } = this.loginForm.value;
 
       this.authService.login(email, password).subscribe({
         next: (response: any) => {
           this.toastService.success('Καλώς ήρθες πίσω! 👋');
-          
           this.router.navigate(['/dashboard']);
         },
         error: (error: any) => {
+          this.isSubmitting = false;
           if (error.status === 429) {
             this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.');
           } else {
@@ -48,8 +50,7 @@ export class LoginComponent {
           }
         }
       });
-    } else {
-      // ✅ Toast: Validation error
+    } else if (!this.isSubmitting) {
       this.toastService.warning('Παρακαλώ συμπλήρωσε όλα τα πεδία σωστά');
     }
   }

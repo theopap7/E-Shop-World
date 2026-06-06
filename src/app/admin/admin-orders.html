@@ -131,7 +131,7 @@
   class="select"
   [value]="order.status"
   (change)="updateStatus(order.id, $any($event.target).value)"
-  [disabled]="order.status === 'delivered' || order.status === 'cancelled'"
+  [disabled]="order.status === 'delivered' || order.status === 'cancelled' || updatingId === order.id"
 >
 
   <option value="pending">

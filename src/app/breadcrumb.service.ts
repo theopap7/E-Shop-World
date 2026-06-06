@@ -51,7 +51,7 @@ export class BreadcrumbService {
  
     // Always start with Home
     breadcrumbs.push({
-      label: 'Home',
+      label: 'Αρχική',
       url: '/dashboard',
       active: false
     });
@@ -118,8 +118,14 @@ export class BreadcrumbService {
           url: '/admin/discounts',
           active: true
         });
+      } else if (segments[1] === 'returns') {
+        breadcrumbs.push({
+          label: 'Αιτήματα Επιστροφής',
+          url: '/admin/returns',
+          active: true
+        });
       }
- 
+
       return breadcrumbs;
     }
  
