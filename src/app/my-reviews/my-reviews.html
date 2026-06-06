@@ -63,9 +63,10 @@
           <button
             class="btn btn-danger"
             type="button"
+            [disabled]="deletingId === review.id"
             (click)="deleteReview(review.id)"
           >
-            Διαγραφή
+            {{ deletingId === review.id ? 'Διαγραφή...' : 'Διαγραφή' }}
           </button>
         </div>
       </ng-container>

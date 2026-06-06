@@ -34,8 +34,16 @@
     <div *ngIf="items.length > 0" class="cart-card">
       <div class="row" *ngFor="let item of items">
         <div class="left">
-          <div class="name">{{ item.name }}</div>
-          <div class="muted">{{ item.price | number:'1.2-2' }} € / τεμ</div>
+          <img
+            class="item-thumb"
+            [src]="item.image_url || 'no-image.svg'"
+            [alt]="item.name"
+            (error)="$any($event.target).src='no-image.svg'"
+          />
+          <div>
+            <div class="name">{{ item.name }}</div>
+            <div class="muted">{{ item.price | number:'1.2-2' }} € / τεμ</div>
+          </div>
         </div>
 
         <div class="right">

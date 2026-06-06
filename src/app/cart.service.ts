@@ -10,6 +10,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   stock: number;
+  image_url?: string;
 }
 
 const GUEST_KEY = 'ecom_cart_guest';
@@ -91,6 +92,7 @@ export class CartService implements OnDestroy {
         price: product.price,
         quantity: 1,
         stock: product.stock,
+        image_url: product.image_url,
       });
     }
 

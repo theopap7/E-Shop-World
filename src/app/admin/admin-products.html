@@ -121,8 +121,9 @@
                     type="button"
                     (click)="deleteProduct(product.id, product.name)"
                     class="icon-btn icon-danger"
+                    [disabled]="deletingId === product.id"
                     title="Διαγραφή">
-                    🗑️
+                    {{ deletingId === product.id ? '⏳' : '🗑️' }}
                   </button>
                 </div>
               </td>

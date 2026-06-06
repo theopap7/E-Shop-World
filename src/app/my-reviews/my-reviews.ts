@@ -23,6 +23,7 @@ export class MyReviewsComponent implements OnInit {
   editComment = '';
   isUpdating = false;
   updateError = '';
+  deletingId: number | null = null;
 
   constructor(
     private reviewService: ReviewService,
@@ -50,10 +51,13 @@ export class MyReviewsComponent implements OnInit {
   }
 
   deleteReview(reviewId: number): void {
+    if (this.deletingId === reviewId) return;
     if (!confirm('Διαγραφή κριτικής;')) return;
 
+    this.deletingId = reviewId;
     this.reviewService.deleteReview(reviewId).subscribe({
       next: () => {
+        this.deletingId = null;
         this.toastService.success('Η κριτική διαγράφηκε');
         this.reviews = this.reviews.filter(r => r.id !== reviewId);
 
@@ -62,6 +66,7 @@ export class MyReviewsComponent implements OnInit {
         }
       },
       error: (err) => {
+        this.deletingId = null;
         this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής');
       }
     });

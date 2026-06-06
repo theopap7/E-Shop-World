@@ -15,6 +15,7 @@ export class AdminProductsComponent implements OnInit {
   products: Product[] = [];
   isLoading = true;
   error: string | null = null;
+  deletingId: number | null = null;
 
   constructor(
     private adminService: AdminService,
@@ -45,12 +46,15 @@ export class AdminProductsComponent implements OnInit {
   }
 
   deleteProduct(id: number, name: string): void {
+    if (this.deletingId === id) return;
     if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το "${name}";`)) {
       return;
     }
 
+    this.deletingId = id;
     this.adminService.deleteProduct(id).subscribe({
       next: (res) => {
+        this.deletingId = null;
         if (res.success) {
           this.products = this.products.filter((p) => p.id !== id);
           this.toastService.success(res.message || 'Το προϊόν διαγράφηκε!');
@@ -59,7 +63,7 @@ export class AdminProductsComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Delete product error:', err);
+        this.deletingId = null;
         const errorMessage = err?.error?.message || err?.message || 'Αποτυχία διαγραφής προϊόντος';
         this.toastService.error(errorMessage);
       },
