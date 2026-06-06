@@ -19,9 +19,14 @@ export class ProfileComponent {
 
   loading = false;
 
+  // Edit profile state
+  editMode = false;
+  isUpdating = false;
+  editForm = { firstName: '', lastName: '', email: '' };
+
   currentPassword = '';
   newPassword = '';
-  confirmPassword = ''; 
+  confirmPassword = '';
   passwordError: string | null = null;
   passwordSuccess: string | null = null;
   changingPassword = false;
@@ -37,6 +42,45 @@ export class ProfileComponent {
     private router: Router
   ) {
     this.user = this.auth.getUser();
+  }
+
+  startEdit(): void {
+    if (!this.user) return;
+    this.editForm = {
+      firstName: this.user.firstName,
+      lastName: this.user.lastName,
+      email: this.user.email
+    };
+    this.editMode = true;
+  }
+
+  cancelEdit(): void {
+    this.editMode = false;
+  }
+
+  updateProfile(): void {
+    const { firstName, lastName, email } = this.editForm;
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      this.toastService.warning('Συμπλήρωσε όλα τα πεδία');
+      return;
+    }
+
+    this.isUpdating = true;
+    this.http.put<any>(`${environment.apiUrl}/me`, { firstName, lastName, email }).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.auth.updateUser(res.user);
+          this.user = res.user;
+          this.editMode = false;
+          this.toastService.success('Το προφίλ ενημερώθηκε επιτυχώς!');
+        }
+        this.isUpdating = false;
+      },
+      error: (err) => {
+        this.toastService.error(err.error?.message || 'Σφάλμα ενημέρωσης προφίλ');
+        this.isUpdating = false;
+      }
+    });
   }
 
   logout() {

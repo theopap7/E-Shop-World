@@ -213,6 +213,25 @@
   color: #b91c1c;
 }
 
+.return-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.return-badge--approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.return-badge--rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
 /* =========================
    EXPAND BUTTON
 ========================= */

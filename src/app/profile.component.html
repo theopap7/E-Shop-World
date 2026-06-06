@@ -84,6 +84,63 @@
           </a>
         </div>
 
+        <!-- Edit Profile Section -->
+        <div class="edit-profile-section">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Στοιχεία Λογαριασμού</h3>
+              <p class="section-subtitle">Επεξεργασία προσωπικών στοιχείων</p>
+            </div>
+            <span class="section-icon">✏️</span>
+          </div>
+
+          <!-- View mode -->
+          <div *ngIf="!editMode" class="profile-info">
+            <div class="profile-info-row">
+              <span class="info-label">Όνομα</span>
+              <span class="info-value">{{ user!.firstName }}</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="info-label">Επώνυμο</span>
+              <span class="info-value">{{ user!.lastName }}</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ user!.email }}</span>
+            </div>
+            <button class="btn btn-outline btn-edit" type="button" (click)="startEdit()">
+              ✏️ Επεξεργασία
+            </button>
+          </div>
+
+          <!-- Edit mode -->
+          <form *ngIf="editMode" class="edit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Όνομα <span class="required">*</span></label>
+                <input class="form-input" type="text" [(ngModel)]="editForm.firstName" name="firstName" placeholder="Όνομα" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Επώνυμο <span class="required">*</span></label>
+                <input class="form-input" type="text" [(ngModel)]="editForm.lastName" name="lastName" placeholder="Επώνυμο" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email <span class="required">*</span></label>
+              <input class="form-input" type="email" [(ngModel)]="editForm.email" name="email" placeholder="Email" />
+            </div>
+            <div class="edit-actions">
+              <button class="btn btn-outline" type="button" (click)="cancelEdit()" [disabled]="isUpdating">
+                Ακύρωση
+              </button>
+              <button class="btn btn-primary" type="button" (click)="updateProfile()" [disabled]="isUpdating">
+                <span *ngIf="!isUpdating">Αποθήκευση</span>
+                <span *ngIf="isUpdating">Αποθήκευση...</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
         <!-- Password Change Section -->
         <div class="password-section">
           <div class="section-header">

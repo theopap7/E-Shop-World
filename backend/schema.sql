@@ -100,6 +100,29 @@ CREATE TABLE discount_code_usages (
   FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
+CREATE TABLE return_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL UNIQUE,
+  user_id INT NOT NULL,
+  reason TEXT NOT NULL,
+  status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  admin_note TEXT,
+  refund_amount DECIMAL(10,2) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE return_request_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  return_request_id INT NOT NULL,
+  product_id INT NOT NULL,
+  product_name VARCHAR(255) NOT NULL,
+  quantity INT NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (return_request_id) REFERENCES return_requests(id) ON DELETE CASCADE
+);
+
 -- Sample categories
 INSERT INTO categories (name) VALUES ('Ηλεκτρονικά'), ('Ρούχα'), ('Βιβλία'), ('Αθλητικά');
 

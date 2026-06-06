@@ -237,6 +237,107 @@
             <strong>{{ order.total_amount | number:'1.2-2' }} €</strong>
           </div>
 
+          <div class="cancel-section" *ngIf="canCancel">
+
+            <button class="btn btn-danger btn-block" (click)="cancelOrder()" [disabled]="isCancelling">
+              <span *ngIf="!isCancelling">✕ Ακύρωση Παραγγελίας</span>
+              <span *ngIf="isCancelling">Ακύρωση...</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Return Request Section -->
+        <div class="card full return-card" *ngIf="!isAdminPage && order.status === 'delivered'">
+
+          <div class="return-top">
+            <div class="return-top-left">
+              <span class="return-icon">↩</span>
+              <div>
+                <h3 class="h3" style="margin:0 0 4px 0">Επιστροφή Προϊόντος</h3>
+                <p class="return-hint">Έχεις πρόβλημα με την παραγγελία; Υπόβαλε αίτημα επιστροφής.</p>
+              </div>
+            </div>
+            <div *ngIf="!order.return_request && !showReturnForm">
+              <button class="btn btn-warning" (click)="initReturnForm()">
+                ↩ Αίτημα Επιστροφής
+              </button>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <ng-container *ngIf="!order.return_request">
+            <div *ngIf="showReturnForm" class="return-form">
+
+              <p class="return-section-label">Επίλεξε προϊόντα προς επιστροφή:</p>
+
+              <div class="return-items-list">
+                <div class="return-item-row" *ngFor="let item of returnItems">
+                  <label class="return-item-check">
+                    <input type="checkbox" [(ngModel)]="item.selected" [name]="'sel_' + item.productId" />
+                    <span class="return-item-name">{{ item.productName }}</span>
+                  </label>
+                  <div class="return-item-qty" *ngIf="item.selected">
+                    <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty > 1 ? item.selectedQty - 1 : 1">−</button>
+                    <span class="qty-val">{{ item.selectedQty }}</span>
+                    <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty < item.maxQty ? item.selectedQty + 1 : item.maxQty">+</button>
+                    <span class="return-item-price">{{ (item.selectedQty * item.unitPrice) | number:'1.2-2' }} €</span>
+                  </div>
+                  <div class="return-item-qty" *ngIf="!item.selected">
+                    <span class="muted">{{ item.maxQty }} τεμ.</span>
+                  </div>
+                </div>
+              </div>
+
+              <label class="return-label" style="margin-top:12px">Λόγος επιστροφής <span style="color:#ef4444">*</span></label>
+              <textarea
+                class="return-textarea"
+                [(ngModel)]="returnReason"
+                name="returnReason"
+                placeholder="π.χ. Ελαττωματικό προϊόν, λάθος μέγεθος..."
+                rows="3">
+              </textarea>
+              <div class="return-actions">
+                <button class="btn btn-outline" type="button"
+                  (click)="showReturnForm = false; returnReason = ''"
+                  [disabled]="isSubmittingReturn">
+                  Ακύρωση
+                </button>
+                <button class="btn btn-warning" type="button"
+                  (click)="submitReturn()"
+                  [disabled]="isSubmittingReturn || !returnReason.trim() || selectedReturnItems.length === 0">
+                  <span *ngIf="!isSubmittingReturn">Υποβολή Αιτήματος</span>
+                  <span *ngIf="isSubmittingReturn">Υποβολή...</span>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Status -->
+          <ng-container *ngIf="order.return_request">
+            <div class="return-status-card">
+              <div class="return-status-row">
+                <span class="return-status-label">Κατάσταση</span>
+                <span class="pill"
+                  [ngClass]="{
+                    'pill--pending': order.return_request.status === 'pending',
+                    'pill--delivered': order.return_request.status === 'approved',
+                    'pill--cancelled': order.return_request.status === 'rejected'
+                  }">
+                  {{ returnStatusLabel(order.return_request.status) }}
+                </span>
+              </div>
+              <div class="return-status-row">
+                <span class="return-status-label">Λόγος</span>
+                <span>{{ order.return_request.reason }}</span>
+              </div>
+              <div class="return-status-row" *ngIf="order.return_request.admin_note">
+                <span class="return-status-label">Σχόλιο</span>
+                <span>{{ order.return_request.admin_note }}</span>
+              </div>
+            </div>
+          </ng-container>
+
         </div>
 
         <!-- Προϊόντα -->

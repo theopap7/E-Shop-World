@@ -1,0 +1,99 @@
+<section class="page">
+  <div class="container">
+
+    <header class="page-header">
+      <div>
+        <a routerLink="/admin" class="back-button">← Πίσω στο Admin</a>
+        <h2 class="page-title">↩ Αιτήματα Επιστροφής</h2>
+        <p class="page-subtitle" *ngIf="pendingCount > 0">
+          <span class="badge-pending">{{ pendingCount }} σε αναμονή</span>
+        </p>
+      </div>
+    </header>
+
+    <div *ngIf="isLoading" class="card">Φόρτωση...</div>
+
+    <div *ngIf="!isLoading && returns.length === 0" class="card empty-state">
+      <p>Δεν υπάρχουν αιτήματα επιστροφής.</p>
+    </div>
+
+    <div *ngIf="!isLoading && returns.length > 0" class="returns-list">
+      <div class="return-card" *ngFor="let r of returns">
+
+        <div class="return-header">
+          <div class="return-meta">
+            <span class="return-id">Αίτημα #{{ r.id }}</span>
+            <span class="dot">•</span>
+            <a [routerLink]="'/admin/orders/' + r.order_id" class="order-link">Παραγγελία #{{ r.order_id }}</a>
+            <span class="dot">•</span>
+            <span class="return-date">{{ r.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <span class="pill"
+            [ngClass]="{
+              'pill--pending': r.status === 'pending',
+              'pill--approved': r.status === 'approved',
+              'pill--rejected': r.status === 'rejected'
+            }">
+            {{ statusLabel(r.status) }}
+          </span>
+        </div>
+
+        <div class="return-body">
+          <div class="info-row">
+            <span class="info-label">Πελάτης</span>
+            <span>{{ r.first_name }} {{ r.last_name }} — {{ r.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Αξία Παραγγελίας</span>
+            <span>{{ r.total_amount | number:'1.2-2' }} €</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Λόγος</span>
+            <span class="return-reason">{{ r.reason }}</span>
+          </div>
+          <div class="info-row" *ngIf="r.items && r.items.length > 0">
+            <span class="info-label">Προϊόντα</span>
+            <div class="return-items">
+              <div class="return-item" *ngFor="let item of r.items">
+                <span>{{ item.product_name }}</span>
+                <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | number:'1.2-2' }} € = <strong>{{ (item.quantity * item.unit_price) | number:'1.2-2' }} €</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Επιστροφή</span>
+            <strong style="color:#059669">{{ r.refund_amount | number:'1.2-2' }} €</strong>
+          </div>
+          <div class="info-row" *ngIf="r.admin_note">
+            <span class="info-label">Σχόλιο</span>
+            <span>{{ r.admin_note }}</span>
+          </div>
+        </div>
+
+        <div class="return-actions" *ngIf="r.status === 'pending'">
+          <textarea
+            class="admin-note-input"
+            [(ngModel)]="adminNotes[r.id]"
+            [name]="'note_' + r.id"
+            placeholder="Προαιρετικό σχόλιο προς πελάτη..."
+            rows="2">
+          </textarea>
+          <div class="action-buttons">
+            <button class="btn btn-danger-outline"
+              (click)="updateStatus(r, 'rejected')"
+              [disabled]="processingId === r.id">
+              ✕ Απόρριψη
+            </button>
+            <button class="btn btn-success"
+              (click)="updateStatus(r, 'approved')"
+              [disabled]="processingId === r.id">
+              ✓ Έγκριση
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

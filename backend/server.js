@@ -203,6 +203,52 @@ app.get('/api/me', authenticateToken, async (req, res) => {
   }
 });
 
+app.put('/api/me', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { firstName, lastName, email } = req.body;
+
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ success: false, message: 'Όλα τα πεδία είναι υποχρεωτικά' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο email' });
+    }
+
+    const [existing] = await db.query(
+      'SELECT id FROM users WHERE email = ? AND id != ?',
+      [email.toLowerCase().trim(), userId]
+    );
+    if (existing.length > 0) {
+      return res.status(400).json({ success: false, message: 'Το email χρησιμοποιείται ήδη από άλλο λογαριασμό' });
+    }
+
+    await db.query(
+      'UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?',
+      [firstName.trim(), lastName.trim(), email.toLowerCase().trim(), userId]
+    );
+
+    const [rows] = await db.query('SELECT role FROM users WHERE id = ?', [userId]);
+
+    return res.json({
+      success: true,
+      message: 'Το προφίλ ενημερώθηκε επιτυχώς',
+      user: {
+        id: userId,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.toLowerCase().trim(),
+        role: rows[0]?.role
+      }
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 /**
  * ✅ Change password: POST /api/change-password
  * Θέλει token + currentPassword + newPassword
@@ -638,14 +684,16 @@ app.get('/api/my-orders', authenticateToken, async (req, res) => {
 
     const [rows] = await db.query(
       `SELECT
-         id, total_amount, status, created_at,
-         recipient_name, phone,
-         ship_city, ship_zip, ship_address1,
-         shipping_method, shipping_cost,
-         payment_method, payment_status
-       FROM orders
-       WHERE user_id = ?
-       ORDER BY created_at DESC`,
+         o.id, o.total_amount, o.status, o.created_at,
+         o.recipient_name, o.phone,
+         o.ship_city, o.ship_zip, o.ship_address1,
+         o.shipping_method, o.shipping_cost,
+         o.payment_method, o.payment_status,
+         rr.status AS return_status
+       FROM orders o
+       LEFT JOIN return_requests rr ON rr.order_id = o.id
+       WHERE o.user_id = ?
+       ORDER BY o.created_at DESC`,
       [userId]
     );
 
@@ -699,9 +747,237 @@ app.get('/api/my-orders/:orderId', authenticateToken, async (req, res) => {
       [orderId]
     );
 
-    return res.json({ success: true, order, items });
+    const [returnRows] = await db.query(
+      'SELECT id, status, reason, admin_note, created_at FROM return_requests WHERE order_id = ?',
+      [orderId]
+    );
+    const returnRequest = returnRows.length ? returnRows[0] : null;
+
+    return res.json({ success: true, order, items, returnRequest });
   } catch (error) {
     console.error('Order details error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.post('/api/orders/:id/return', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = Number(req.params.id);
+    const { reason, items } = req.body;
+
+    if (!reason || !String(reason).trim()) {
+      return res.status(400).json({ success: false, message: 'Παρακαλώ συμπλήρωσε τον λόγο επιστροφής' });
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, message: 'Επίλεξε τουλάχιστον ένα προϊόν για επιστροφή' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT status FROM orders WHERE id = ? AND user_id = ?',
+      [orderId, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
+    }
+
+    if (rows[0].status !== 'delivered') {
+      return res.status(400).json({ success: false, message: 'Μπορείτε να ζητήσετε επιστροφή μόνο για παραδομένες παραγγελίες' });
+    }
+
+    // Validate items against actual order items
+    const [orderItems] = await db.query(
+      `SELECT oi.product_id, oi.quantity, oi.unit_price, p.name AS product_name
+       FROM order_items oi JOIN products p ON p.id = oi.product_id
+       WHERE oi.order_id = ?`,
+      [orderId]
+    );
+
+    const orderItemMap = {};
+    for (const oi of orderItems) {
+      orderItemMap[oi.product_id] = oi;
+    }
+
+    let refundAmount = 0;
+    const validatedItems = [];
+
+    for (const item of items) {
+      const productId = Number(item.productId);
+      const qty = Number(item.quantity);
+      const oi = orderItemMap[productId];
+
+      if (!oi) return res.status(400).json({ success: false, message: `Προϊόν ${productId} δεν ανήκει σε αυτή την παραγγελία` });
+      if (qty < 1 || qty > oi.quantity) return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${oi.product_name}"` });
+
+      refundAmount += qty * Number(oi.unit_price);
+      validatedItems.push({ productId, productName: oi.product_name, quantity: qty, unitPrice: Number(oi.unit_price) });
+    }
+
+    refundAmount = Number(refundAmount.toFixed(2));
+
+    const [result] = await db.query(
+      'INSERT INTO return_requests (order_id, user_id, reason, refund_amount) VALUES (?, ?, ?, ?)',
+      [orderId, userId, String(reason).trim(), refundAmount]
+    );
+
+    const returnRequestId = result.insertId;
+
+    for (const item of validatedItems) {
+      await db.query(
+        'INSERT INTO return_request_items (return_request_id, product_id, product_name, quantity, unit_price) VALUES (?, ?, ?, ?, ?)',
+        [returnRequestId, item.productId, item.productName, item.quantity, item.unitPrice]
+      );
+    }
+
+    return res.json({ success: true, message: 'Το αίτημα επιστροφής υποβλήθηκε επιτυχώς' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ success: false, message: 'Έχετε ήδη υποβάλει αίτημα επιστροφής για αυτή την παραγγελία' });
+    }
+    console.error('Return request error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.get('/api/admin/returns', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT rr.id, rr.order_id, rr.reason, rr.status, rr.admin_note, rr.refund_amount, rr.created_at,
+              u.first_name, u.last_name, u.email,
+              o.total_amount, o.status AS order_status
+       FROM return_requests rr
+       JOIN users u ON u.id = rr.user_id
+       JOIN orders o ON o.id = rr.order_id
+       ORDER BY rr.created_at DESC`
+    );
+
+    const [itemRows] = await db.query(
+      `SELECT return_request_id, product_id, product_name, quantity, unit_price
+       FROM return_request_items`
+    );
+
+    const itemsByRequest = {};
+    for (const item of itemRows) {
+      if (!itemsByRequest[item.return_request_id]) itemsByRequest[item.return_request_id] = [];
+      itemsByRequest[item.return_request_id].push(item);
+    }
+
+    const returns = rows.map(r => ({ ...r, items: itemsByRequest[r.id] || [] }));
+    return res.json({ success: true, returns });
+  } catch (error) {
+    console.error('Admin returns error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.patch('/api/admin/returns/:id', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const returnId = Number(req.params.id);
+    const { status, adminNote } = req.body;
+
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρη κατάσταση' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT rr.id, rr.order_id, rr.status AS current_status FROM return_requests rr WHERE rr.id = ?',
+      [returnId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Αίτημα δεν βρέθηκε' });
+    }
+
+    const returnReq = rows[0];
+
+    if (returnReq.current_status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Το αίτημα έχει ήδη επεξεργαστεί' });
+    }
+
+    await db.query(
+      'UPDATE return_requests SET status = ?, admin_note = ? WHERE id = ?',
+      [status, adminNote?.trim() || null, returnId]
+    );
+
+    if (status === 'approved') {
+      await db.query(
+        `UPDATE orders SET payment_status = 'refunded' WHERE id = ?`,
+        [returnReq.order_id]
+      );
+
+      const [returnItems] = await db.query(
+        'SELECT product_id, quantity FROM return_request_items WHERE return_request_id = ?',
+        [returnId]
+      );
+      for (const item of returnItems) {
+        await db.query(
+          'UPDATE products SET stock = stock + ? WHERE id = ?',
+          [item.quantity, item.product_id]
+        );
+      }
+    }
+
+    return res.json({ success: true, message: status === 'approved' ? 'Αίτημα εγκρίθηκε — stock & refund ενημερώθηκαν' : 'Αίτημα απορρίφθηκε' });
+  } catch (error) {
+    console.error('Update return error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.patch('/api/orders/:id/cancel', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = Number(req.params.id);
+
+    if (!Number.isFinite(orderId)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο ID παραγγελίας' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT id, user_id, status, payment_status FROM orders WHERE id = ? AND user_id = ?',
+      [orderId, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
+    }
+
+    const order = rows[0];
+
+    if (order.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Μπορείτε να ακυρώσετε μόνο παραγγελίες σε αναμονή'
+      });
+    }
+
+    if (order.payment_status === 'paid') {
+      await db.query(
+        `UPDATE orders SET status = 'cancelled', payment_status = 'refunded' WHERE id = ?`,
+        [orderId]
+      );
+    } else {
+      await db.query(
+        `UPDATE orders SET status = 'cancelled' WHERE id = ?`,
+        [orderId]
+      );
+    }
+
+    const [items] = await db.query(
+      'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+      [orderId]
+    );
+    for (const item of items) {
+      await db.query(
+        'UPDATE products SET stock = stock + ? WHERE id = ?',
+        [item.quantity, item.product_id]
+      );
+    }
+
+    return res.json({ success: true, message: 'Η παραγγελία ακυρώθηκε επιτυχώς' });
+  } catch (error) {
+    console.error('Cancel order error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 });

@@ -10,6 +10,7 @@ type OrderRow = {
   total_amount: number;
   status: string;
   created_at: string;
+  return_status?: string | null;
 };
 
 type OrderItem = {

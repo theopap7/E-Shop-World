@@ -75,6 +75,10 @@
               <span class="status-badge" [ngClass]="'status-badge--' + o.status">
                 {{ statusLabel(o.status) }}
               </span>
+
+              <span *ngIf="o.return_status === 'pending'" class="return-badge">↩ Αίτημα Επιστροφής</span>
+              <span *ngIf="o.return_status === 'approved'" class="return-badge return-badge--approved">✓ Εγκρίθηκε</span>
+              <span *ngIf="o.return_status === 'rejected'" class="return-badge return-badge--rejected">✕ Απορρίφθηκε</span>
             </div>
 
             <div class="order-date">

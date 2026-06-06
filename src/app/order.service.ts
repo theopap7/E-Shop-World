@@ -73,6 +73,14 @@ export class OrderService {
     return this.http.get(`${this.baseUrl}/admin/orders/${orderId}`);
   }
 
+  cancelOrder(orderId: number): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/orders/${orderId}/cancel`, {});
+  }
+
+  submitReturnRequest(orderId: number, reason: string, items: { productId: number; quantity: number }[]): Observable<any> {
+    return this.http.post(`${this.baseUrl}/orders/${orderId}/return`, { reason, items });
+  }
+
   downloadOrderPDF(orderId: number) {
     return this.http.get(`${this.baseUrl}/orders/${orderId}/pdf`, { responseType: 'blob' });
   }

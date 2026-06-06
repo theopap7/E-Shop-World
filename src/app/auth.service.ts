@@ -63,6 +63,11 @@ export class AuthService {
     return user?.role === 'admin';
   }
 
+  updateUser(user: AuthUser): void {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.userSubject.next(user);
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

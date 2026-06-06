@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { OrderService } from '../order.service';
 import { AdminService } from '../admin.service';
@@ -28,6 +29,13 @@ type OrderDto = {
   first_name?: string;
   last_name?: string;
   email?: string;
+  return_request?: {
+    id: number;
+    status: 'pending' | 'approved' | 'rejected';
+    reason: string;
+    admin_note?: string | null;
+    created_at: string;
+  } | null;
 };
 
 type OrderItemDto = {
@@ -41,7 +49,7 @@ type OrderItemDto = {
 @Component({
   selector: 'app-order-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './order-details.html',
   styleUrl: './order-details.css',
 })
@@ -55,8 +63,31 @@ export class OrderDetailsComponent implements OnInit {
   order: OrderDto | null = null;
   items: OrderItemDto[] = [];
 
-  // 🔵 για admin / user navigation
   isAdminPage = false;
+  isCancelling = false;
+
+  showReturnForm = false;
+  returnReason = '';
+  isSubmittingReturn = false;
+  returnItems: { productId: number; productName: string; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number }[] = [];
+
+  get returnTotal(): number {
+    return this.returnItems
+      .filter(i => i.selected && i.selectedQty > 0)
+      .reduce((sum, i) => sum + i.selectedQty * i.unitPrice, 0);
+  }
+
+  get selectedReturnItems() {
+    return this.returnItems.filter(i => i.selected && i.selectedQty > 0);
+  }
+
+  get canCancel(): boolean {
+    return !this.isAdminPage && this.order?.status === 'pending';
+  }
+
+  get canReturn(): boolean {
+    return !this.isAdminPage && this.order?.status === 'delivered' && !this.order?.return_request;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -96,6 +127,7 @@ export class OrderDetailsComponent implements OnInit {
     request.subscribe({
       next: (res: any) => {
         this.order = res?.order ?? null;
+        if (this.order) this.order.return_request = res?.returnRequest ?? null;
         this.items = res?.items ?? [];
         this.isLoading = false;
       },
@@ -138,6 +170,68 @@ export class OrderDetailsComponent implements OnInit {
     if (x === 'REFUNDED') return 'Επιστροφή χρημάτων';
     if (x === 'FAILED') return 'Αποτυχία';
     return status || '—';
+  }
+
+  cancelOrder(): void {
+    if (!confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;')) return;
+
+    this.isCancelling = true;
+    this.orderService.cancelOrder(this.orderId).subscribe({
+      next: () => {
+        this.toastService.success('Η παραγγελία ακυρώθηκε επιτυχώς');
+        this.loadDetails();
+        this.isCancelling = false;
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message || 'Αποτυχία ακύρωσης παραγγελίας');
+        this.isCancelling = false;
+      }
+    });
+  }
+
+  initReturnForm(): void {
+    this.returnItems = this.items.map(i => ({
+      productId: i.product_id,
+      productName: i.product_name,
+      maxQty: i.quantity,
+      selectedQty: i.quantity,
+      selected: false,
+      unitPrice: i.unit_price
+    }));
+    this.showReturnForm = true;
+  }
+
+  submitReturn(): void {
+    if (!this.returnReason.trim()) {
+      this.toastService.warning('Συμπλήρωσε τον λόγο επιστροφής');
+      return;
+    }
+    if (this.selectedReturnItems.length === 0) {
+      this.toastService.warning('Επίλεξε τουλάχιστον ένα προϊόν');
+      return;
+    }
+    this.isSubmittingReturn = true;
+    const items = this.selectedReturnItems.map(i => ({ productId: i.productId, quantity: i.selectedQty }));
+    this.orderService.submitReturnRequest(this.orderId, this.returnReason, items).subscribe({
+      next: () => {
+        this.toastService.success('Το αίτημα επιστροφής υποβλήθηκε!');
+        this.showReturnForm = false;
+        this.returnReason = '';
+        this.loadDetails();
+        this.isSubmittingReturn = false;
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message || 'Αποτυχία υποβολής αιτήματος');
+        this.isSubmittingReturn = false;
+      }
+    });
+  }
+
+  returnStatusLabel(status: string): string {
+    if (status === 'pending') return 'Σε Αναμονή';
+    if (status === 'approved') return 'Εγκρίθηκε';
+    if (status === 'rejected') return 'Απορρίφθηκε';
+    return status;
   }
 
   get itemsTotal(): number {

@@ -19,6 +19,7 @@ import { AdminReviewsComponent } from './admin/admin-reviews';
 import { ProductDetailComponent } from './product-details/product-details';
 import { NotFoundComponent } from './not-found/not-found';
 import { AdminDiscountsComponent } from './admin-discounts/admin-discounts';
+import { AdminReturnsComponent } from './admin/admin-returns';
 
 export const routes: Routes = [
 
@@ -157,6 +158,13 @@ export const routes: Routes = [
     component: AdminDiscountsComponent,
     canActivate: [authGuard, adminGuard],
     data: { breadcrumb: 'Κωδικοί Έκπτωσης' }
+  },
+
+  {
+    path: 'admin/returns',
+    component: AdminReturnsComponent,
+    canActivate: [adminGuard],
+    data: { breadcrumb: 'Αιτήματα Επιστροφής' }
   },
 
   // ===== ERROR (no breadcrumbs) =====
