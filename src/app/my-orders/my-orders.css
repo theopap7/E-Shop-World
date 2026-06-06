@@ -325,6 +325,21 @@
   padding: 8px 0;
 }
 
+.order-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.order-actions .btn,
+.order-actions .btn-soft {
+  flex: 1;
+  justify-content: center;
+  width: auto;
+  text-align: center;
+}
+
 .btn-soft {
   width: 100%;
   justify-content: center;

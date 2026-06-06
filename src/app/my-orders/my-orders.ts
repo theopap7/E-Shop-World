@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrderService } from '../order.service';
-import { OrderTimelineComponent } from '../order-timeline/order-timeline';  
+import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
+import { CartService } from '../cart.service';
 
 type OrderRow = {
   id: number;
@@ -14,10 +15,13 @@ type OrderRow = {
 };
 
 type OrderItem = {
+  product_id: number;
   product_name: string;
   quantity: number;
   unit_price: number;
   line_total: number;
+  stock: number;
+  image_url?: string;
 };
 
 @Component({
@@ -35,7 +39,9 @@ export class MyOrdersComponent implements OnInit {
   itemsMap: Record<number, OrderItem[]> = {};
   loadingItems: Record<number, boolean> = {};
 
-  constructor(private orderService: OrderService) {}
+  reorderingId: number | null = null;
+
+  constructor(private orderService: OrderService, private cartService: CartService) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -81,6 +87,37 @@ export class MyOrdersComponent implements OnInit {
   }
 
   
+  reorderAll(orderId: number): void {
+    if (this.reorderingId === orderId) return;
+    const items = this.itemsMap[orderId];
+    if (items) {
+      this.cartService.reorderItems(items.map(i => ({
+        id: i.product_id,
+        name: i.product_name,
+        price: i.unit_price,
+        stock: i.stock,
+        image_url: i.image_url
+      })));
+      return;
+    }
+    this.reorderingId = orderId;
+    this.orderService.getOrderDetails(orderId).subscribe({
+      next: (res: any) => {
+        const loaded: OrderItem[] = res.items ?? [];
+        this.itemsMap[orderId] = loaded;
+        this.reorderingId = null;
+        this.cartService.reorderItems(loaded.map(i => ({
+          id: i.product_id,
+          name: i.product_name,
+          price: i.unit_price,
+          stock: i.stock,
+          image_url: i.image_url
+        })));
+      },
+      error: () => { this.reorderingId = null; }
+    });
+  }
+
   statusLabel(s: string): string {
     const x = (s || '').toLowerCase();
     if (x === 'pending') return 'Σε Αναμονή';

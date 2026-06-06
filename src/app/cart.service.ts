@@ -104,7 +104,7 @@ export class CartService implements OnDestroy {
     const items = [...this.itemsSubject.value];
     const item = items.find(i => i.productId === productId);
     if (!item) return;
-    if (item.quantity >= item.stock) {
+    if (item.stock && item.quantity >= item.stock) {
       this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα`);
       return;
     }
@@ -128,6 +128,23 @@ export class CartService implements OnDestroy {
     const items = this.itemsSubject.value.filter(i => i.productId !== productId);
     this.setItems(items);
  
+  }
+
+  reorderItems(items: Array<{ id: number; name: string; price: number; stock: number; image_url?: string }>): void {
+    const cart = [...this.itemsSubject.value];
+    for (const item of items) {
+      if (item.stock <= 0) continue;
+      const existing = cart.find(i => i.productId === item.id);
+      if (existing) {
+        existing.stock = item.stock;
+        existing.quantity = Math.min((existing.quantity || 1) + 1, item.stock);
+      } else {
+        cart.push({ productId: item.id, name: item.name, price: item.price, quantity: 1, stock: item.stock, image_url: item.image_url });
+      }
+    }
+    this.setItems(cart);
+    this.toastService.success('Τα προϊόντα προστέθηκαν στο καλάθι!');
+    this.openSidebar();
   }
 
   clear(): void {

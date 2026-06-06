@@ -734,12 +734,14 @@ app.get('/api/my-orders/:orderId', authenticateToken, async (req, res) => {
     const order = orders[0];
 
     const [items] = await db.query(
-      `SELECT 
+      `SELECT
          oi.product_id,
          p.name AS product_name,
          oi.quantity,
          oi.unit_price,
-         (oi.quantity * oi.unit_price) AS line_total
+         (oi.quantity * oi.unit_price) AS line_total,
+         p.stock,
+         p.image_url
        FROM order_items oi
        JOIN products p ON p.id = oi.product_id
        WHERE oi.order_id = ?

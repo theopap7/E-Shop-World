@@ -36,7 +36,7 @@ export const routes: Routes = [
   // ===== REDIRECT ROOT =====
   {
     path: '',
-    redirectTo: '/login',
+    redirectTo: '/dashboard',
     pathMatch: 'full'
   },
 
@@ -44,7 +44,6 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
-    canActivate: [authGuard],
     data: { breadcrumb: 'Προϊόντα' }
   },
 
