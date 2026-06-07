@@ -83,15 +83,24 @@
           {{ product.description || 'Δεν υπάρχει περιγραφή.' }}
         </p>
 
-        <button
-          class="btn btn-primary btn-large"
-          type="button"
-          (click)="addToCart()"
-          [disabled]="product.stock === 0 || addedToCart">
+        <div class="product-actions">
+          <button
+            class="btn btn-primary btn-large"
+            type="button"
+            (click)="addToCart()"
+            [disabled]="product.stock === 0 || addedToCart">
+            {{ addedToCart ? '✅ Προστέθηκε!' : 'Προσθήκη στο καλάθι' }}
+          </button>
 
-          {{ addedToCart ? '✅ Προστέθηκε!' : 'Προσθήκη στο καλάθι' }}
-
-        </button>
+          <button
+            class="btn-wishlist"
+            type="button"
+            (click)="toggleWishlist()"
+            [class.in-wishlist]="isInWishlist()"
+            [title]="isInWishlist() ? 'Αφαίρεση από αγαπημένα' : 'Προσθήκη στα αγαπημένα'">
+            {{ isInWishlist() ? '❤️' : '🤍' }}
+          </button>
+        </div>
 
       </div>
 

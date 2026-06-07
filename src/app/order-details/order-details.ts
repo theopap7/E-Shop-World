@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { OrderService } from '../order.service';
 import { AdminService } from '../admin.service';
 import { ToastService } from '../toast.service';
+import { statusLabel } from '../order-status.util';
 
 type OrderDto = {
   id: number;
@@ -140,15 +141,7 @@ export class OrderDetailsComponent implements OnInit {
     });
   }
 
-  statusLabel(s: string): string {
-    const x = (s || '').toLowerCase();
-    if (x === 'pending') return 'Σε Αναμονή';
-    if (x === 'processing') return 'Σε Επεξεργασία';
-    if (x === 'shipped') return 'Αποστολή';
-    if (x === 'delivered') return 'Παραδόθηκε';
-    if (x === 'cancelled') return 'Ακυρώθηκε';
-    return s || '—';
-  }
+  statusLabel = statusLabel;
 
   shippingMethodLabel(method: string): string {
     if (method === 'courier_standard') return 'Τυπική Αποστολή';

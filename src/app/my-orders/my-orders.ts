@@ -5,6 +5,7 @@ import { OrderService } from '../order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { CartService } from '../cart.service';
+import { statusLabel } from '../order-status.util';
 
 type OrderRow = {
   id: number;
@@ -117,15 +118,7 @@ export class MyOrdersComponent implements OnInit {
     });
   }
 
-  statusLabel(s: string): string {
-    const x = (s || '').toLowerCase();
-    if (x === 'pending') return 'Σε Αναμονή';
-    if (x === 'processing') return 'Σε Επεξεργασία';
-    if (x === 'shipped') return 'Αποστολή';
-    if (x === 'delivered') return 'Παραδόθηκε';
-    if (x === 'cancelled') return 'Ακυρώθηκε';
-    return s || '—';
-  }
+  statusLabel = statusLabel;
 
 
   normalizeStatus(status: string): 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' {

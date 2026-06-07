@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AdminService, AdminOrder } from '../admin.service';
 import { ToastService } from '../toast.service';
+import { statusLabel } from '../order-status.util';
 
 @Component({
   selector: 'app-admin-orders',
@@ -39,8 +40,7 @@ export class AdminOrdersComponent implements OnInit {
         }
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Load orders error:', err);
+      error: () => {
         this.error = 'Σφάλμα φόρτωσης παραγγελιών';
         this.isLoading = false;
       },
@@ -82,21 +82,6 @@ export class AdminOrdersComponent implements OnInit {
     this.router.navigate(['/admin/orders', orderId]);
   }
 
-  statusLabel(status: string): string {
-    switch ((status || '').toLowerCase()) {
-      case 'pending':
-        return 'Σε αναμονή';
-      case 'processing':
-        return 'Σε επεξεργασία';
-      case 'shipped':
-        return 'Απεστάλη';
-      case 'delivered':
-        return 'Παραδόθηκε';
-      case 'cancelled':
-        return 'Ακυρώθηκε';
-      default:
-        return status;
-    }
-  }
+  statusLabel = statusLabel;
 
 }

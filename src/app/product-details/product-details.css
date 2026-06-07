@@ -105,12 +105,43 @@
   flex: 1;
 }
 
+.product-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: auto;
+}
+
 .btn-large {
   padding: 14px 28px;
   font-size: 16px;
   border-radius: 8px;
-  width: 100%;
-  margin-top: auto;
+  flex: 1;
+}
+
+.btn-wishlist {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-wishlist:hover {
+  border-color: #f87171;
+  background: #fff1f2;
+}
+
+.btn-wishlist.in-wishlist {
+  border-color: #f87171;
+  background: #fff1f2;
 }
 
 /* States */

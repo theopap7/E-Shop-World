@@ -37,8 +37,7 @@ export class AdminProductsComponent implements OnInit {
         }
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Load products error:', err);
+      error: () => {
         this.error = 'Σφάλμα φόρτωσης προϊόντων';
         this.isLoading = false;
       },

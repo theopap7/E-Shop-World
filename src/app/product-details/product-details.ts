@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService, ProductDto } from '../product.service';
 import { CartService } from '../cart.service';
+import { WishlistService } from '../wishlist-service';
 import { ReviewsComponent } from '../reviews/reviews';
 import { BreadcrumbService } from '../breadcrumb.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
@@ -26,9 +27,18 @@ export class ProductDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private router: Router,
     private breadcrumbService: BreadcrumbService
   ) {}
+
+  isInWishlist(): boolean {
+    return this.product ? this.wishlistService.isInWishlist(this.product.id) : false;
+  }
+
+  toggleWishlist(): void {
+    if (this.product) this.wishlistService.toggle(this.product);
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

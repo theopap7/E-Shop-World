@@ -1,19 +1,55 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { ProductDto } from './product.service';
-import { ToastService } from './toast.service';  // ✅ ADD
+import { ToastService } from './toast.service';
+import { AuthService, AuthUser } from './auth.service';
 
-const WISHLIST_KEY = 'ecom_wishlist';
+const GUEST_KEY = 'ecom_wishlist_guest';
+const USER_KEY_PREFIX = 'ecom_wishlist_user_';
 
 @Injectable({ providedIn: 'root' })
-export class WishlistService {
-  
+export class WishlistService implements OnDestroy {
+
   private readonly itemsSubject = new BehaviorSubject<ProductDto[]>([]);
   readonly items$ = this.itemsSubject.asObservable();
 
-  // ✅ INJECT ToastService
-  constructor(private toastService: ToastService) {
-    this.itemsSubject.next(this.loadFromStorage());
+  private currentStorageKey = GUEST_KEY;
+  private authSub: Subscription;
+
+  constructor(private toastService: ToastService, private auth: AuthService) {
+    this.setStorageKeyFromUser(this.auth.getUser());
+    this.itemsSubject.next(this.loadFromStorage(this.currentStorageKey));
+
+    this.authSub = this.auth.user$.subscribe((user) => {
+      const prevKey = this.currentStorageKey;
+      this.setStorageKeyFromUser(user);
+
+      if (prevKey !== this.currentStorageKey) {
+        const guestItems = prevKey === GUEST_KEY ? this.loadFromStorage(GUEST_KEY) : [];
+        const userItems = this.loadFromStorage(this.currentStorageKey);
+
+        if (guestItems.length > 0 && user) {
+          const merged = [...userItems];
+          for (const guestItem of guestItems) {
+            if (!merged.some(i => i.id === guestItem.id)) {
+              merged.push(guestItem);
+            }
+          }
+          localStorage.removeItem(GUEST_KEY);
+          this.setItems(merged);
+        } else {
+          this.itemsSubject.next(userItems);
+        }
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.authSub.unsubscribe();
+  }
+
+  private setStorageKeyFromUser(user: AuthUser | null): void {
+    this.currentStorageKey = user?.id ? `${USER_KEY_PREFIX}${user.id}` : GUEST_KEY;
   }
 
   getItems(): ProductDto[] {
@@ -33,14 +69,10 @@ export class WishlistService {
     const index = items.findIndex(p => p.id === product.id);
 
     if (index === -1) {
-      // Add to wishlist
       items.push(product);
-      // ✅ Toast: Added
       this.toastService.success(`${product.name} προστέθηκε στα αγαπημένα! ❤️`);
     } else {
-      // Remove from wishlist
       items.splice(index, 1);
-      // ✅ Toast: Removed
       this.toastService.info(`${product.name} αφαιρέθηκε από τα αγαπημένα`);
     }
 
@@ -50,25 +82,22 @@ export class WishlistService {
   remove(productId: number): void {
     const items = this.itemsSubject.value.filter(p => p.id !== productId);
     this.setItems(items);
-    // ✅ Toast: Removed (no product name available here)
     this.toastService.info('Προϊόν αφαιρέθηκε από τα αγαπημένα');
   }
 
   clear(): void {
     this.setItems([]);
-    // ✅ Toast: Cleared all
     this.toastService.warning('Όλα τα αγαπημένα διαγράφηκαν');
   }
 
-  // Private helpers
   private setItems(items: ProductDto[]): void {
     this.itemsSubject.next(items);
     this.saveToStorage(items);
   }
 
-  private loadFromStorage(): ProductDto[] {
+  private loadFromStorage(key: string): ProductDto[] {
     try {
-      const raw = localStorage.getItem(WISHLIST_KEY);
+      const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -77,9 +106,7 @@ export class WishlistService {
 
   private saveToStorage(items: ProductDto[]): void {
     try {
-      localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error('Failed to save wishlist:', e);
-    }
-  }
+      localStorage.setItem(this.currentStorageKey, JSON.stringify(items));
+    } catch {}
+}
 }
