@@ -33,19 +33,19 @@ export class Dashboard implements OnInit, OnDestroy {
 
 wishlistCount = 0;  
   ngOnInit(): void {
-    // 🔁 Cart badge (όπως πριν – ΔΕΝ το χαλάμε)
     this.sub = this.cartService.items$.subscribe(() => {
       this.cartCount = this.cartService.getCount();
     });
     this.cartCount = this.cartService.getCount();
 
-    // 🔐 Auth state
-    this.isLoggedIn = this.authService.isLoggedIn();
+    this.authService.user$.subscribe(user => {
+      this.isLoggedIn = !!user;
+    });
+
     this.wishlistSub = this.wishlistService.items$.subscribe(() => {
       this.wishlistCount = this.wishlistService.getCount();
     });
     this.wishlistCount = this.wishlistService.getCount();
-    
   }
 
   ngOnDestroy(): void {

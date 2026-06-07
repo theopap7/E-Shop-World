@@ -61,7 +61,6 @@ export class ProductDetailComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err: any) => {
-        console.error('Load product error:', err);
         this.error = err?.status === 404
           ? 'Το προϊόν δεν βρέθηκε.'
           : 'Σφάλμα φόρτωσης προϊόντος.';

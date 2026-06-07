@@ -52,8 +52,24 @@ export class CartService implements OnDestroy {
       this.setStorageKeyFromUser(user);
 
       if (prevKey !== this.currentStorageKey) {
-        const items = this.loadFromStorage(this.currentStorageKey);
-        this.itemsSubject.next(items);
+        const guestItems = prevKey === GUEST_KEY ? this.loadFromStorage(GUEST_KEY) : [];
+        const userItems = this.loadFromStorage(this.currentStorageKey);
+
+        if (guestItems.length > 0 && user) {
+          const merged = [...userItems];
+          for (const guestItem of guestItems) {
+            const existing = merged.find(i => i.productId === guestItem.productId);
+            if (existing) {
+              existing.quantity = Math.min(existing.quantity + guestItem.quantity, existing.stock);
+            } else {
+              merged.push(guestItem);
+            }
+          }
+          localStorage.removeItem(GUEST_KEY);
+          this.setItems(merged);
+        } else {
+          this.itemsSubject.next(userItems);
+        }
       }
     });
   }

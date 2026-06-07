@@ -1,14 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ReviewService, Review } from '../review.service';
 import { AuthService } from '../auth.service';
-import { ToastService } from '../toast.service';  // ✅ ADD
+import { ToastService } from '../toast.service';
 
 @Component({
   selector: 'app-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './reviews.html',
   styleUrl: './reviews.css'
 })
@@ -70,8 +71,7 @@ export class ReviewsComponent implements OnInit {
         this.total = res.total;
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Load reviews error:', err);
+      error: () => {
         this.isLoading = false;
       }
     });

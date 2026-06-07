@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { ToastService } from '../toast.service';  // ✅ ADD
+import { ToastService } from '../toast.service';
 
 @Component({
   selector: 'app-login',
@@ -18,12 +18,12 @@ export class LoginComponent {
   showPassword = false;
   isSubmitting = false;
 
-  // ✅ INJECT ToastService
   constructor(
-    private fb: FormBuilder, 
-    private router: Router, 
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
-    private toastService: ToastService  // ✅ ADD
+    private toastService: ToastService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -39,12 +39,13 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: (response: any) => {
           this.toastService.success('Καλώς ήρθες πίσω! 👋');
-          this.router.navigate(['/dashboard']);
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+          this.router.navigateByUrl(returnUrl);
         },
         error: (error: any) => {
           this.isSubmitting = false;
           if (error.status === 429) {
-            this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.');
+            this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 10 λεπτά.');
           } else {
             this.toastService.error('Λάθος email ή κωδικός πρόσβασης');
           }

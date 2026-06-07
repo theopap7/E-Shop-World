@@ -57,7 +57,6 @@ export class MyOrdersComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('getMyOrders error:', err);
         this.error = err?.error?.message || 'Αποτυχία φόρτωσης παραγγελιών.';
         this.isLoading = false;
       },

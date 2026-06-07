@@ -16,9 +16,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 10 * 60 * 1000,
   max: 5,
-  message: { success: false, message: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.' },
+  message: { success: false, message: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 10 λεπτά.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
