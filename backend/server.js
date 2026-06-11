@@ -1331,6 +1331,12 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
         `UPDATE orders SET status = ?, payment_status = 'refunded' WHERE id = ?`,
         [status, orderId]
       );
+    // Αν γίνει cancelled + δεν είχε πληρωθεί → ακυρωμένη πληρωμή
+    } else if (status === 'cancelled' && currentPaymentStatus === 'pending') {
+      await db.query(
+        `UPDATE orders SET status = ?, payment_status = 'cancelled' WHERE id = ?`,
+        [status, orderId]
+      );
     } else {
       await db.query(
         `UPDATE orders SET status = ? WHERE id = ?`,

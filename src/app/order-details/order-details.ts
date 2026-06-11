@@ -169,6 +169,7 @@ export class OrderDetailsComponent implements OnInit {
     if (x === 'PENDING') return 'Σε εκκρεμότητα';
     if (x === 'REFUNDED') return 'Επιστροφή χρημάτων';
     if (x === 'FAILED') return 'Αποτυχία';
+    if (x === 'CANCELLED') return 'Ακυρώθηκε';
     return status || '—';
   }
 
