@@ -284,6 +284,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         productId: Number(i.productId),
         quantity: Number(i.quantity),
         unitPrice: Number(i.price),
+        size: i.size || undefined,
       })),
 
       recipientName: String(v.recipientName).trim(),

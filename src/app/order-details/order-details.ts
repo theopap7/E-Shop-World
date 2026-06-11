@@ -46,6 +46,9 @@ type OrderItemDto = {
   quantity: number;
   unit_price: number;
   line_total: number;
+  size?: string;
+  stock?: number;
+  image_url?: string;
 };
 
 @Component({

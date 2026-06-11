@@ -507,7 +507,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
         });
       }
 
-      validatedItems.push({ productId: Number(productId), quantity: q, unitPrice: Number(product.price) });
+      validatedItems.push({ productId: Number(productId), quantity: q, unitPrice: Number(product.price), size: item.size || null });
       subtotal += q * Number(product.price);
     }
     subtotal = Number(subtotal.toFixed(2));
@@ -632,9 +632,9 @@ if (discountCode && String(discountCode).trim()) {
 
     for (const item of validatedItems) {
       await conn.query(
-        `INSERT INTO order_items (order_id, product_id, quantity, unit_price)
-         VALUES (?, ?, ?, ?)`,
-        [orderId, item.productId, item.quantity, item.unitPrice]
+        `INSERT INTO order_items (order_id, product_id, quantity, unit_price, size)
+         VALUES (?, ?, ?, ?, ?)`,
+        [orderId, item.productId, item.quantity, item.unitPrice, item.size || null]
       );
 
       await conn.query(
@@ -740,6 +740,7 @@ app.get('/api/my-orders/:orderId', authenticateToken, async (req, res) => {
          p.name AS product_name,
          oi.quantity,
          oi.unit_price,
+         oi.size,
          (oi.quantity * oi.unit_price) AS line_total,
          p.stock,
          p.image_url
@@ -1242,11 +1243,12 @@ app.get('/api/admin/orders/:id', authenticateToken, isAdmin, async (req, res) =>
     const order = orders[0];
 
     const [items] = await db.query(
-      `SELECT 
+      `SELECT
          oi.product_id,
          p.name AS product_name,
          oi.quantity,
          oi.unit_price,
+         oi.size,
          (oi.quantity * oi.unit_price) AS line_total
        FROM order_items oi
        JOIN products p ON p.id = oi.product_id

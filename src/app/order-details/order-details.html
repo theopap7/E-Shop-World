@@ -367,7 +367,7 @@
 
               <div>
                 <div class="name">{{ it.product_name }}</div>
-
+                <div *ngIf="it.size" class="item-size-tag">{{ it.size }}</div>
                 <div class="muted">
                   Ποσότητα: {{ it.quantity }}
                   × {{ it.unit_price | number:'1.2-2' }} €

@@ -6,6 +6,7 @@ export interface CreateOrderItemDto {
   productId: number;
   quantity: number;
   unitPrice: number;
+  size?: string;
 }
 
 export interface ShippingDto {
