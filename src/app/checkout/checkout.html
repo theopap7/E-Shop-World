@@ -29,8 +29,11 @@
           Τηλέφωνο
           <input formControlName="phone" />
         </label>
-        <small class="err" *ngIf="form.get('phone')?.touched && form.get('phone')?.invalid">
+        <small class="err" *ngIf="form.get('phone')?.touched && form.get('phone')?.errors?.['required']">
           Υποχρεωτικό πεδίο
+        </small>
+        <small class="err" *ngIf="form.get('phone')?.touched && form.get('phone')?.errors?.['pattern']">
+          Μη έγκυρο τηλέφωνο (π.χ. 6912345678 ή +306912345678)
         </small>
 
         <hr />

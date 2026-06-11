@@ -55,7 +55,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ) {
     this.form = this.fb.group({
       recipientName: ['', [Validators.required, Validators.minLength(2)]],
-      phone: ['', [Validators.required, Validators.minLength(8)]],
+      phone: ['', [Validators.required, Validators.pattern(/^(\+30|0030)?[269]\d{9}$/)]],
 
       shipping: this.fb.group({
         country: ['ΕΛΛΑΔΑ', Validators.required],
