@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { OrderService } from '../order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
@@ -36,13 +36,13 @@ export class MyOrdersComponent implements OnInit {
   orders: OrderRow[] = [];
   isLoading = true;
   error: string | null = null;
-  expandedOrderId: number | null = null;
-  itemsMap: Record<number, OrderItem[]> = {};
-  loadingItems: Record<number, boolean> = {};
-
   reorderingId: number | null = null;
 
-  constructor(private orderService: OrderService, private cartService: CartService) {}
+  constructor(
+    private orderService: OrderService,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadOrders();
@@ -64,49 +64,19 @@ export class MyOrdersComponent implements OnInit {
     });
   }
 
- 
-  toggleOrderDetails(orderId: number): void {
-    if (this.expandedOrderId === orderId) {
-      this.expandedOrderId = null;
-      return;
-    }
-    this.expandedOrderId = orderId;
-    if (!this.itemsMap[orderId]) {
-      this.loadingItems[orderId] = true;
-      this.orderService.getOrderDetails(orderId).subscribe({
-        next: (res: any) => {
-          this.itemsMap[orderId] = res.items ?? [];
-          this.loadingItems[orderId] = false;
-        },
-        error: () => {
-          this.itemsMap[orderId] = [];
-          this.loadingItems[orderId] = false;
-        }
-      });
-    }
+  goToOrder(orderId: number): void {
+    this.router.navigate(['/profile/orders', orderId]);
   }
 
-  
-  reorderAll(orderId: number): void {
+  reorderAll(orderId: number, event: Event): void {
+    event.stopPropagation();
     if (this.reorderingId === orderId) return;
-    const items = this.itemsMap[orderId];
-    if (items) {
-      this.cartService.reorderItems(items.map(i => ({
-        id: i.product_id,
-        name: i.product_name,
-        price: i.unit_price,
-        stock: i.stock,
-        image_url: i.image_url
-      })));
-      return;
-    }
     this.reorderingId = orderId;
     this.orderService.getOrderDetails(orderId).subscribe({
       next: (res: any) => {
-        const loaded: OrderItem[] = res.items ?? [];
-        this.itemsMap[orderId] = loaded;
+        const items: OrderItem[] = res.items ?? [];
         this.reorderingId = null;
-        this.cartService.reorderItems(loaded.map(i => ({
+        this.cartService.reorderItems(items.map(i => ({
           id: i.product_id,
           name: i.product_name,
           price: i.unit_price,

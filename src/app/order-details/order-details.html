@@ -343,7 +343,16 @@
         <!-- Προϊόντα -->
         <div class="card full">
 
-          <h3 class="h3">Προϊόντα</h3>
+          <div class="items-header">
+            <h3 class="h3">Προϊόντα</h3>
+            <button
+              *ngIf="!isAdminPage && order.status !== 'cancelled' && items.length > 0"
+              class="btn btn-outline reorder-btn"
+              type="button"
+              (click)="reorderAll()">
+              🔁 Αγόρασε ξανά
+            </button>
+          </div>
 
           <div *ngIf="items.length === 0" class="muted">
             Δεν βρέθηκαν προϊόντα.

@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { OrderService } from '../order.service';
 import { AdminService } from '../admin.service';
 import { ToastService } from '../toast.service';
+import { CartService } from '../cart.service';
 import { statusLabel } from '../order-status.util';
 
 type OrderDto = {
@@ -67,6 +68,7 @@ export class OrderDetailsComponent implements OnInit {
   isAdminPage = false;
   isCancelling = false;
   isConfirmingPayment = false;
+  isReordering = false;
 
   showReturnForm = false;
   returnReason = '';
@@ -96,7 +98,8 @@ export class OrderDetailsComponent implements OnInit {
     private orderService: OrderService,
     private router: Router,
     private adminService: AdminService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -226,6 +229,19 @@ export class OrderDetailsComponent implements OnInit {
     if (status === 'approved') return 'Εγκρίθηκε';
     if (status === 'rejected') return 'Απορρίφθηκε';
     return status;
+  }
+
+  reorderAll(): void {
+    if (this.isReordering || this.items.length === 0) return;
+    this.isReordering = true;
+    this.cartService.reorderItems(this.items.map(i => ({
+      id: i.product_id,
+      name: i.product_name,
+      price: i.unit_price,
+      stock: 999,
+      image_url: undefined
+    })));
+    this.isReordering = false;
   }
 
   get itemsTotal(): number {

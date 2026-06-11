@@ -122,6 +122,22 @@
   letter-spacing: 0.2px;
 }
 
+.items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.items-header .h3 {
+  margin: 0;
+}
+
+.reorder-btn {
+  font-size: 13px;
+  padding: 6px 14px;
+}
+
 /* ===============================
    ROWS (Definition style)
 ================================= */

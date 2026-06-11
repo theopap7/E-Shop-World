@@ -1,4 +1,14 @@
 /* =========================
+   PAGE
+========================= */
+
+section.page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 24px 16px;
+}
+
+/* =========================
    HERO
 ========================= */
 
@@ -117,7 +127,29 @@
   border-radius: 16px;
   border: 1px solid #e5e7eb;
   background: #ffffff;
-  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.08);
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.1);
+  border-color: #2563eb;
+}
+
+.arrow-hint {
+  font-size: 18px;
+  color: #9ca3af;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.clickable-card:hover .arrow-hint {
+  transform: translateX(4px);
+  color: #2563eb;
 }
 
 /* =========================
@@ -328,16 +360,13 @@
 .order-actions {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 4px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid #f1f5f9;
 }
 
-.order-actions .btn,
-.order-actions .btn-soft {
-  flex: 1;
-  justify-content: center;
+.order-actions .btn {
+  flex: none;
   width: auto;
-  text-align: center;
 }
 
 .btn-soft {

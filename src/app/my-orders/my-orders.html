@@ -62,7 +62,7 @@
     <!-- ✅ REAL ORDERS -->
     <div *ngIf="!isLoading && !error && orders.length > 0" class="orders-list">
 
-      <div *ngFor="let o of orders" class="order-card">
+      <div *ngFor="let o of orders" class="order-card clickable-card" (click)="goToOrder(o.id)">
 
         <!-- ORDER HEADER -->
         <div class="order-header">
@@ -90,13 +90,7 @@
             <div class="order-total">
               {{ o.total_amount | number:'1.2-2' }} €
             </div>
-
-            <button
-              type="button"
-              class="expand-btn"
-              (click)="toggleOrderDetails(o.id)">
-              {{ expandedOrderId === o.id ? '▲' : '▼' }}
-            </button>
+            <span class="arrow-hint">→</span>
           </div>
 
         </div>
@@ -106,38 +100,6 @@
           <app-order-timeline [currentStatus]="normalizeStatus(o.status)"></app-order-timeline>
         </div>
 
-        <!-- EXPANDED PANEL -->
-        <div *ngIf="expandedOrderId === o.id" class="order-details">
-
-          <div *ngIf="loadingItems[o.id]" class="items-loading">Φόρτωση...</div>
-
-          <div *ngIf="!loadingItems[o.id] && itemsMap[o.id]">
-            <div class="order-item-row" *ngFor="let item of itemsMap[o.id]">
-              <span class="item-name">{{ item.product_name }}</span>
-              <span class="item-qty">{{ item.quantity }} τεμ.</span>
-              <span class="item-price">{{ item.line_total | number:'1.2-2' }}€</span>
-            </div>
-            <div class="order-items-total">
-              <span>Σύνολο παραγγελίας (με μεταφορικά)</span>
-              <span>{{ o.total_amount | number:'1.2-2' }}€</span>
-            </div>
-          </div>
-
-          <div class="order-actions">
-            <button
-              class="btn btn-primary"
-              type="button"
-              [disabled]="reorderingId === o.id"
-              (click)="reorderAll(o.id)">
-              {{ reorderingId === o.id ? 'Φόρτωση...' : '🔁 Αγόρασε ξανά' }}
-            </button>
-
-            <a class="btn btn-soft" [routerLink]="['/profile/orders', o.id]">
-              Λεπτομέρειες παραγγελίας
-              <span class="arrow">→</span>
-            </a>
-          </div>
-        </div>
 
       </div>
 
