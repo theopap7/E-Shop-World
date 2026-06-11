@@ -149,10 +149,21 @@
 
         <div class="product-footer">
           <div class="stock-badge" [class.in-stock]="p.stock > 0">
-            {{ p.stock > 0 ? 'Διαθέσιμο (' + p.stock + ' τεμάχια)' : 'Μη διαθέσιμο' }}
+            {{ p.stock > 0 ? 'Διαθέσιμο' : 'Μη διαθέσιμο' }}
           </div>
-          <div class="product-price">{{ p.price | number:'1.2-2' }}€</div>
+          <div class="footer-right">
+            <div class="product-price">{{ p.price | number:'1.2-2' }}€</div>
+            <button
+              *ngIf="p.stock > 0"
+              class="cart-icon-btn"
+              type="button"
+              (click)="addToCart(p); $event.stopPropagation()"
+              aria-label="Προσθήκη στο καλάθι">
+              🛒
+            </button>
+          </div>
         </div>
+
 
       </div>
 

@@ -146,6 +146,12 @@
   font-size: 14px;
   flex: 1;
   margin-right: 8px;
+  text-decoration: none;
+}
+
+.item-name:hover {
+  color: #2563eb;
+  text-decoration: underline;
 }
 
 .item-price {

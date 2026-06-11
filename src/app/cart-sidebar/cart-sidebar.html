@@ -29,15 +29,17 @@
   <!-- Items -->
   <div class="sidebar-items" *ngIf="items.length > 0">
     <div class="cart-item" *ngFor="let item of items">
-      <img
-        class="item-thumb"
-        [src]="item.image_url || 'no-image.svg'"
-        [alt]="item.name"
-        (error)="$any($event.target).src='no-image.svg'"
-      />
+      <a [routerLink]="['/products', item.productId]" (click)="close()">
+        <img
+          class="item-thumb"
+          [src]="item.image_url || 'no-image.svg'"
+          [alt]="item.name"
+          (error)="$any($event.target).src='no-image.svg'"
+        />
+      </a>
       <div class="item-body">
         <div class="item-top">
-          <div class="item-name">{{ item.name }}</div>
+          <a class="item-name" [routerLink]="['/products', item.productId]" (click)="close()">{{ item.name }}</a>
           <div class="item-price">{{ item.price | number:'1.2-2' }}€</div>
         </div>
         <div class="item-bottom">
