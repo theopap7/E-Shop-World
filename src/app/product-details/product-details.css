@@ -103,6 +103,55 @@
   line-height: 1.7;
   font-size: 15px;
   flex: 1;
+  white-space: pre-line;
+}
+
+.size-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.size-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.size-hint {
+  font-weight: 400;
+  color: #ef4444;
+  font-size: 13px;
+}
+
+.size-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.size-btn {
+  min-width: 44px;
+  padding: 8px 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.size-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.size-btn.selected {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
 }
 
 .product-actions {

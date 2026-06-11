@@ -127,6 +127,46 @@
 
 
 
+      <!-- ΜΕΓΕΘΗ -->
+      <div class="form-group">
+        <div class="sizes-head">
+          <label>Μεγέθη</label>
+          <span class="sizes-hint">Άφησε κενό αν το προϊόν δεν έχει μεγέθη (πχ. ηλεκτρονικά)</span>
+        </div>
+
+        <div class="sizes-group-label">Ρούχα</div>
+        <div class="size-chips">
+          <button
+            *ngFor="let s of CLOTHING_SIZES"
+            type="button"
+            class="size-chip"
+            [class.active]="isSizeSelected(s)"
+            (click)="toggleSize(s)">
+            {{ s }}
+          </button>
+        </div>
+
+        <div class="sizes-group-label" style="margin-top:10px">Παπούτσια</div>
+        <div class="size-chips">
+          <button
+            *ngFor="let s of SHOE_SIZES"
+            type="button"
+            class="size-chip"
+            [class.active]="isSizeSelected(s)"
+            (click)="toggleSize(s)">
+            {{ s }}
+          </button>
+        </div>
+
+        <div class="sizes-selected" *ngIf="selectedSizes.length > 0">
+          <span>Επιλεγμένα: <strong>{{ selectedSizes.join(', ') }}</strong></span>
+          <button type="button" class="clear-sizes-btn" (click)="clearSizes()">Καθαρισμός</button>
+        </div>
+        <div class="sizes-selected muted-text" *ngIf="selectedSizes.length === 0">
+          Κανένα μέγεθος επιλεγμένο — δεν θα εμφανιστεί επιλογή μεγέθους
+        </div>
+      </div>
+
       <!-- IMAGE UPLOAD -->
       <div class="image-block">
 

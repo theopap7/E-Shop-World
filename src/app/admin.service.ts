@@ -22,6 +22,7 @@ export interface CreateProductDto {
   stock: number;
   category_id: number | null;
   image_url: string;
+  sizes?: string[] | null;
 }
 
 export interface AdminOrder {

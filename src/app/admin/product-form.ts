@@ -35,6 +35,31 @@ export class ProductFormComponent implements OnInit {
   // drag state
   isDragging = false;
 
+  // sizes
+  readonly CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  readonly SHOE_SIZES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+  selectedSizes: string[] = [];
+
+  get allSizeOptions(): string[] {
+    return [...this.CLOTHING_SIZES, ...this.SHOE_SIZES];
+  }
+
+  isSizeSelected(s: string): boolean {
+    return this.selectedSizes.includes(s);
+  }
+
+  toggleSize(s: string): void {
+    if (this.isSizeSelected(s)) {
+      this.selectedSizes = this.selectedSizes.filter(x => x !== s);
+    } else {
+      this.selectedSizes = [...this.selectedSizes, s];
+    }
+  }
+
+  clearSizes(): void {
+    this.selectedSizes = [];
+  }
+
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
@@ -112,6 +137,7 @@ export class ProductFormComponent implements OnInit {
           this.selectedFile = null;
           this.uploadError = '';
           this.uploading = false;
+          this.selectedSizes = Array.isArray(p.sizes) ? [...p.sizes] : [];
         }
 
         this.isLoading = false;
@@ -144,6 +170,7 @@ export class ProductFormComponent implements OnInit {
     const productData = {
       ...this.form.value,
       category_id: this.form.value.category_id || null,
+      sizes: this.selectedSizes.length > 0 ? this.selectedSizes : null,
     };
 
     const request = this.isEditMode

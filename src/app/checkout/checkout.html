@@ -193,7 +193,7 @@
         <div *ngFor="let it of items" class="row">
           <div>
             <strong>{{ it.name }}</strong>
-            <div class="muted">x{{ it.quantity }}</div>
+            <div class="muted">x{{ it.quantity }}<span *ngIf="it.size"> · {{ it.size }}</span></div>
           </div>
           <div>{{ (it.price * it.quantity) | number:'1.2-2' }}€</div>
         </div>

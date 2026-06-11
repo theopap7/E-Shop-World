@@ -24,10 +24,21 @@ export class ProductDetailComponent implements OnInit {
   error = '';
   addedToCart = false;
   selectedQty = 1;
+  selectedSize: string | null = null;
 
   get qtyOptions(): number[] {
     if (!this.product || this.product.stock <= 0) return [];
     return Array.from({ length: Math.min(this.product.stock, 100) }, (_, i) => i + 1);
+  }
+
+  get sizes(): string[] {
+    return this.product?.sizes ?? [];
+  }
+
+  get canAddToCart(): boolean {
+    if (!this.product || this.product.stock === 0) return false;
+    if (this.sizes.length > 0 && !this.selectedSize) return false;
+    return true;
   }
 
   constructor(
@@ -86,9 +97,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart(): void {
-    if (!this.product) return;
+    if (!this.product || !this.canAddToCart) return;
 
-    this.cartService.addToCart(this.product, this.selectedQty);
+    this.cartService.addToCart(this.product, this.selectedQty, this.selectedSize ?? undefined);
     this.addedToCart = true;
     this.cartService.openSidebar();
 

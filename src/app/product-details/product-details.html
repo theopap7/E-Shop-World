@@ -83,6 +83,24 @@
           {{ product.description || 'Δεν υπάρχει περιγραφή.' }}
         </p>
 
+        <!-- Size selector (only for clothing) -->
+        <div class="size-selector" *ngIf="sizes.length > 0">
+          <label class="size-label">
+            Μέγεθος
+            <span *ngIf="!selectedSize" class="size-hint">— επιλέξτε</span>
+          </label>
+          <div class="size-buttons">
+            <button
+              *ngFor="let s of sizes"
+              type="button"
+              class="size-btn"
+              [class.selected]="selectedSize === s"
+              (click)="selectedSize = s">
+              {{ s }}
+            </button>
+          </div>
+        </div>
+
         <div class="product-actions">
           <div class="qty-selector" *ngIf="product.stock > 0">
             <label class="qty-label">Ποσότητα</label>
@@ -95,7 +113,7 @@
             class="btn btn-primary btn-large"
             type="button"
             (click)="addToCart()"
-            [disabled]="product.stock === 0 || addedToCart">
+            [disabled]="!canAddToCart || addedToCart">
             {{ addedToCart ? '✅ Προστέθηκε!' : 'Προσθήκη στο καλάθι' }}
           </button>
 

@@ -304,7 +304,7 @@ app.get('/api/products', async (req, res) => {
     const { search, category, minPrice, maxPrice, sort } = req.query;
 
     let query = `
-      SELECT 
+      SELECT
         p.id,
         p.name,
         p.description,
@@ -313,6 +313,7 @@ app.get('/api/products', async (req, res) => {
         p.image_url,
         p.category_id,
         p.created_at,
+        p.sizes,
         c.name AS category_name,
         ROUND(AVG(r.rating), 1) AS average_rating,
         COUNT(r.id) AS review_count
@@ -384,7 +385,7 @@ app.get('/api/products/:id', async (req, res) => {
     }
 
     const [rows] = await db.query(`
-      SELECT 
+      SELECT
         p.id,
         p.name,
         p.description,
@@ -393,6 +394,7 @@ app.get('/api/products/:id', async (req, res) => {
         p.image_url,
         p.created_at,
         p.category_id,
+        p.sizes,
         c.name AS category_name
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
@@ -407,7 +409,6 @@ app.get('/api/products/:id', async (req, res) => {
       });
     }
 
-    // rows[0] γιατί θέλουμε το ΠΡΩΤΟ (και μοναδικό) αποτέλεσμα
     res.json({ success: true, product: rows[0] });
 
   } catch (error) {
@@ -1044,19 +1045,21 @@ app.get('/api/admin/products/:id', authenticateToken, isAdmin, async (req, res) 
  */
 app.post('/api/admin/products', authenticateToken, isAdmin, async (req, res) => {
   try {
-    const { name, description, price, stock, category_id, image_url } = req.body;
+    const { name, description, price, stock, category_id, image_url, sizes } = req.body;
 
     if (!name || !price || stock == null) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' 
+      return res.status(400).json({
+        success: false,
+        message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά'
       });
     }
 
+    const sizesJson = Array.isArray(sizes) && sizes.length > 0 ? JSON.stringify(sizes) : null;
+
     const [result] = await db.query(
-      `INSERT INTO products (name, description, price, stock, category_id, image_url)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, description || null, Number(price), Number(stock), category_id || null, image_url || null]
+      `INSERT INTO products (name, description, price, stock, category_id, image_url, sizes)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [name, description || null, Number(price), Number(stock), category_id || null, image_url || null, sizesJson]
     );
 
     res.status(201).json({
@@ -1076,20 +1079,22 @@ app.post('/api/admin/products', authenticateToken, isAdmin, async (req, res) => 
 app.put('/api/admin/products/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const productId = Number(req.params.id);
-    const { name, description, price, stock, category_id, image_url } = req.body;
+    const { name, description, price, stock, category_id, image_url, sizes } = req.body;
 
     if (!name || !price || stock == null) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' 
+      return res.status(400).json({
+        success: false,
+        message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά'
       });
     }
 
+    const sizesJson = Array.isArray(sizes) && sizes.length > 0 ? JSON.stringify(sizes) : null;
+
     const [result] = await db.query(
-      `UPDATE products 
-       SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ?
+      `UPDATE products
+       SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ?, sizes = ?
        WHERE id = ?`,
-      [name, description || null, Number(price), Number(stock), category_id || null, image_url || null, productId]
+      [name, description || null, Number(price), Number(stock), category_id || null, image_url || null, sizesJson, productId]
     );
 
     if (result.affectedRows === 0) {

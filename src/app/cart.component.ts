@@ -36,24 +36,24 @@ export class CartComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  setQty(productId: number, qty: number): void {
-    this.cartService.setQuantity(productId, Number(qty));
+  setQty(productId: number, qty: number, size?: string): void {
+    this.cartService.setQuantity(productId, Number(qty), size);
   }
 
   qtyOptions(item: CartItem): number[] {
     return Array.from({ length: Math.min(item.stock, 100) }, (_, i) => i + 1);
   }
 
-  increase(productId: number): void {
-    this.cartService.increase(productId);
+  increase(productId: number, size?: string): void {
+    this.cartService.increase(productId, size);
   }
 
-  decrease(productId: number): void {
-    this.cartService.decrease(productId);
+  decrease(productId: number, size?: string): void {
+    this.cartService.decrease(productId, size);
   }
 
-  remove(productId: number): void {
-    this.cartService.removeFromCart(productId);
+  remove(productId: number, size?: string): void {
+    this.cartService.removeFromCart(productId, size);
   }
 
   clear(): void {

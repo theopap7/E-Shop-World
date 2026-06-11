@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService, ProductDto, ProductFilters } from './product.service';
 import { CartService } from './cart.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { WishlistService } from './wishlist-service';
 import { SkeletonComponent } from './skeleton/skeleton';
 
@@ -36,7 +36,8 @@ export class ProductListComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    private wishlistService: WishlistService
+    private wishlistService: WishlistService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -124,8 +125,11 @@ export class ProductListComponent implements OnInit {
     this.sortBy = 'newest';
   }
 
-  // ✅ Existing: addToCart (δεν αλλάζει!)
   addToCart(product: ProductDto): void {
+    if (product.sizes?.length) {
+      this.router.navigate(['/products', product.id]);
+      return;
+    }
     this.cartService.addToCart(product);
   }
   // Μέσα στην class ProductListComponent:

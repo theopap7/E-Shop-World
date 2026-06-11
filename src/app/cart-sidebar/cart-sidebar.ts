@@ -56,33 +56,23 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
     this.cartService.closeSidebar();
   }
 
-  increase(productId: number): void {
-    this.cartService.increase(productId);
+  increase(productId: number, size?: string): void {
+    this.cartService.increase(productId, size);
   }
 
- decrease(productId: number): void {
-  // Get item BEFORE decreasing
-  const item = this.cartService.getItems().find(i => i.productId === productId);
-  
-  if (!item) return;
-  
-  // ✅ Toast ΜΟΝΟ αν θα διαγραφεί (quantity = 1)
-  if (item.quantity === 1) {
-    this.toastService.info(`${item.name} αφαιρέθηκε από το καλάθι`);
+  decrease(productId: number, size?: string): void {
+    const item = this.cartService.getItems().find(i => i.productId === productId && (i.size ?? '') === (size ?? ''));
+    if (!item) return;
+    if (item.quantity === 1) {
+      this.toastService.info(`${item.name} αφαιρέθηκε από το καλάθι`);
+    }
+    this.cartService.decrease(productId, size);
   }
-  // Αν quantity > 1 → Δεν εμφανίζουμε τίποτα
-  
-  this.cartService.decrease(productId);
-}
 
-  // ✅ UPDATE αυτό το method:
-  remove(productId: number): void {
-    // Get product name BEFORE removing
-    const item = this.cartService.getItems().find(i => i.productId === productId);
+  remove(productId: number, size?: string): void {
+    const item = this.cartService.getItems().find(i => i.productId === productId && (i.size ?? '') === (size ?? ''));
     const productName = item?.name || 'Προϊόν';
-
-    this.cartService.removeFromCart(productId);
-
+    this.cartService.removeFromCart(productId, size);
     this.toastService.info(`${productName} αφαιρέθηκε από το καλάθι`);
   }
 

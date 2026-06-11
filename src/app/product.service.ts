@@ -12,8 +12,9 @@ export interface ProductDto {
   category_id: number | null;
   category_name: string | null;
   created_at: string;
-  average_rating: number | null;  
-  review_count: number;            
+  average_rating: number | null;
+  review_count: number;
+  sizes?: string[] | null;
 }
 
 export interface ProductFilters {

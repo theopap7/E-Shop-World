@@ -336,19 +336,19 @@
   margin: 0;
   color: #6b7280;
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.5;
+  white-space: pre-line;
 
   display: -webkit-box;
-  display: box;              
+  display: box;
 
-  -webkit-line-clamp: 2;
-  line-clamp: 2;             
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
 
   -webkit-box-orient: vertical;
-  box-orient: vertical;      
+  box-orient: vertical;
 
   overflow: hidden;
-  min-height: 36px;
 }
 /* Footer */
 .product-footer {
