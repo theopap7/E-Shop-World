@@ -26,6 +26,7 @@ CREATE TABLE products (
   stock INT NOT NULL DEFAULT 0,
   image_url VARCHAR(500),
   category_id INT,
+  sizes JSON NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
@@ -47,7 +48,7 @@ CREATE TABLE orders (
   shipping_method ENUM('courier_standard', 'courier_express', 'pickup') NOT NULL,
   shipping_cost DECIMAL(10,2) NOT NULL DEFAULT 0,
   payment_method ENUM('cod', 'card_mock', 'bank_transfer') NOT NULL,
-  payment_status ENUM('pending', 'paid', 'refunded') DEFAULT 'pending',
+  payment_status ENUM('pending', 'paid', 'refunded', 'cancelled') DEFAULT 'pending',
   discount_code VARCHAR(100),
   discount_amount DECIMAL(10,2) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -60,6 +61,7 @@ CREATE TABLE order_items (
   product_id INT NOT NULL,
   quantity INT NOT NULL,
   unit_price DECIMAL(10,2) NOT NULL,
+  size VARCHAR(20) NULL,
   FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES products(id)
 );

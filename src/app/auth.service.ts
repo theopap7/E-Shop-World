@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface AuthUser {
   id: number;
@@ -15,7 +16,7 @@ const USER_KEY = 'user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = environment.apiUrl;
 
   // ✅ auth state
   private readonly userSubject = new BehaviorSubject<AuthUser | null>(this.getUser());
