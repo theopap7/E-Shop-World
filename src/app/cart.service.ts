@@ -158,16 +158,16 @@ export class CartService implements OnDestroy {
     this.setItems(items);
   }
 
-  reorderItems(items: Array<{ id: number; name: string; price: number; stock: number; image_url?: string }>): void {
+  reorderItems(items: Array<{ id: number; name: string; price: number; stock: number; image_url?: string; size?: string }>): void {
     const cart = [...this.itemsSubject.value];
     for (const item of items) {
       if (item.stock <= 0) continue;
-      const existing = cart.find(i => i.productId === item.id);
+      const existing = cart.find(i => i.productId === item.id && (i.size ?? '') === (item.size ?? ''));
       if (existing) {
         existing.stock = item.stock;
         existing.quantity = Math.min((existing.quantity || 1) + 1, item.stock);
       } else {
-        cart.push({ productId: item.id, name: item.name, price: item.price, quantity: 1, stock: item.stock, image_url: item.image_url });
+        cart.push({ productId: item.id, name: item.name, price: item.price, quantity: 1, stock: item.stock, image_url: item.image_url, size: item.size });
       }
     }
     this.setItems(cart);

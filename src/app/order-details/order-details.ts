@@ -241,8 +241,9 @@ export class OrderDetailsComponent implements OnInit {
       id: i.product_id,
       name: i.product_name,
       price: i.unit_price,
-      stock: 999,
-      image_url: undefined
+      stock: i.stock ?? 999,
+      image_url: i.image_url,
+      size: i.size,
     })));
     this.isReordering = false;
   }
