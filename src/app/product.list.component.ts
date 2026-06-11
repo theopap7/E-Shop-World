@@ -154,6 +154,8 @@ isInWishlist(productId: number): boolean {
 }
 
 cartQty(productId: number): number {
-  return this.cartService.getItems().find(i => i.productId === productId)?.quantity ?? 0;
+  return this.cartService.getItems()
+    .filter(i => i.productId === productId)
+    .reduce((sum, i) => sum + i.quantity, 0);
 }
 }
