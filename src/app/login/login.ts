@@ -39,6 +39,7 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: (response: any) => {
           this.toastService.success('Καλώς ήρθες πίσω! 👋');
+          this.isSubmitting = false;
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
           this.router.navigateByUrl(returnUrl);
         },

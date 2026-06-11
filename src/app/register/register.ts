@@ -54,6 +54,7 @@ export class RegisterComponent {
           setTimeout(() => {
             this.toastService.info('Μπορείς να συνδεθείς τώρα');
           }, 500);
+          this.isSubmitting = false;
           this.router.navigate(['/login']);
         },
         error: (error: any) => {
