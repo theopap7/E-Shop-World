@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AdminService, AdminOrder } from '../admin.service';
 import { ToastService } from '../toast.service';
@@ -8,7 +9,7 @@ import { statusLabel } from '../order-status.util';
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.css',
 })
@@ -18,6 +19,40 @@ export class AdminOrdersComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   updatingId: number | null = null;
+  activeFilter = 'all';
+  searchTerm = '';
+
+  readonly filters = [
+    { key: 'all',        label: 'Όλες' },
+    { key: 'pending',    label: 'Σε αναμονή' },
+    { key: 'processing', label: 'Σε επεξεργασία' },
+    { key: 'shipped',    label: 'Απεστάλη' },
+    { key: 'delivered',  label: 'Παραδόθηκε' },
+    { key: 'cancelled',  label: 'Ακυρώθηκε' },
+  ];
+
+  get filteredOrders(): AdminOrder[] {
+    let result = this.activeFilter === 'all'
+      ? this.orders
+      : this.orders.filter(o => o.status === this.activeFilter);
+
+    const term = this.searchTerm.trim().toLowerCase();
+    if (term) {
+      result = result.filter(o =>
+        `#${o.id}`.includes(term) ||
+        o.first_name?.toLowerCase().includes(term) ||
+        o.last_name?.toLowerCase().includes(term) ||
+        o.user_email?.toLowerCase().includes(term)
+      );
+    }
+
+    return result;
+  }
+
+  count(key: string): number {
+    if (key === 'all') return this.orders.length;
+    return this.orders.filter(o => o.status === key).length;
+  }
 
   constructor(
     private adminService: AdminService,
@@ -36,7 +71,10 @@ export class AdminOrdersComponent implements OnInit {
     this.adminService.getOrders().subscribe({
       next: (res) => {
         if (res.success) {
-          this.orders = res.orders;
+          this.orders = res.orders.sort((a: AdminOrder, b: AdminOrder) =>
+            a.status === 'pending' && b.status !== 'pending' ? -1 :
+            a.status !== 'pending' && b.status === 'pending' ? 1 : 0
+          );
         }
         this.isLoading = false;
       },

@@ -20,6 +20,7 @@ import { ProductDetailComponent } from './product-details/product-details';
 import { NotFoundComponent } from './not-found/not-found';
 import { AdminDiscountsComponent } from './admin-discounts/admin-discounts';
 import { AdminReturnsComponent } from './admin/admin-returns';
+import { AdminUsersComponent } from './admin/admin-users';
 
 export const routes: Routes = [
 
@@ -164,6 +165,13 @@ export const routes: Routes = [
     component: AdminReturnsComponent,
     canActivate: [adminGuard],
     data: { breadcrumb: 'Αιτήματα Επιστροφής' }
+  },
+
+  {
+    path: 'admin/users',
+    component: AdminUsersComponent,
+    canActivate: [adminGuard],
+    data: { breadcrumb: 'Χρήστες' }
   },
 
   // ===== ERROR (no breadcrumbs) =====

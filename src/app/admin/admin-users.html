@@ -1,0 +1,83 @@
+<section class="page">
+  <div class="container">
+
+    <header class="header">
+      <div class="header-left">
+        <h1 class="page-title">Χρήστες</h1>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/admin" class="back-button">← Πίσω στον πίνακα</a>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="panel">
+      <div class="panel-title">Φόρτωση χρηστών...</div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="panel alert">{{ error }}</div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !error" class="panel">
+
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Αναζήτηση με όνομα ή email..."
+          [(ngModel)]="searchTerm"
+        />
+        <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''">✕</button>
+      </div>
+
+      <div class="count-info">{{ filteredUsers.length }} χρήστες</div>
+
+      <div *ngIf="filteredUsers.length === 0" class="empty">
+        <div class="empty-icon">👥</div>
+        <h3>Δεν βρέθηκαν χρήστες</h3>
+      </div>
+
+      <div *ngIf="filteredUsers.length > 0" class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Χρήστης</th>
+              <th class="right">Παραγγελίες</th>
+              <th class="right">Σύνολο αγορών</th>
+              <th>Τελευταία παραγγελία</th>
+              <th>Μέλος από</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of filteredUsers" [class.active-buyer]="u.order_count > 0">
+              <td class="mono">{{ u.id }}</td>
+              <td>
+                <div class="user-name">{{ u.first_name }} {{ u.last_name }}</div>
+                <div class="user-email">{{ u.email }}</div>
+              </td>
+              <td class="right">
+                <span class="order-badge" [class.has-orders]="u.order_count > 0">
+                  {{ u.order_count }}
+                </span>
+              </td>
+              <td class="right">
+                <strong [class.revenue]="u.total_spent > 0">
+                  {{ u.total_spent | number:'1.2-2' }}€
+                </strong>
+              </td>
+              <td>
+                <span *ngIf="u.last_order_at">{{ u.last_order_at | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="!u.last_order_at" class="no-orders">—</span>
+              </td>
+              <td>{{ u.created_at | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</section>

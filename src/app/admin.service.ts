@@ -42,6 +42,9 @@ export interface AdminStats {
   totalRevenue: number;
   totalUsers: number;
   totalProducts: number;
+  pendingOrders: number;
+  pendingPayments: number;
+  pendingReturns: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -84,6 +87,12 @@ export class AdminService {
 
   confirmPayment(orderId: number): Observable<any> {
     return this.http.patch(`${this.baseUrl}/orders/${orderId}/confirm-payment`, {});
+  }
+
+  // ========== USERS ==========
+
+  getUsers(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/users`);
   }
 
   // ========== STATS ==========

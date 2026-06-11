@@ -35,6 +35,32 @@
     <!-- Content -->
     <div *ngIf="!isLoading && !error" class="panel">
 
+      <!-- Search -->
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Αναζήτηση με όνομα, email ή #αριθμό..."
+          [(ngModel)]="searchTerm"
+        />
+        <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''">✕</button>
+      </div>
+
+      <!-- Status Tabs -->
+      <div class="status-tabs">
+        <button
+          *ngFor="let f of filters"
+          class="status-tab"
+          [class.active]="activeFilter === f.key"
+          [class.tab--pending]="f.key === 'pending' && count('pending') > 0 && activeFilter !== 'pending'"
+          (click)="activeFilter = f.key"
+          type="button">
+          {{ f.label }}
+          <span class="tab-count">{{ count(f.key) }}</span>
+        </button>
+      </div>
+
       <div *ngIf="orders.length === 0" class="empty">
         <div class="empty-icon">🧾</div>
         <h3>Δεν βρέθηκαν παραγγελίες</h3>
@@ -59,8 +85,9 @@
           <tbody>
 
             <tr
-              *ngFor="let order of orders"
+              *ngFor="let order of filteredOrders"
               class="clickable-row"
+              [class.row--pending]="order.status === 'pending'"
               (click)="goToOrder(order.id)"
             >
 

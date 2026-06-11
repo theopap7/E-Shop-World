@@ -58,7 +58,10 @@
           <a routerLink="/admin/orders" class="quick-card">
             <div class="quick-icon">🛒</div>
             <div class="quick-body">
-              <div class="quick-title">Παραγγελίες</div>
+              <div class="quick-title">
+                Παραγγελίες
+                <span *ngIf="stats.pendingOrders > 0" class="pending-badge">{{ stats.pendingOrders }}</span>
+              </div>
               <div class="quick-desc">Προβολή και διαχείριση παραγγελιών</div>
             </div>
             <span class="quick-arrow">→</span>
@@ -82,10 +85,22 @@
             <span class="quick-arrow">→</span>
           </a>
 
+          <a routerLink="/admin/users" class="quick-card">
+            <div class="quick-icon">👥</div>
+            <div class="quick-body">
+              <div class="quick-title">Χρήστες</div>
+              <div class="quick-desc">Προβολή πελατών & αγορών</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </a>
+
           <a routerLink="/admin/returns" class="quick-card">
             <div class="quick-icon">↩️</div>
             <div class="quick-body">
-              <div class="quick-title">Επιστροφές</div>
+              <div class="quick-title">
+                Επιστροφές
+                <span *ngIf="stats.pendingReturns > 0" class="pending-badge">{{ stats.pendingReturns }}</span>
+              </div>
               <div class="quick-desc">Διαχείριση αιτημάτων επιστροφής</div>
             </div>
             <span class="quick-arrow">→</span>

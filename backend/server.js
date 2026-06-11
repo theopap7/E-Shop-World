@@ -1386,6 +1386,33 @@ app.patch('/api/admin/orders/:id/confirm-payment', authenticateToken, isAdmin, a
 });
 
 /**
+ * ✅ Admin: Users list with order stats
+ */
+app.get('/api/admin/users', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const [users] = await db.query(`
+      SELECT
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.created_at,
+        COUNT(o.id) AS order_count,
+        COALESCE(SUM(o.total_amount), 0) AS total_spent,
+        MAX(o.created_at) AS last_order_at
+      FROM users u
+      LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
+      GROUP BY u.id
+      ORDER BY order_count DESC, u.created_at DESC
+    `);
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error('Admin users error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+/**
  * ✅ Admin: Dashboard stats
  */
 app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
@@ -1402,13 +1429,21 @@ app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
     // Total products
     const [productsCount] = await db.query('SELECT COUNT(*) as total FROM products');
 
+    // Pending counts for badges
+    const [pendingOrders] = await db.query(`SELECT COUNT(*) as total FROM orders WHERE status = 'pending'`);
+    const [pendingPayments] = await db.query(`SELECT COUNT(*) as total FROM orders WHERE payment_status = 'pending' AND payment_method = 'bank_transfer' AND status != 'cancelled'`);
+    const [pendingReturns] = await db.query(`SELECT COUNT(*) as total FROM return_requests WHERE status = 'pending'`);
+
     res.json({
       success: true,
       stats: {
         totalOrders: ordersCount[0].total || 0,
         totalRevenue: revenue[0].total || 0,
         totalUsers: usersCount[0].total || 0,
-        totalProducts: productsCount[0].total || 0
+        totalProducts: productsCount[0].total || 0,
+        pendingOrders: pendingOrders[0].total || 0,
+        pendingPayments: pendingPayments[0].total || 0,
+        pendingReturns: pendingReturns[0].total || 0
       }
     });
   } catch (error) {
