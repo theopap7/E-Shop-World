@@ -963,7 +963,7 @@ app.patch('/api/orders/:id/cancel', authenticateToken, async (req, res) => {
       );
     } else {
       await db.query(
-        `UPDATE orders SET status = 'cancelled' WHERE id = ?`,
+        `UPDATE orders SET status = 'cancelled', payment_status = 'cancelled' WHERE id = ?`,
         [orderId]
       );
     }
