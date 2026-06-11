@@ -85,6 +85,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.sub = this.cart.items$.subscribe((items) => {
       this.items = items;
       this.subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+      if (this.appliedDiscount) {
+        if (this.appliedDiscount.type === 'percentage') {
+          this.discountAmount = +(this.subtotal * this.appliedDiscount.value / 100).toFixed(2);
+        } else {
+          this.discountAmount = Math.min(this.appliedDiscount.value, this.subtotal);
+        }
+      }
       this.recalcTotals();
     });
 

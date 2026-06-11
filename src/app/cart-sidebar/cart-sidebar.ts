@@ -80,9 +80,15 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
     // Get product name BEFORE removing
     const item = this.cartService.getItems().find(i => i.productId === productId);
     const productName = item?.name || 'Προϊόν';
-    
+
     this.cartService.removeFromCart(productId);
-    
+
     this.toastService.info(`${productName} αφαιρέθηκε από το καλάθι`);
+  }
+
+  clearCart(): void {
+    if (!confirm('Θέλεις να αδειάσεις το καλάθι;')) return;
+    this.cartService.clear();
+    this.toastService.info('Το καλάθι αδειάστηκε');
   }
 }

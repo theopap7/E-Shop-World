@@ -14,12 +14,12 @@
 
       <div class="top-actions">
         <button
-          class="btn btn-outline"
+          class="btn btn-danger-outline"
           type="button"
           (click)="clear()"
           [disabled]="items.length === 0"
         >
-          Καθάρισμα
+          Αφαίρεση όλων
         </button>
       </div>
     </header>
@@ -48,9 +48,9 @@
 
         <div class="right">
           <div class="qty">
-            <button class="qty-btn" type="button" (click)="decrease(item.productId)">−</button>
-            <span class="qty-num">{{ item.quantity }}</span>
-            <button class="qty-btn" type="button" (click)="increase(item.productId)">+</button>
+            <select class="qty-select" [ngModel]="item.quantity" (ngModelChange)="setQty(item.productId, $event)">
+              <option *ngFor="let n of qtyOptions(item)" [value]="n">{{ n }}</option>
+            </select>
           </div>
 
           <div class="line-total">{{ item.quantity * item.price | number:'1.2-2' }} €</div>

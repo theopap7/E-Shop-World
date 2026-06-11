@@ -84,6 +84,13 @@
         </p>
 
         <div class="product-actions">
+          <div class="qty-selector" *ngIf="product.stock > 0">
+            <label class="qty-label">Ποσότητα</label>
+            <select class="qty-select" [(ngModel)]="selectedQty">
+              <option *ngFor="let n of qtyOptions" [value]="n">{{ n }}</option>
+            </select>
+          </div>
+
           <button
             class="btn btn-primary btn-large"
             type="button"

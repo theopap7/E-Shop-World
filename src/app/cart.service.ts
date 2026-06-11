@@ -91,22 +91,23 @@ export class CartService implements OnDestroy {
   }
 
   // ✅ ADD TOAST HERE
-  addToCart(product: ProductDto): void {
+  addToCart(product: ProductDto, qty = 1): void {
     const items = [...this.itemsSubject.value];
     const existing = items.find(i => i.productId === product.id);
 
     if (existing) {
-      if (existing.quantity >= product.stock) {
+      const canAdd = product.stock - existing.quantity;
+      if (canAdd <= 0) {
         this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα για "${product.name}"`);
         return;
       }
-      existing.quantity += 1;
+      existing.quantity = Math.min(existing.quantity + qty, product.stock);
     } else {
       items.push({
         productId: product.id,
         name: product.name,
         price: product.price,
-        quantity: 1,
+        quantity: Math.min(qty, product.stock),
         stock: product.stock,
         image_url: product.image_url,
       });
@@ -120,11 +121,23 @@ export class CartService implements OnDestroy {
     const items = [...this.itemsSubject.value];
     const item = items.find(i => i.productId === productId);
     if (!item) return;
-    if (item.stock && item.quantity >= item.stock) {
+    if (item.quantity >= item.stock) {
       this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα`);
       return;
     }
     item.quantity += 1;
+    this.setItems(items);
+  }
+
+  setQuantity(productId: number, qty: number): void {
+    const items = [...this.itemsSubject.value];
+    const item = items.find(i => i.productId === productId);
+    if (!item) return;
+    if (qty <= 0) {
+      this.setItems(items.filter(i => i.productId !== productId));
+      return;
+    }
+    item.quantity = Math.min(qty, item.stock);
     this.setItems(items);
   }
 

@@ -223,6 +223,23 @@
   position: relative;
 }
 
+.image-wrap {
+  position: relative;
+}
+
+.in-cart-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: #16a34a;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
 .wishlist-btn {
   position: absolute;
   top: 12px;

@@ -148,4 +148,8 @@ toggleWishlist(product: ProductDto, event: Event): void {
 isInWishlist(productId: number): boolean {
   return this.wishlistService.isInWishlist(productId);
 }
+
+cartQty(productId: number): number {
+  return this.cartService.getItems().find(i => i.productId === productId)?.quantity ?? 0;
+}
 }

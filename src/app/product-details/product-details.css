@@ -108,8 +108,45 @@
 .product-actions {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-end;
   margin-top: auto;
+}
+
+.qty-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.qty-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.qty-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 32px 10px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  min-width: 72px;
+  transition: border-color 0.2s;
+}
+
+.qty-select:hover {
+  border-color: #3b82f6;
+}
+
+.qty-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
 }
 
 .btn-large {

@@ -44,7 +44,7 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    if (this.registerForm.valid) {
+    if (this.registerForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const { firstName, lastName, email, password } = this.registerForm.value;
 

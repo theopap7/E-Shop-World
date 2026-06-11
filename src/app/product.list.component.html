@@ -108,12 +108,18 @@
         <span class="heart-icon">{{ isInWishlist(p.id) ? '❤️' : '🤍' }}</span>
       </button>
 
-      <img
-        [src]="p.image_url || 'no-image.svg'"
-        [alt]="p.name"
-        class="product-image"
-        (error)="$any($event.target).src='no-image.svg'"
-      />
+
+      <div class="image-wrap">
+        <img
+          [src]="p.image_url || 'no-image.svg'"
+          [alt]="p.name"
+          class="product-image"
+          (error)="$any($event.target).src='no-image.svg'"
+        />
+        <div *ngIf="cartQty(p.id) > 0" class="in-cart-badge">
+          🛒 {{ cartQty(p.id) }}
+        </div>
+      </div>
 
       <div class="product-details">
         <span class="category-badge">
@@ -147,6 +153,7 @@
           </div>
           <div class="product-price">{{ p.price | number:'1.2-2' }}€</div>
         </div>
+
       </div>
 
     </article>

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { CartService, CartItem } from './cart.service';
 import { Router, RouterModule } from '@angular/router';
@@ -7,7 +8,7 @@ import { Router, RouterModule } from '@angular/router';
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css',
 })
@@ -33,6 +34,14 @@ export class CartComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+  }
+
+  setQty(productId: number, qty: number): void {
+    this.cartService.setQuantity(productId, Number(qty));
+  }
+
+  qtyOptions(item: CartItem): number[] {
+    return Array.from({ length: Math.min(item.stock, 100) }, (_, i) => i + 1);
   }
 
   increase(productId: number): void {
