@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { OrderService, OrderDetailResponse } from '../order.service';
@@ -29,6 +30,8 @@ export class MyOrdersComponent implements OnInit {
   error: string | null = null;
   reorderingId: number | null = null;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private orderService: OrderService,
     private cartService: CartService,
@@ -43,7 +46,7 @@ export class MyOrdersComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    this.orderService.getMyOrders().subscribe({
+    this.orderService.getMyOrders().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.orders = res.orders ?? [];
         this.isLoading = false;
@@ -63,7 +66,7 @@ export class MyOrdersComponent implements OnInit {
     event.stopPropagation();
     if (this.reorderingId === orderId) return;
     this.reorderingId = orderId;
-    this.orderService.getOrderDetails(orderId).subscribe({
+    this.orderService.getOrderDetails(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: OrderDetailResponse) => {
         const items = res.items ?? [];
         this.reorderingId = null;

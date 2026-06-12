@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -47,6 +48,8 @@ export class AdminDiscountsComponent implements OnInit {
 
   private readonly apiUrl = `${environment.apiUrl}/admin/discount-codes`;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private http: HttpClient,
     private toastService: ToastService
@@ -59,7 +62,7 @@ export class AdminDiscountsComponent implements OnInit {
   loadCodes(): void {
     this.isLoading = true;
 
-    this.http.get<{ codes: DiscountCode[] }>(this.apiUrl).subscribe({
+    this.http.get<{ codes: DiscountCode[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.codes = res.codes || [];
         this.isLoading = false;
@@ -136,7 +139,7 @@ export class AdminDiscountsComponent implements OnInit {
       this.http.put<{ success: boolean; message?: string }>(
         `${this.apiUrl}/${this.editingCodeId}`,
         payload
-      ).subscribe({
+      ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (res) => {
           this.isSaving = false;
           if (res.success) {
@@ -153,7 +156,7 @@ export class AdminDiscountsComponent implements OnInit {
       return;
     }
 
-    this.http.post<{ success: boolean; message?: string }>(this.apiUrl, payload).subscribe({
+    this.http.post<{ success: boolean; message?: string }>(this.apiUrl, payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.isSaving = false;
         if (res.success) {
@@ -178,7 +181,7 @@ export class AdminDiscountsComponent implements OnInit {
       maxUses: code.max_uses,
       expiresAt: code.expires_at,
       active: !code.active
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           code.active = !code.active;
@@ -194,7 +197,7 @@ export class AdminDiscountsComponent implements OnInit {
   deleteCode(id: number, code: string): void {
     if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`)) return;
 
-    this.http.delete<{ success: boolean; message?: string }>(`${this.apiUrl}/${id}`).subscribe({
+    this.http.delete<{ success: boolean; message?: string }>(`${this.apiUrl}/${id}`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           this.toastService.success('Κωδικός διαγράφηκε');

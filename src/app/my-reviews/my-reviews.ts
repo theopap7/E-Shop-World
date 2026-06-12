@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,8 @@ export class MyReviewsComponent implements OnInit {
   updateError = '';
   deletingId: number | null = null;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private reviewService: ReviewService,
     private toastService: ToastService
@@ -38,7 +41,7 @@ export class MyReviewsComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
 
-    this.reviewService.getMyReviews().subscribe({
+    this.reviewService.getMyReviews().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.reviews = res.reviews;
         this.isLoading = false;
@@ -55,7 +58,7 @@ export class MyReviewsComponent implements OnInit {
     if (!confirm('Διαγραφή κριτικής;')) return;
 
     this.deletingId = reviewId;
-    this.reviewService.deleteReview(reviewId).subscribe({
+    this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.deletingId = null;
         this.toastService.success('Η κριτική διαγράφηκε');
@@ -100,7 +103,7 @@ export class MyReviewsComponent implements OnInit {
       reviewId,
       this.editRating,
       this.editComment
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Η κριτική ενημερώθηκε επιτυχώς!');
 

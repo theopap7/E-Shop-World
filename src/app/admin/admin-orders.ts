@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -54,6 +55,8 @@ export class AdminOrdersComponent implements OnInit {
     return this.orders.filter(o => o.status === key).length;
   }
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private adminService: AdminService,
     private router: Router,
@@ -68,7 +71,7 @@ export class AdminOrdersComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    this.adminService.getOrders().subscribe({
+    this.adminService.getOrders().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           this.orders = res.orders.sort((a: AdminOrder, b: AdminOrder) =>
@@ -99,7 +102,7 @@ export class AdminOrdersComponent implements OnInit {
     }
 
     this.updatingId = orderId;
-    this.adminService.updateOrderStatus(orderId, newStatus).subscribe({
+    this.adminService.updateOrderStatus(orderId, newStatus).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           const order = this.orders.find((o) => o.id === orderId);

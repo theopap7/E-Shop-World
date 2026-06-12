@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { CartService, CartItem } from './cart.service';
 import { Router, RouterModule } from '@angular/router';
 
@@ -12,13 +12,13 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css',
 })
-export class CartComponent implements OnInit, OnDestroy {
+export class CartComponent implements OnInit {
   items: CartItem[] = [];
   total = 0;
 
   orderError: string | null = null;
 
-  private sub?: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private cartService: CartService,
@@ -26,14 +26,10 @@ export class CartComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.sub = this.cartService.items$.subscribe((items) => {
+    this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
       this.total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
   }
 
   setQty(productId: number, qty: number, size?: string): void {

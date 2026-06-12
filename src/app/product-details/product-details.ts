@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -41,6 +42,8 @@ export class ProductDetailComponent implements OnInit {
     return true;
   }
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
@@ -73,7 +76,7 @@ export class ProductDetailComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
 
-    this.productService.getProduct(id).subscribe({
+    this.productService.getProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res?.success) {
           this.product = res.product;

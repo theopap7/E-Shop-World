@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -17,10 +18,12 @@ export class AdminUsersComponent implements OnInit {
   error: string | null = null;
   searchTerm = '';
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
-    this.adminService.getUsers().subscribe({
+    this.adminService.getUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) this.users = res.users;
         this.isLoading = false;

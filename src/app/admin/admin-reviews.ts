@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { AdminService, AdminReviewDto } from '../admin.service';
 import { RouterModule } from '@angular/router';
@@ -17,6 +18,8 @@ export class AdminReviewsComponent implements OnInit {
   isLoading = false;
   error = '';
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private adminService: AdminService, private toastService: ToastService) {}
 
   ngOnInit(): void {
@@ -27,7 +30,7 @@ export class AdminReviewsComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
 
-    this.adminService.getAllReviews().subscribe({
+    this.adminService.getAllReviews().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           this.reviews = res.reviews;
@@ -46,7 +49,7 @@ export class AdminReviewsComponent implements OnInit {
       return;
     }
 
-    this.adminService.deleteReview(reviewId).subscribe({
+    this.adminService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           // Remove από τη λίστα

@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { CartService, CartItem } from '../cart.service';
-import { ToastService } from '../toast.service';  
+import { ToastService } from '../toast.service';
 
 @Component({
   selector: 'app-cart-sidebar',
@@ -16,35 +16,23 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
 
   isOpen = false;
   items: CartItem[] = [];
-  private subs: Subscription[] = [];
+
+  private destroyRef = inject(DestroyRef);
 
   constructor(public cartService: CartService, private toastService: ToastService) {}
 
   ngOnInit(): void {
-    // Subscribe στο isOpen$
-    this.subs.push(
-      this.cartService.isOpen$.subscribe(open => {
-        this.isOpen = open;
+    this.cartService.isOpen$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(open => {
+      this.isOpen = open;
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
 
-        // Αν ανοίξει το sidebar → block scroll
-        if (open) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
-      })
-    );
-
-    // Subscribe στα items
-    this.subs.push(
-      this.cartService.items$.subscribe(items => {
-        this.items = items;
-      })
-    );
+    this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(items => {
+      this.items = items;
+    });
   }
 
   ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
     document.body.style.overflow = '';
   }
 

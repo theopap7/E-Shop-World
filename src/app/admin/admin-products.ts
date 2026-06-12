@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService, Product } from '../admin.service';
@@ -17,6 +18,8 @@ export class AdminProductsComponent implements OnInit {
   error: string | null = null;
   deletingId: number | null = null;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private adminService: AdminService,
     private toastService: ToastService
@@ -30,7 +33,7 @@ export class AdminProductsComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    this.adminService.getProducts().subscribe({
+    this.adminService.getProducts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           this.products = res.products;
@@ -51,7 +54,7 @@ export class AdminProductsComponent implements OnInit {
     }
 
     this.deletingId = id;
-    this.adminService.deleteProduct(id).subscribe({
+    this.adminService.deleteProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.deletingId = null;
         if (res.success) {

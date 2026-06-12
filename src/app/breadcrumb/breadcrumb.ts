@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BreadcrumbService, Breadcrumb } from '../breadcrumb.service';
- 
+
 @Component({
   selector: 'app-breadcrumb',
   standalone: true,
@@ -12,42 +12,31 @@ import { BreadcrumbService, Breadcrumb } from '../breadcrumb.service';
   templateUrl: './breadcrumb.html',
   styleUrl: './breadcrumb.css'
 })
-export class BreadcrumbComponent implements OnInit, OnDestroy {
- 
+export class BreadcrumbComponent implements OnInit {
+
   breadcrumbs: Breadcrumb[] = [];
   showBreadcrumbs = true;
- 
-  private sub?: Subscription;
-  private routerSub?: Subscription;
- 
+
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private breadcrumbService: BreadcrumbService,
     private router: Router
   ) {}
- 
+
   ngOnInit(): void {
-    // Hide breadcrumbs on specific pages
-    this.routerSub = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const url = this.router.url;
-        
-        // Hide on: login, register, 404
-        this.showBreadcrumbs = 
-          !url.includes('/login') && 
+        this.showBreadcrumbs =
+          !url.includes('/login') &&
           !url.includes('/register') &&
           !url.includes('/404');
       });
- 
-    // Subscribe to breadcrumb changes
-    this.sub = this.breadcrumbService.breadcrumbs$.subscribe(breadcrumbs => {
+
+    this.breadcrumbService.breadcrumbs$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(breadcrumbs => {
       this.breadcrumbs = breadcrumbs;
     });
   }
- 
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-    this.routerSub?.unsubscribe();
-  }
 }
- 

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
@@ -96,6 +97,8 @@ export class OrderDetailsComponent implements OnInit {
     return !this.isAdminPage && this.order?.status === 'delivered' && !this.order?.return_request;
   }
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private route: ActivatedRoute,
     private orderService: OrderService,
@@ -132,7 +135,7 @@ export class OrderDetailsComponent implements OnInit {
       ? this.orderService.getAdminOrderDetails(this.orderId)
       : this.orderService.getOrderDetails(this.orderId);
 
-    request.subscribe({
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: OrderDetailResponse) => {
         this.order = res?.order ?? null;
         if (this.order) this.order.return_request = res?.returnRequest ?? null;
@@ -176,7 +179,7 @@ export class OrderDetailsComponent implements OnInit {
     if (!confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;')) return;
 
     this.isCancelling = true;
-    this.orderService.cancelOrder(this.orderId).subscribe({
+    this.orderService.cancelOrder(this.orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Η παραγγελία ακυρώθηκε επιτυχώς');
         this.loadDetails();
@@ -212,7 +215,7 @@ export class OrderDetailsComponent implements OnInit {
     }
     this.isSubmittingReturn = true;
     const items = this.selectedReturnItems.map(i => ({ productId: i.productId, quantity: i.selectedQty }));
-    this.orderService.submitReturnRequest(this.orderId, this.returnReason, items).subscribe({
+    this.orderService.submitReturnRequest(this.orderId, this.returnReason, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Το αίτημα επιστροφής υποβλήθηκε!');
         this.showReturnForm = false;
@@ -254,7 +257,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 downloadCSV(orderId: number) {
 
-  this.adminService.downloadOrderCSV(orderId).subscribe(blob => {
+  this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(blob => {
 
     const url = window.URL.createObjectURL(blob);
 
@@ -273,7 +276,7 @@ downloadCSV(orderId: number) {
   confirmPayment(): void {
     if (this.isConfirmingPayment) return;
     this.isConfirmingPayment = true;
-    this.adminService.confirmPayment(this.orderId).subscribe({
+    this.adminService.confirmPayment(this.orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Η πληρωμή επιβεβαιώθηκε!');
         this.isConfirmingPayment = false;
@@ -287,7 +290,7 @@ downloadCSV(orderId: number) {
   }
 
 downloadPDF(orderId: number) {
-  this.orderService.downloadOrderPDF(orderId).subscribe({
+  this.orderService.downloadOrderPDF(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
     next: blob => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

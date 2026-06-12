@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -8,7 +9,6 @@ import {
   Validators,
   FormsModule
 } from '@angular/forms';
-import { Subscription } from 'rxjs';
 
 import { CartService, CartItem } from '../cart.service';
 import { OrderService, CreateOrderDto } from '../order.service';
@@ -25,7 +25,7 @@ type PaymentMethod = 'cod' | 'card_mock' | 'bank_transfer';
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })
-export class CheckoutComponent implements OnInit, OnDestroy {
+export class CheckoutComponent implements OnInit {
   items: CartItem[] = [];
   subtotal = 0;
   shippingCost = 0;
@@ -41,7 +41,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   error: string | null = null;
   success: string | null = null;
 
-  private sub?: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   form: FormGroup;
 
@@ -82,7 +82,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sub = this.cart.items$.subscribe((items) => {
+    this.cart.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
       this.subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
       if (this.appliedDiscount) {
@@ -95,21 +95,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.recalcTotals();
     });
 
-    this.form.get('shippingMethod')!.valueChanges.subscribe(() => {
+    this.form.get('shippingMethod')!.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.recalcTotals();
       this.applyShippingValidators();
     });
-    this.form.get('paymentMethod')!.valueChanges.subscribe(() => this.applyPaymentValidators());
+    this.form.get('paymentMethod')!.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyPaymentValidators());
     this.applyPaymentValidators();
     this.applyShippingValidators();
 
     if (this.cart.getItems().length === 0) {
       this.router.navigate(['/cart']);
     }
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
   }
 
   get total(): number {

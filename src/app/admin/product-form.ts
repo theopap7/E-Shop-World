@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -61,6 +62,8 @@ export class ProductFormComponent implements OnInit {
     this.selectedSizes = [];
   }
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
@@ -99,7 +102,7 @@ export class ProductFormComponent implements OnInit {
 
   loadCategories(): void {
 
-    this.http.get<{ success: boolean; categories: Category[] }>(`${environment.apiUrl}/categories`).subscribe({
+    this.http.get<{ success: boolean; categories: Category[] }>(`${environment.apiUrl}/categories`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 
       next: (res) => {
         if (res.success) {
@@ -117,7 +120,7 @@ export class ProductFormComponent implements OnInit {
 
     this.isLoading = true;
 
-    this.adminService.getProduct(id).subscribe({
+    this.adminService.getProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 
       next: (res) => {
 
@@ -177,7 +180,7 @@ export class ProductFormComponent implements OnInit {
       ? this.adminService.updateProduct(this.productId!, productData)
       : this.adminService.createProduct(productData);
 
-    request.subscribe({
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 
       next: (res) => {
 
@@ -298,7 +301,7 @@ export class ProductFormComponent implements OnInit {
     this.http.post<{ success: boolean; imageUrl?: string; message?: string }>(
       `${environment.apiUrl}/upload-image`,
       formData
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 
       next: (res) => {
 

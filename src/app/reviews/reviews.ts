@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -48,10 +49,12 @@ export class ReviewsComponent implements OnInit {
   }
 
   // ✅ INJECT ToastService
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private reviewService: ReviewService,
     private authService: AuthService,
-    private toastService: ToastService  // ✅ ADD
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -64,7 +67,7 @@ export class ReviewsComponent implements OnInit {
   loadReviews(): void {
     this.isLoading = true;
 
-    this.reviewService.getReviews(this.productId).subscribe({
+    this.reviewService.getReviews(this.productId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.reviews = res.reviews;
         this.average = res.average;
@@ -114,7 +117,7 @@ export class ReviewsComponent implements OnInit {
       this.productId,
       this.newRating,
       this.newComment
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           // ✅ Toast instead of inline message
@@ -182,7 +185,7 @@ export class ReviewsComponent implements OnInit {
       this.editingReviewId,
       this.editRating,
       this.editComment
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           // ✅ Toast: Updated
@@ -205,7 +208,7 @@ export class ReviewsComponent implements OnInit {
   deleteReview(reviewId: number): void {
     if (!confirm('Διαγραφή κριτικής;')) return;
 
-    this.reviewService.deleteReview(reviewId).subscribe({
+    this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         // ✅ Toast: Deleted
         this.toastService.success('Η κριτική διαγράφηκε');

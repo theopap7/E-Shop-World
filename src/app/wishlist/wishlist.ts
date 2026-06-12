@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { WishlistService } from '../wishlist-service';
 import { CartService } from '../cart.service';
@@ -19,11 +19,12 @@ import { SkeletonComponent } from '../skeleton/skeleton';
   templateUrl: './wishlist.html',
   styleUrl: './wishlist.css'
 })
-export class WishlistComponent implements OnInit, OnDestroy {
+export class WishlistComponent implements OnInit {
 
   items: ProductDto[] = [];
-  isLoading = true;   // ✅ loading state
-  private sub?: Subscription;
+  isLoading = true;
+
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     public wishlistService: WishlistService,
@@ -31,19 +32,12 @@ export class WishlistComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-
-    // δείχνουμε skeleton στην αρχή
     this.isLoading = true;
 
-    this.sub = this.wishlistService.items$.subscribe(items => {
+    this.wishlistService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(items => {
       this.items = items;
       this.isLoading = false;
     });
-
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
   }
 
   remove(productId: number): void {
@@ -60,5 +54,4 @@ export class WishlistComponent implements OnInit, OnDestroy {
       this.wishlistService.clear();
     }
   }
-
 }

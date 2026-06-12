@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { ToastService, Toast } from '../toast.service';
 
 @Component({
@@ -10,35 +10,24 @@ import { ToastService, Toast } from '../toast.service';
   templateUrl: './toast.html',
   styleUrl: './toast.css'
 })
-export class ToastContainerComponent implements OnInit, OnDestroy {
-  
+export class ToastContainerComponent implements OnInit {
+
   toasts: Toast[] = [];
-  private sub?: Subscription;
+
+  private destroyRef = inject(DestroyRef);
 
   constructor(public toastService: ToastService) {}
 
   ngOnInit(): void {
-    // Subscribe to toast changes
-    this.sub = this.toastService.toasts$.subscribe(toasts => {
+    this.toastService.toasts$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(toasts => {
       this.toasts = toasts;
     });
   }
 
-  ngOnDestroy(): void {
-    // Cleanup
-    this.sub?.unsubscribe();
-  }
-
-  /**
-   * Get CSS class based on toast type
-   */
   getToastClass(type: string): string {
     return `toast toast-${type}`;
   }
 
-  /**
-   * Get icon based on toast type
-   */
   getIcon(type: string): string {
     switch (type) {
       case 'success': return '✓';
@@ -49,9 +38,6 @@ export class ToastContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * User clicks X to close
-   */
   close(id: number): void {
     this.toastService.remove(id);
   }

@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { ProductListComponent } from '../product.list.component';
 import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
@@ -16,12 +16,12 @@ import { ToastService } from '../toast.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit, OnDestroy {
+export class Dashboard implements OnInit {
   cartCount = 0;
   isLoggedIn = false;
+  wishlistCount = 0;
 
-  private sub?: Subscription;
-  private wishlistSub?: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private cartService: CartService,
@@ -31,31 +31,25 @@ export class Dashboard implements OnInit, OnDestroy {
     private toastService: ToastService,
   ) {}
 
-wishlistCount = 0;  
   ngOnInit(): void {
-    this.sub = this.cartService.items$.subscribe(() => {
+    this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.cartCount = this.cartService.getCount();
     });
     this.cartCount = this.cartService.getCount();
 
-    this.authService.user$.subscribe(user => {
+    this.authService.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
       this.isLoggedIn = !!user;
     });
 
-    this.wishlistSub = this.wishlistService.items$.subscribe(() => {
+    this.wishlistService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.wishlistCount = this.wishlistService.getCount();
     });
     this.wishlistCount = this.wishlistService.getCount();
   }
 
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-    this.wishlistSub?.unsubscribe();
+  toggleCart(): void {
+    this.cartService.toggleSidebar();
   }
-  // Method για toggle
-toggleCart(): void {
-  this.cartService.toggleSidebar();
-}
 
   logout(): void {
     this.authService.logout();

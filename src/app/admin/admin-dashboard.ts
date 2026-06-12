@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService, AdminStats } from '../admin.service';
@@ -15,6 +16,8 @@ export class AdminDashboardComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
@@ -25,7 +28,7 @@ export class AdminDashboardComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
-    this.adminService.getStats().subscribe({
+    this.adminService.getStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           this.stats = res.stats;

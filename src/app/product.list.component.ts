@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService, ProductDto, ProductFilters, Category } from './product.service';
@@ -33,6 +34,8 @@ export class ProductListComponent implements OnInit {
   priceMax = 2000;
   sortBy = 'newest';
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private productService: ProductService,
     private cartService: CartService,
@@ -48,7 +51,7 @@ export class ProductListComponent implements OnInit {
   // ✅ Updated: φορτώνει χωρίς filters (frontend filtering)
   fetchProducts(): void {
     this.errorMessage = '';
-    this.productService.getProducts().subscribe({
+    this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.allProducts = res.products ?? [];
         this.isLoading = false;
@@ -62,7 +65,7 @@ export class ProductListComponent implements OnInit {
 
   // ✅ ΝΕΟ: Φόρτωσε κατηγορίες
   fetchCategories(): void {
-    this.productService.getCategories().subscribe({
+    this.productService.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.categories = res.categories ?? [];
       },

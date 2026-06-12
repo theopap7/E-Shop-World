@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -44,6 +45,8 @@ export class AdminReturnsComponent implements OnInit {
 
   private readonly apiUrl = `${environment.apiUrl}/admin/returns`;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private http: HttpClient, private toastService: ToastService) {}
 
   ngOnInit(): void {
@@ -52,7 +55,7 @@ export class AdminReturnsComponent implements OnInit {
 
   loadReturns(): void {
     this.isLoading = true;
-    this.http.get<{ success: boolean; returns: ReturnRequest[] }>(this.apiUrl).subscribe({
+    this.http.get<{ success: boolean; returns: ReturnRequest[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.returns = res.returns || [];
         this.isLoading = false;
@@ -72,7 +75,7 @@ export class AdminReturnsComponent implements OnInit {
     this.http.patch<{ success: boolean; message: string }>(`${this.apiUrl}/${r.id}`, {
       status,
       adminNote: this.adminNotes[r.id] || ''
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.toastService.success(res.message);
         this.loadReturns();
