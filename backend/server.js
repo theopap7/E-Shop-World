@@ -880,112 +880,127 @@ app.get('/api/admin/returns', authenticateToken, isAdmin, async (req, res) => {
 });
 
 app.patch('/api/admin/returns/:id', authenticateToken, isAdmin, async (req, res) => {
+  const returnId = Number(req.params.id);
+  const { status, adminNote } = req.body;
+
+  if (!['approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ success: false, message: 'Μη έγκυρη κατάσταση' });
+  }
+
+  let conn;
   try {
-    const returnId = Number(req.params.id);
-    const { status, adminNote } = req.body;
+    conn = await db.getConnection();
+    await conn.beginTransaction();
 
-    if (!['approved', 'rejected'].includes(status)) {
-      return res.status(400).json({ success: false, message: 'Μη έγκυρη κατάσταση' });
-    }
-
-    const [rows] = await db.query(
-      'SELECT rr.id, rr.order_id, rr.status AS current_status FROM return_requests rr WHERE rr.id = ?',
+    const [rows] = await conn.query(
+      'SELECT rr.id, rr.order_id, rr.status AS current_status FROM return_requests rr WHERE rr.id = ? FOR UPDATE',
       [returnId]
     );
+
     if (rows.length === 0) {
+      await conn.rollback();
       return res.status(404).json({ success: false, message: 'Αίτημα δεν βρέθηκε' });
     }
 
     const returnReq = rows[0];
 
     if (returnReq.current_status !== 'pending') {
+      await conn.rollback();
       return res.status(400).json({ success: false, message: 'Το αίτημα έχει ήδη επεξεργαστεί' });
     }
 
-    await db.query(
+    await conn.query(
       'UPDATE return_requests SET status = ?, admin_note = ? WHERE id = ?',
       [status, adminNote?.trim() || null, returnId]
     );
 
     if (status === 'approved') {
-      await db.query(
+      await conn.query(
         `UPDATE orders SET payment_status = 'refunded' WHERE id = ?`,
         [returnReq.order_id]
       );
 
-      const [returnItems] = await db.query(
+      const [returnItems] = await conn.query(
         'SELECT product_id, quantity FROM return_request_items WHERE return_request_id = ?',
         [returnId]
       );
       for (const item of returnItems) {
-        await db.query(
+        await conn.query(
           'UPDATE products SET stock = stock + ? WHERE id = ?',
           [item.quantity, item.product_id]
         );
       }
     }
 
+    await conn.commit();
     return res.json({ success: true, message: status === 'approved' ? 'Αίτημα εγκρίθηκε — stock & refund ενημερώθηκαν' : 'Αίτημα απορρίφθηκε' });
   } catch (error) {
+    if (conn) await conn.rollback();
     console.error('Update return error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
+  } finally {
+    if (conn) conn.release();
   }
 });
 
 app.patch('/api/orders/:id/cancel', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const orderId = Number(req.params.id);
+
+  if (!Number.isFinite(orderId)) {
+    return res.status(400).json({ success: false, message: 'Μη έγκυρο ID παραγγελίας' });
+  }
+
+  let conn;
   try {
-    const userId = req.user.id;
-    const orderId = Number(req.params.id);
+    conn = await db.getConnection();
+    await conn.beginTransaction();
 
-    if (!Number.isFinite(orderId)) {
-      return res.status(400).json({ success: false, message: 'Μη έγκυρο ID παραγγελίας' });
-    }
-
-    const [rows] = await db.query(
-      'SELECT id, user_id, status, payment_status FROM orders WHERE id = ? AND user_id = ?',
+    const [rows] = await conn.query(
+      'SELECT id, user_id, status, payment_status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
       [orderId, userId]
     );
 
     if (rows.length === 0) {
+      await conn.rollback();
       return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
     const order = rows[0];
 
     if (order.status !== 'pending') {
+      await conn.rollback();
       return res.status(400).json({
         success: false,
         message: 'Μπορείτε να ακυρώσετε μόνο παραγγελίες σε αναμονή'
       });
     }
 
-    if (order.payment_status === 'paid') {
-      await db.query(
-        `UPDATE orders SET status = 'cancelled', payment_status = 'refunded' WHERE id = ?`,
-        [orderId]
-      );
-    } else {
-      await db.query(
-        `UPDATE orders SET status = 'cancelled', payment_status = 'cancelled' WHERE id = ?`,
-        [orderId]
-      );
-    }
+    const newPaymentStatus = order.payment_status === 'paid' ? 'refunded' : 'cancelled';
+    await conn.query(
+      `UPDATE orders SET status = 'cancelled', payment_status = ? WHERE id = ?`,
+      [newPaymentStatus, orderId]
+    );
 
-    const [items] = await db.query(
+    const [items] = await conn.query(
       'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
       [orderId]
     );
     for (const item of items) {
-      await db.query(
+      await conn.query(
         'UPDATE products SET stock = stock + ? WHERE id = ?',
         [item.quantity, item.product_id]
       );
     }
 
+    await conn.commit();
     return res.json({ success: true, message: 'Η παραγγελία ακυρώθηκε επιτυχώς' });
   } catch (error) {
+    if (conn) await conn.rollback();
     console.error('Cancel order error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
+  } finally {
+    if (conn) conn.release();
   }
 });
 
@@ -1279,26 +1294,34 @@ app.get('/api/admin/orders/:id', authenticateToken, isAdmin, async (req, res) =>
  * ✅ Admin: Update order status
  */
 app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req, res) => {
+  const orderId = Number(req.params.id);
+  const { status } = req.body;
+
+  const allowedStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ success: false, message: 'Μη έγκυρη κατάσταση παραγγελίας' });
+  }
+
+  const allowedTransitions = {
+    pending: ['processing', 'cancelled'],
+    processing: ['shipped', 'cancelled'],
+    shipped: ['delivered'],
+    delivered: [],
+    cancelled: []
+  };
+
+  let conn;
   try {
-    const orderId = Number(req.params.id);
-    const { status } = req.body;
+    conn = await db.getConnection();
+    await conn.beginTransaction();
 
-    const allowedStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-
-    if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Μη έγκυρη κατάσταση παραγγελίας'
-      });
-    }
-
-    // Βρίσκουμε το current status
-    const [rows] = await db.query(
-      'SELECT status, payment_method, payment_status FROM orders WHERE id = ?',
+    const [rows] = await conn.query(
+      'SELECT status, payment_method, payment_status FROM orders WHERE id = ? FOR UPDATE',
       [orderId]
     );
 
     if (rows.length === 0) {
+      await conn.rollback();
       return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
@@ -1306,66 +1329,58 @@ app.patch('/api/admin/orders/:id/status', authenticateToken, isAdmin, async (req
     const paymentMethod = rows[0].payment_method;
     const currentPaymentStatus = rows[0].payment_status;
 
-    // Επιτρεπόμενες μεταβάσεις
-    const allowedTransitions = {
-      pending: ['processing', 'cancelled'],
-      processing: ['shipped', 'cancelled'],
-      shipped: ['delivered'],
-      delivered: [],
-      cancelled: []
-    };
-
     if (!allowedTransitions[currentStatus].includes(status)) {
+      await conn.rollback();
       return res.status(400).json({
         success: false,
         message: `Δεν επιτρέπεται η αλλαγή κατάστασης από ${currentStatus} σε ${status}`
       });
     }
 
-    // Αν γίνει delivered + αντικαταβολή → πληρωμένη
     if (status === 'delivered' && paymentMethod === 'cod') {
-      await db.query(
+      await conn.query(
         `UPDATE orders SET status = ?, payment_status = 'paid' WHERE id = ?`,
         [status, orderId]
       );
-    // Αν γίνει cancelled + ήταν πληρωμένη → επιστροφή χρημάτων
     } else if (status === 'cancelled' && currentPaymentStatus === 'paid') {
-      await db.query(
+      await conn.query(
         `UPDATE orders SET status = ?, payment_status = 'refunded' WHERE id = ?`,
         [status, orderId]
       );
-    // Αν γίνει cancelled + δεν είχε πληρωθεί → ακυρωμένη πληρωμή
     } else if (status === 'cancelled' && currentPaymentStatus === 'pending') {
-      await db.query(
+      await conn.query(
         `UPDATE orders SET status = ?, payment_status = 'cancelled' WHERE id = ?`,
         [status, orderId]
       );
     } else {
-      await db.query(
+      await conn.query(
         `UPDATE orders SET status = ? WHERE id = ?`,
         [status, orderId]
       );
     }
 
-    // Αν ακυρώθηκε → επιστροφή stock στα products
     if (status === 'cancelled') {
-      const [orderItems] = await db.query(
+      const [orderItems] = await conn.query(
         'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
         [orderId]
       );
       for (const item of orderItems) {
-        await db.query(
+        await conn.query(
           'UPDATE products SET stock = stock + ? WHERE id = ?',
           [item.quantity, item.product_id]
         );
       }
     }
 
+    await conn.commit();
     res.json({ success: true, message: 'Η κατάσταση παραγγελίας ενημερώθηκε' });
 
   } catch (error) {
+    if (conn) await conn.rollback();
     console.error('Admin update order status error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  } finally {
+    if (conn) conn.release();
   }
 });
 /**
