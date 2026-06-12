@@ -12,8 +12,11 @@ const PORT = process.env.PORT || 3000;
 
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  credentials: true
+}));
+app.use(bodyParser.json({ limit: '10mb' }));
 
 const authLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
