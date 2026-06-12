@@ -74,7 +74,7 @@ export class MyOrdersComponent implements OnInit {
           id: i.product_id,
           name: i.product_name,
           price: i.unit_price,
-          stock: i.stock ?? 999,
+          stock: i.stock ?? 0,
           image_url: i.image_url
         })));
       },

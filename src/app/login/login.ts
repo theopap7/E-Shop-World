@@ -40,7 +40,8 @@ export class LoginComponent {
         next: () => {
           this.toastService.success('Καλώς ήρθες πίσω! 👋');
           this.isSubmitting = false;
-          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+          const raw = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+          const returnUrl = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/dashboard';
           this.router.navigateByUrl(returnUrl);
         },
         error: (error: { status: number; error?: { message?: string } }) => {
