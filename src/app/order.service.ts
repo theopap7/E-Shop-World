@@ -47,11 +47,70 @@ export interface CreateOrderResponse {
   success: boolean;
   message: string;
   orderId?: number;
-
   subtotal?: number;
   shippingCost?: number;
   totalAmount?: number;
   paymentStatus?: string;
+}
+
+export interface OrderSummary {
+  id: number;
+  total_amount: number;
+  status: string;
+  created_at: string;
+  return_status?: string | null;
+}
+
+export interface OrderDetailItem {
+  product_id: number;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+  size?: string;
+  stock?: number;
+  image_url?: string;
+}
+
+export interface OrderDetailResponse {
+  success: boolean;
+  order: {
+    id: number;
+    total_amount: number;
+    status: string;
+    created_at: string;
+    recipient_name: string;
+    phone: string;
+    ship_country: string;
+    ship_city: string;
+    ship_zip: string;
+    ship_address1: string;
+    ship_notes?: string;
+    floor?: string;
+    shipping_method: string;
+    shipping_cost: number;
+    payment_method: string;
+    payment_status: string;
+    subtotal: number;
+    discount_code?: string | null;
+    discount_amount?: number | null;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+  };
+  items: OrderDetailItem[];
+  returnRequest?: {
+    id: number;
+    status: 'pending' | 'approved' | 'rejected';
+    reason: string;
+    admin_note?: string | null;
+    created_at: string;
+  } | null;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -64,23 +123,24 @@ export class OrderService {
     return this.http.post<CreateOrderResponse>(`${this.baseUrl}/orders`, payload);
   }
 
-  getMyOrders(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/my-orders`);
+  getMyOrders(): Observable<{ success: boolean; orders: OrderSummary[] }> {
+    return this.http.get<{ success: boolean; orders: OrderSummary[] }>(`${this.baseUrl}/my-orders`);
   }
 
-  getOrderDetails(orderId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/my-orders/${orderId}`);
-  }
-  getAdminOrderDetails(orderId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/admin/orders/${orderId}`);
+  getOrderDetails(orderId: number): Observable<OrderDetailResponse> {
+    return this.http.get<OrderDetailResponse>(`${this.baseUrl}/my-orders/${orderId}`);
   }
 
-  cancelOrder(orderId: number): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/orders/${orderId}/cancel`, {});
+  getAdminOrderDetails(orderId: number): Observable<OrderDetailResponse> {
+    return this.http.get<OrderDetailResponse>(`${this.baseUrl}/admin/orders/${orderId}`);
   }
 
-  submitReturnRequest(orderId: number, reason: string, items: { productId: number; quantity: number }[]): Observable<any> {
-    return this.http.post(`${this.baseUrl}/orders/${orderId}/return`, { reason, items });
+  cancelOrder(orderId: number): Observable<ApiResponse> {
+    return this.http.patch<ApiResponse>(`${this.baseUrl}/orders/${orderId}/cancel`, {});
+  }
+
+  submitReturnRequest(orderId: number, reason: string, items: { productId: number; quantity: number }[]): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/orders/${orderId}/return`, { reason, items });
   }
 
   downloadOrderPDF(orderId: number) {

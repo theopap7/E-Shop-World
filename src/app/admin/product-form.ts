@@ -6,6 +6,7 @@ import { AdminService } from '../admin.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../toast.service';
 import { environment } from '../../environments/environment';
+import { Category } from '../product.service';
 
 @Component({
   selector: 'app-product-form',
@@ -24,7 +25,7 @@ export class ProductFormComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
 
-  categories: any[] = [];
+  categories: Category[] = [];
 
   // upload state
   uploading = false;
@@ -98,7 +99,7 @@ export class ProductFormComponent implements OnInit {
 
   loadCategories(): void {
 
-    this.http.get<any>(`${environment.apiUrl}/categories`).subscribe({
+    this.http.get<{ success: boolean; categories: Category[] }>(`${environment.apiUrl}/categories`).subscribe({
 
       next: (res) => {
         if (res.success) {
@@ -106,7 +107,7 @@ export class ProductFormComponent implements OnInit {
         }
       },
 
-      error: (err) => console.error('Load categories error:', err),
+      error: () => {},
 
     });
 
@@ -144,7 +145,6 @@ export class ProductFormComponent implements OnInit {
       },
 
       error: (err) => {
-        console.error('Load product error:', err);
         this.error = 'Σφάλμα φόρτωσης προϊόντος';
         this.isLoading = false;
       }
@@ -190,7 +190,6 @@ export class ProductFormComponent implements OnInit {
       },
 
       error: (err) => {
-        console.error('Save product error:', err);
         this.error = err?.error?.message || 'Σφάλμα αποθήκευσης προϊόντος';
         this.isLoading = false;
       }
@@ -296,7 +295,7 @@ export class ProductFormComponent implements OnInit {
     const formData = new FormData();
     formData.append('image', this.selectedFile);
 
-    this.http.post<any>(
+    this.http.post<{ success: boolean; imageUrl?: string; message?: string }>(
       `${environment.apiUrl}/upload-image`,
       formData
     ).subscribe({

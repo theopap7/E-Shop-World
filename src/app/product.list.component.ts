@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProductService, ProductDto, ProductFilters } from './product.service';
+import { ProductService, ProductDto, ProductFilters, Category } from './product.service';
 import { CartService } from './cart.service';
 import { Router, RouterModule } from '@angular/router';
 import { WishlistService } from './wishlist-service';
@@ -25,7 +25,7 @@ export class ProductListComponent implements OnInit {
   allProducts: ProductDto[] = [];
 
   // ✅ ΝΕΟ: Categories για dropdown
-  categories: any[] = [];
+  categories: Category[] = [];
 
   // ✅ ΝΕΟ: Filter state
   searchTerm = '';
@@ -53,8 +53,7 @@ export class ProductListComponent implements OnInit {
         this.allProducts = res.products ?? [];
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('GET /api/products failed:', err);
+      error: () => {
         this.errorMessage = 'Αποτυχία φόρτωσης προϊόντων. Δοκίμασε ξανά.';
         this.isLoading = false;
       },
@@ -67,9 +66,8 @@ export class ProductListComponent implements OnInit {
       next: (res) => {
         this.categories = res.categories ?? [];
       },
-      error: (err) => {
-        console.error('GET /api/categories failed:', err);
-      }
+      error: () => {}
+
     });
   }
 

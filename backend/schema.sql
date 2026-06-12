@@ -128,5 +128,9 @@ CREATE TABLE return_request_items (
 -- Sample categories
 INSERT INTO categories (name) VALUES ('Ηλεκτρονικά'), ('Ρούχα'), ('Βιβλία'), ('Αθλητικά');
 
+-- Indexes for frequent lookups (FK columns already indexed by MySQL automatically)
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_orders_status ON orders(status);
+
 -- To create an admin: register normally, then run:
 -- UPDATE users SET role = 'admin' WHERE email = 'your@email.com';

@@ -52,7 +52,7 @@ export class AdminReturnsComponent implements OnInit {
 
   loadReturns(): void {
     this.isLoading = true;
-    this.http.get<any>(this.apiUrl).subscribe({
+    this.http.get<{ success: boolean; returns: ReturnRequest[] }>(this.apiUrl).subscribe({
       next: (res) => {
         this.returns = res.returns || [];
         this.isLoading = false;
@@ -69,7 +69,7 @@ export class AdminReturnsComponent implements OnInit {
     if (!confirm(`Επιβεβαίωση ${label} αιτήματος #${r.id};`)) return;
 
     this.processingId = r.id;
-    this.http.patch<any>(`${this.apiUrl}/${r.id}`, {
+    this.http.patch<{ success: boolean; message: string }>(`${this.apiUrl}/${r.id}`, {
       status,
       adminNote: this.adminNotes[r.id] || ''
     }).subscribe({

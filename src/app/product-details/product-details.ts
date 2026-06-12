@@ -74,7 +74,7 @@ export class ProductDetailComponent implements OnInit {
     this.error = '';
 
     this.productService.getProduct(id).subscribe({
-      next: (res: any) => {
+      next: (res) => {
         if (res?.success) {
           this.product = res.product;
 
@@ -87,7 +87,7 @@ export class ProductDetailComponent implements OnInit {
 
         this.isLoading = false;
       },
-      error: (err: any) => {
+      error: (err: { status: number }) => {
         this.error = err?.status === 404
           ? 'Το προϊόν δεν βρέθηκε.'
           : 'Σφάλμα φόρτωσης προϊόντος.';

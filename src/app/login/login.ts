@@ -37,13 +37,13 @@ export class LoginComponent {
       const { email, password } = this.loginForm.value;
 
       this.authService.login(email, password).subscribe({
-        next: (response: any) => {
+        next: () => {
           this.toastService.success('Καλώς ήρθες πίσω! 👋');
           this.isSubmitting = false;
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
           this.router.navigateByUrl(returnUrl);
         },
-        error: (error: any) => {
+        error: (error: { status: number; error?: { message?: string } }) => {
           this.isSubmitting = false;
           if (error.status === 429) {
             this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 10 λεπτά.');

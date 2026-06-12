@@ -66,7 +66,7 @@ export class ProfileComponent {
     }
 
     this.isUpdating = true;
-    this.http.put<any>(`${environment.apiUrl}/me`, { firstName, lastName, email }).subscribe({
+    this.http.put<{ success: boolean; user: AuthUser }>(`${environment.apiUrl}/me`, { firstName, lastName, email }).subscribe({
       next: (res) => {
         if (res.success) {
           this.auth.updateUser(res.user);
@@ -120,7 +120,7 @@ export class ProfileComponent {
     this.changingPassword = true;
 
     this.http
-      .post<any>(`${environment.apiUrl}/change-password`, {
+      .post<{ success: boolean; message?: string }>(`${environment.apiUrl}/change-password`, {
         currentPassword: this.currentPassword,
         newPassword: this.newPassword,
       })

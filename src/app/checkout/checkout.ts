@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 
 import { CartService, CartItem } from '../cart.service';
 import { OrderService, CreateOrderDto } from '../order.service';
-import { DiscountService } from '../discount.service';
+import { DiscountService, DiscountValidationResponse } from '../discount.service';
 import { ToastService } from '../toast.service';
 
 type ShippingMethod = 'courier_standard' | 'courier_express' | 'pickup';
@@ -33,7 +33,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   // Discount state
   discountCode = '';
   discountAmount = 0;
-  appliedDiscount: any = null;
+  appliedDiscount: DiscountValidationResponse['discount'] | null = null;
   discountError = '';
   applyingDiscount = false;
 

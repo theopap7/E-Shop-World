@@ -13,6 +13,7 @@ export interface Product {
   image_url: string;
   category_name?: string;
   created_at?: string;
+  sizes?: string[] | null;
 }
 
 export interface CreateProductDto {
@@ -48,6 +49,37 @@ export interface AdminStats {
   pendingReturns: number;
 }
 
+export interface AdminUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  created_at: string;
+  order_count: number;
+  total_spent: number;
+  last_order_at: string | null;
+}
+
+export interface AdminReviewDto {
+  id: number;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  product_id: number;
+  user_id: number;
+  product_name: string;
+  product_image: string | null;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly baseUrl = `${environment.apiUrl}/admin`;
@@ -55,56 +87,56 @@ export class AdminService {
   constructor(private http: HttpClient) {}
 
   // ========== PRODUCTS ==========
-  
-  getProducts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/products`);
+
+  getProducts(): Observable<{ success: boolean; products: Product[] }> {
+    return this.http.get<{ success: boolean; products: Product[] }>(`${this.baseUrl}/products`);
   }
 
-  getProduct(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/products/${id}`);
+  getProduct(id: number): Observable<{ success: boolean; product: Product }> {
+    return this.http.get<{ success: boolean; product: Product }>(`${this.baseUrl}/products/${id}`);
   }
 
-  createProduct(product: CreateProductDto): Observable<any> {
-    return this.http.post(`${this.baseUrl}/products`, product);
+  createProduct(product: CreateProductDto): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/products`, product);
   }
 
-  updateProduct(id: number, product: CreateProductDto): Observable<any> {
-    return this.http.put(`${this.baseUrl}/products/${id}`, product);
+  updateProduct(id: number, product: CreateProductDto): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.baseUrl}/products/${id}`, product);
   }
 
-  deleteProduct(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/products/${id}`);
+  deleteProduct(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.baseUrl}/products/${id}`);
   }
 
   // ========== ORDERS ==========
-  
-  getOrders(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/orders`);
+
+  getOrders(): Observable<{ success: boolean; orders: AdminOrder[] }> {
+    return this.http.get<{ success: boolean; orders: AdminOrder[] }>(`${this.baseUrl}/orders`);
   }
 
-  updateOrderStatus(orderId: number, status: string): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/orders/${orderId}/status`, { status });
+  updateOrderStatus(orderId: number, status: string): Observable<ApiResponse> {
+    return this.http.patch<ApiResponse>(`${this.baseUrl}/orders/${orderId}/status`, { status });
   }
 
-  confirmPayment(orderId: number): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/orders/${orderId}/confirm-payment`, {});
+  confirmPayment(orderId: number): Observable<ApiResponse> {
+    return this.http.patch<ApiResponse>(`${this.baseUrl}/orders/${orderId}/confirm-payment`, {});
   }
 
   // ========== USERS ==========
 
-  getUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users`);
+  getUsers(): Observable<{ success: boolean; users: AdminUser[] }> {
+    return this.http.get<{ success: boolean; users: AdminUser[] }>(`${this.baseUrl}/users`);
   }
 
   // ========== STATS ==========
-  
-  getStats(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/stats`);
+
+  getStats(): Observable<{ success: boolean; stats: AdminStats }> {
+    return this.http.get<{ success: boolean; stats: AdminStats }>(`${this.baseUrl}/stats`);
   }
-  
-getAllReviews(): Observable<{ success: boolean; reviews: any[] }> {
-  return this.http.get<{ success: boolean; reviews: any[] }>(
-    `${this.baseUrl}/reviews`  // ✅ Χωρίς /admin
+
+getAllReviews(): Observable<{ success: boolean; reviews: AdminReviewDto[] }> {
+  return this.http.get<{ success: boolean; reviews: AdminReviewDto[] }>(
+    `${this.baseUrl}/reviews`
   );
 }
 

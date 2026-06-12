@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AdminService } from '../admin.service';
+import { AdminService, AdminUser } from '../admin.service';
 
 @Component({
   selector: 'app-admin-users',
@@ -12,7 +12,7 @@ import { AdminService } from '../admin.service';
   styleUrl: './admin-users.css',
 })
 export class AdminUsersComponent implements OnInit {
-  users: any[] = [];
+  users: AdminUser[] = [];
   isLoading = true;
   error: string | null = null;
   searchTerm = '';
@@ -32,7 +32,7 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  get filteredUsers(): any[] {
+  get filteredUsers(): AdminUser[] {
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) return this.users;
     return this.users.filter(u =>

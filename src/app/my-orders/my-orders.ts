@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { OrderService } from '../order.service';
+import { OrderService, OrderDetailResponse } from '../order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { CartService } from '../cart.service';
@@ -15,15 +15,6 @@ type OrderRow = {
   return_status?: string | null;
 };
 
-type OrderItem = {
-  product_id: number;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  line_total: number;
-  stock: number;
-  image_url?: string;
-};
 
 @Component({
   selector: 'app-my-orders',
@@ -53,8 +44,8 @@ export class MyOrdersComponent implements OnInit {
     this.error = null;
 
     this.orderService.getMyOrders().subscribe({
-      next: (res: any) => {
-        this.orders = (res?.orders ?? []) as OrderRow[];
+      next: (res) => {
+        this.orders = res.orders ?? [];
         this.isLoading = false;
       },
       error: (err) => {
@@ -73,14 +64,14 @@ export class MyOrdersComponent implements OnInit {
     if (this.reorderingId === orderId) return;
     this.reorderingId = orderId;
     this.orderService.getOrderDetails(orderId).subscribe({
-      next: (res: any) => {
-        const items: OrderItem[] = res.items ?? [];
+      next: (res: OrderDetailResponse) => {
+        const items = res.items ?? [];
         this.reorderingId = null;
         this.cartService.reorderItems(items.map(i => ({
           id: i.product_id,
           name: i.product_name,
           price: i.unit_price,
-          stock: i.stock,
+          stock: i.stock ?? 999,
           image_url: i.image_url
         })));
       },

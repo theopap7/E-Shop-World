@@ -8,7 +8,18 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   email: string;
-  role?: string;  // ✅ ΠΡΟΣΘΗΚΗ: role field
+  role?: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  token: string;
+  user: AuthUser;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message?: string;
 }
 
 const TOKEN_KEY = 'token';
@@ -24,20 +35,18 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap((res) => {
         if (res?.token) localStorage.setItem(TOKEN_KEY, res.token);
         if (res?.user) localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-
-        // ✅ ενημέρωση state
         this.userSubject.next(res?.user ?? null);
       })
     );
   }
 
-  register(firstName: string, lastName: string, email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, { firstName, lastName, email, password });
+  register(firstName: string, lastName: string, email: string, password: string): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, { firstName, lastName, email, password });
   }
 
   getToken(): string | null {

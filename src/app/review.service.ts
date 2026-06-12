@@ -50,22 +50,19 @@ export class ReviewService {
     );
   }
 
-  // Γράψε review
-  submitReview(productId: number, rating: number, comment: string): Observable<any> {
-    return this.http.post(
+  submitReview(productId: number, rating: number, comment: string): Observable<{ success: boolean; message?: string }> {
+    return this.http.post<{ success: boolean; message?: string }>(
       `${this.baseUrl}/reviews/${productId}`,
       { rating, comment }
     );
   }
 
-  // Διάγραψε review
-  deleteReview(reviewId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/reviews/${reviewId}`);
+  deleteReview(reviewId: number): Observable<{ success: boolean; message?: string }> {
+    return this.http.delete<{ success: boolean; message?: string }>(`${this.baseUrl}/reviews/${reviewId}`);
   }
 
-  // Ενημέρωσε review
-  updateReview(reviewId: number, rating: number, comment: string): Observable<any> {
-    return this.http.put(
+  updateReview(reviewId: number, rating: number, comment: string): Observable<{ success: boolean; message?: string }> {
+    return this.http.put<{ success: boolean; message?: string }>(
       `${this.baseUrl}/reviews/${reviewId}`,
       { rating, comment }
     );

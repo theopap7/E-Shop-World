@@ -59,13 +59,12 @@ export class AdminDiscountsComponent implements OnInit {
   loadCodes(): void {
     this.isLoading = true;
 
-    this.http.get<any>(this.apiUrl).subscribe({
+    this.http.get<{ codes: DiscountCode[] }>(this.apiUrl).subscribe({
       next: (res) => {
         this.codes = res.codes || [];
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Load codes error:', err);
+      error: () => {
         this.toastService.error('Σφάλμα φόρτωσης κωδικών');
         this.isLoading = false;
       }
@@ -134,7 +133,7 @@ export class AdminDiscountsComponent implements OnInit {
     };
 
     if (this.isEditMode && this.editingCodeId) {
-      this.http.put<any>(
+      this.http.put<{ success: boolean; message?: string }>(
         `${this.apiUrl}/${this.editingCodeId}`,
         payload
       ).subscribe({
@@ -154,7 +153,7 @@ export class AdminDiscountsComponent implements OnInit {
       return;
     }
 
-    this.http.post<any>(this.apiUrl, payload).subscribe({
+    this.http.post<{ success: boolean; message?: string }>(this.apiUrl, payload).subscribe({
       next: (res) => {
         this.isSaving = false;
         if (res.success) {
@@ -171,7 +170,7 @@ export class AdminDiscountsComponent implements OnInit {
   }
 
   toggleActive(code: DiscountCode): void {
-    this.http.put<any>(`${this.apiUrl}/${code.id}`, {
+    this.http.put<{ success: boolean; message?: string }>(`${this.apiUrl}/${code.id}`, {
       code: code.code,
       type: code.type,
       value: code.value,
@@ -195,7 +194,7 @@ export class AdminDiscountsComponent implements OnInit {
   deleteCode(id: number, code: string): void {
     if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`)) return;
 
-    this.http.delete<any>(`${this.apiUrl}/${id}`).subscribe({
+    this.http.delete<{ success: boolean; message?: string }>(`${this.apiUrl}/${id}`).subscribe({
       next: (res) => {
         if (res.success) {
           this.toastService.success('Κωδικός διαγράφηκε');

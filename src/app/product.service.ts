@@ -26,6 +26,12 @@ export interface ProductFilters {
   sort?: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  description?: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -62,8 +68,8 @@ export class ProductService {
   }
 
   // ✅ ΝΕΟ: Φόρτωσε τις κατηγορίες για το dropdown
-  getCategories(): Observable<{ success: boolean; categories: any[] }> {
-    return this.http.get<{ success: boolean; categories: any[] }>(
+  getCategories(): Observable<{ success: boolean; categories: Category[] }> {
+    return this.http.get<{ success: boolean; categories: Category[] }>(
       `${this.baseUrl}/categories`
     );
   }

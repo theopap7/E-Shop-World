@@ -1,21 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminService } from '../admin.service';
+import { AdminService, AdminReviewDto } from '../admin.service';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../toast.service';
-export interface AdminReview {
-  id: number;
-  rating: number;
-  comment: string | null;
-  created_at: string;
-  product_id: number;
-  user_id: number;
-  product_name: string;
-  product_image: string | null;
-  first_name: string;
-  last_name: string;
-  email: string;
-}
 
 @Component({
   selector: 'app-admin-reviews',
@@ -26,7 +13,7 @@ export interface AdminReview {
 })
 export class AdminReviewsComponent implements OnInit {
 
-  reviews: AdminReview[] = [];
+  reviews: AdminReviewDto[] = [];
   isLoading = false;
   error = '';
 
@@ -48,7 +35,6 @@ export class AdminReviewsComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Load admin reviews error:', err);
         this.error = 'Σφάλμα φόρτωσης reviews.';
         this.isLoading = false;
       }
@@ -69,7 +55,6 @@ export class AdminReviewsComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Delete review error:', err);
         this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής review.');
       }
     });

@@ -49,7 +49,7 @@ export class RegisterComponent {
       const { firstName, lastName, email, password } = this.registerForm.value;
 
       this.authService.register(firstName, lastName, email, password).subscribe({
-        next: (response: any) => {
+        next: () => {
           this.toastService.success('Η εγγραφή ολοκληρώθηκε επιτυχώς! 🎉');
           setTimeout(() => {
             this.toastService.info('Μπορείς να συνδεθείς τώρα');
@@ -57,7 +57,7 @@ export class RegisterComponent {
           this.isSubmitting = false;
           this.router.navigate(['/login']);
         },
-        error: (error: any) => {
+        error: (error: { error?: { message?: string } }) => {
           const errorMsg = error?.error?.message || 'Σφάλμα εγγραφής. Δοκίμασε ξανά';
           this.toastService.error(errorMsg);
           this.isSubmitting = false;

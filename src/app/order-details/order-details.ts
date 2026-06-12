@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { OrderService } from '../order.service';
+import { OrderService, OrderDetailResponse } from '../order.service';
 import { AdminService } from '../admin.service';
 import { ToastService } from '../toast.service';
 import { CartService } from '../cart.service';
@@ -133,14 +133,13 @@ export class OrderDetailsComponent implements OnInit {
       : this.orderService.getOrderDetails(this.orderId);
 
     request.subscribe({
-      next: (res: any) => {
+      next: (res: OrderDetailResponse) => {
         this.order = res?.order ?? null;
         if (this.order) this.order.return_request = res?.returnRequest ?? null;
         this.items = res?.items ?? [];
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('getOrderDetails error:', err);
         this.error = err?.error?.message || 'Αποτυχία φόρτωσης λεπτομερειών.';
         this.isLoading = false;
       },
