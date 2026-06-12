@@ -74,10 +74,15 @@ export class AuthService {
     }
   }
 
-  // ✅ ΠΡΟΣΘΗΚΗ: Check if user is admin
   isAdmin(): boolean {
-    const user = this.getUser();
-    return user?.role === 'admin';
+    const token = this.getToken();
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role === 'admin';
+    } catch {
+      return false;
+    }
   }
 
   updateUser(user: AuthUser): void {

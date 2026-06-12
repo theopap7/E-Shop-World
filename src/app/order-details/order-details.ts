@@ -245,7 +245,7 @@ export class OrderDetailsComponent implements OnInit {
       name: i.product_name,
       price: i.unit_price,
       quantity: i.quantity,
-      stock: i.stock ?? 999,
+      stock: i.stock ?? 0,
       image_url: i.image_url,
       size: i.size,
     })));
