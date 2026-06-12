@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 require('dotenv').config();
 const db = require('./db');
 const PDFDocument = require('pdfkit');
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 
 // Middleware
+app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:4200',
   credentials: true
@@ -22,6 +24,14 @@ const authLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 5,
   message: { success: false, message: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 10 λεπτά.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const passwordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: { success: false, message: 'Πολλές αποτυχημένες προσπάθειες αλλαγής κωδικού. Δοκιμάστε ξανά σε 15 λεπτά.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -108,6 +118,19 @@ app.use('/uploads', express.static('uploads'));
 app.post('/api/register', authLimiter, async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName?.trim() || !lastName?.trim()) {
+      return res.status(400).json({ success: false, message: 'Το όνομα και το επώνυμο είναι υποχρεωτικά' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο email' });
+    }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες' });
+    }
 
     const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     if (existingUser.length > 0) {
@@ -256,7 +279,7 @@ app.put('/api/me', authenticateToken, async (req, res) => {
  * ✅ Change password: POST /api/change-password
  * Θέλει token + currentPassword + newPassword
  */
-app.post('/api/change-password', authenticateToken, async (req, res) => {
+app.post('/api/change-password', authenticateToken, passwordLimiter, async (req, res) => {
   try {
     const userId = req.user.id;
     const { currentPassword, newPassword } = req.body;
@@ -524,7 +547,7 @@ if (discountCode && String(discountCode).trim()) {
 
   const [rows] = await conn.query(
     `SELECT * FROM discount_codes
-     WHERE code = ? AND active = TRUE`,
+     WHERE code = ? AND active = TRUE FOR UPDATE`,
     [code]
   );
 
@@ -768,34 +791,39 @@ app.get('/api/my-orders/:orderId', authenticateToken, async (req, res) => {
 });
 
 app.post('/api/orders/:id/return', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const orderId = Number(req.params.id);
+  const { reason, items } = req.body;
+
+  if (!reason || !String(reason).trim()) {
+    return res.status(400).json({ success: false, message: 'Παρακαλώ συμπλήρωσε τον λόγο επιστροφής' });
+  }
+
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ success: false, message: 'Επίλεξε τουλάχιστον ένα προϊόν για επιστροφή' });
+  }
+
+  let conn;
   try {
-    const userId = req.user.id;
-    const orderId = Number(req.params.id);
-    const { reason, items } = req.body;
+    conn = await db.getConnection();
+    await conn.beginTransaction();
 
-    if (!reason || !String(reason).trim()) {
-      return res.status(400).json({ success: false, message: 'Παρακαλώ συμπλήρωσε τον λόγο επιστροφής' });
-    }
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ success: false, message: 'Επίλεξε τουλάχιστον ένα προϊόν για επιστροφή' });
-    }
-
-    const [rows] = await db.query(
-      'SELECT status FROM orders WHERE id = ? AND user_id = ?',
+    const [rows] = await conn.query(
+      'SELECT status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
       [orderId, userId]
     );
 
     if (rows.length === 0) {
+      await conn.rollback();
       return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
     if (rows[0].status !== 'delivered') {
+      await conn.rollback();
       return res.status(400).json({ success: false, message: 'Μπορείτε να ζητήσετε επιστροφή μόνο για παραδομένες παραγγελίες' });
     }
 
-    // Validate items against actual order items
-    const [orderItems] = await db.query(
+    const [orderItems] = await conn.query(
       `SELECT oi.product_id, oi.quantity, oi.unit_price, p.name AS product_name
        FROM order_items oi JOIN products p ON p.id = oi.product_id
        WHERE oi.order_id = ?`,
@@ -815,8 +843,14 @@ app.post('/api/orders/:id/return', authenticateToken, async (req, res) => {
       const qty = Number(item.quantity);
       const oi = orderItemMap[productId];
 
-      if (!oi) return res.status(400).json({ success: false, message: `Προϊόν ${productId} δεν ανήκει σε αυτή την παραγγελία` });
-      if (qty < 1 || qty > oi.quantity) return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${oi.product_name}"` });
+      if (!oi) {
+        await conn.rollback();
+        return res.status(400).json({ success: false, message: `Προϊόν ${productId} δεν ανήκει σε αυτή την παραγγελία` });
+      }
+      if (qty < 1 || qty > oi.quantity) {
+        await conn.rollback();
+        return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${oi.product_name}"` });
+      }
 
       refundAmount += qty * Number(oi.unit_price);
       validatedItems.push({ productId, productName: oi.product_name, quantity: qty, unitPrice: Number(oi.unit_price) });
@@ -824,7 +858,7 @@ app.post('/api/orders/:id/return', authenticateToken, async (req, res) => {
 
     refundAmount = Number(refundAmount.toFixed(2));
 
-    const [result] = await db.query(
+    const [result] = await conn.query(
       'INSERT INTO return_requests (order_id, user_id, reason, refund_amount) VALUES (?, ?, ?, ?)',
       [orderId, userId, String(reason).trim(), refundAmount]
     );
@@ -832,19 +866,23 @@ app.post('/api/orders/:id/return', authenticateToken, async (req, res) => {
     const returnRequestId = result.insertId;
 
     for (const item of validatedItems) {
-      await db.query(
+      await conn.query(
         'INSERT INTO return_request_items (return_request_id, product_id, product_name, quantity, unit_price) VALUES (?, ?, ?, ?, ?)',
         [returnRequestId, item.productId, item.productName, item.quantity, item.unitPrice]
       );
     }
 
+    await conn.commit();
     return res.json({ success: true, message: 'Το αίτημα επιστροφής υποβλήθηκε επιτυχώς' });
   } catch (error) {
+    if (conn) await conn.rollback();
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(400).json({ success: false, message: 'Έχετε ήδη υποβάλει αίτημα επιστροφής για αυτή την παραγγελία' });
     }
     console.error('Return request error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
+  } finally {
+    if (conn) conn.release();
   }
 });
 
