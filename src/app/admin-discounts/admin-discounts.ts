@@ -204,8 +204,8 @@ export class AdminDiscountsComponent implements OnInit {
           this.loadCodes();
         }
       },
-      error: () => {
-        this.toastService.error('Σφάλμα διαγραφής');
+      error: (err) => {
+        this.toastService.error(err?.error?.message || 'Σφάλμα διαγραφής');
       }
     });
   }

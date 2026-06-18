@@ -111,9 +111,8 @@ export class ProfileComponent {
     }
 
     // Έλεγχος μήκους
-    if (this.newPassword.length < 6) {
-      // ✅ Toast: Too short
-      this.toastService.warning('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες');
+    if (this.newPassword.length < 8) {
+      this.toastService.warning('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες');
       return;
     }
 

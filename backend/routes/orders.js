@@ -415,7 +415,7 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
     await conn.beginTransaction();
 
     const [rows] = await conn.query(
-      'SELECT id, user_id, status, payment_status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
+      'SELECT id, user_id, status, payment_status, discount_code FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
       [orderId, userId]
     );
 
@@ -448,14 +448,10 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
       );
     }
 
-    const [orderData] = await conn.query(
-      'SELECT discount_code FROM orders WHERE id = ?',
-      [orderId]
-    );
-    if (orderData[0]?.discount_code) {
+    if (order.discount_code) {
       await conn.query(
         `UPDATE discount_codes SET used_count = GREATEST(used_count - 1, 0) WHERE code = ?`,
-        [orderData[0].discount_code]
+        [order.discount_code]
       );
       await conn.query(
         `DELETE FROM discount_code_usages WHERE order_id = ?`,

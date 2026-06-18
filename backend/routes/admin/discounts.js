@@ -117,6 +117,19 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
 router.delete('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
+
+    const [usages] = await db.query(
+      'SELECT COUNT(*) as count FROM discount_code_usages WHERE discount_code_id = ?',
+      [id]
+    );
+
+    if (usages[0].count > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Δεν είναι δυνατή η διαγραφή — ο κωδικός έχει χρησιμοποιηθεί σε ${usages[0].count} παραγγελία(-ές). Απενεργοποιήστε τον αντί να τον διαγράψετε.`
+      });
+    }
+
     await db.query('DELETE FROM discount_codes WHERE id = ?', [id]);
     res.json({ success: true, message: 'Κωδικός διαγράφηκε' });
   } catch (error) {

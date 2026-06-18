@@ -19,8 +19,8 @@ router.post('/register', authLimiter, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Μη έγκυρο email' });
     }
 
-    if (!password || password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες' });
+    if (!password || password.length < 8) {
+      return res.status(400).json({ success: false, message: 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες' });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -176,8 +176,8 @@ router.post('/change-password', authenticateToken, passwordLimiter, async (req, 
     const userId = req.user.id;
     const { currentPassword, newPassword } = req.body;
 
-    if (!currentPassword || !newPassword || newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: 'Μη έγκυρα δεδομένα κωδικού' });
+    if (!currentPassword || !newPassword || newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες' });
     }
 
     const [rows] = await db.query('SELECT password FROM users WHERE id = ?', [userId]);

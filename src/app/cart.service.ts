@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { ProductDto } from './product.service';
 import { AuthService, AuthUser } from './auth.service';
-import { ToastService } from './toast.service';  // ✅ ADD THIS
+import { ToastService } from './toast.service';
 
 export interface CartItem {
   productId: number;
@@ -40,10 +40,9 @@ export class CartService implements OnDestroy {
 
   private authSub: Subscription;
 
-  // ✅ ADD toastService HERE
   constructor(
     private auth: AuthService,
-    private toastService: ToastService  // ✅ ADD THIS
+    private toastService: ToastService
   ) {
     this.setStorageKeyFromUser(this.auth.getUser());
     this.itemsSubject.next(this.loadFromStorage(this.currentStorageKey));
@@ -180,7 +179,6 @@ export class CartService implements OnDestroy {
     this.setItems([]);
   }
 
-  // ... rest stays the same
   private setItems(items: CartItem[]): void {
     this.itemsSubject.next(items);
     this.saveToStorage(this.currentStorageKey, items);
