@@ -448,6 +448,21 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
       );
     }
 
+    const [orderData] = await conn.query(
+      'SELECT discount_code FROM orders WHERE id = ?',
+      [orderId]
+    );
+    if (orderData[0]?.discount_code) {
+      await conn.query(
+        `UPDATE discount_codes SET used_count = GREATEST(used_count - 1, 0) WHERE code = ?`,
+        [orderData[0].discount_code]
+      );
+      await conn.query(
+        `DELETE FROM discount_code_usages WHERE order_id = ?`,
+        [orderId]
+      );
+    }
+
     await conn.commit();
     return res.json({ success: true, message: 'Η παραγγελία ακυρώθηκε επιτυχώς' });
   } catch (error) {
