@@ -49,7 +49,6 @@
 /* Image */
 .product-image-wrap {
   border-radius: 8px;
-  overflow: hidden;
   background: #f9fafb;
 }
 
@@ -58,6 +57,42 @@
   height: 350px;
   object-fit: cover;
   display: block;
+  border-radius: 8px;
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.thumb-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  background: #f9fafb;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumb-btn.active {
+  border-color: #2563eb;
+}
+
+.thumb-btn:hover {
+  border-color: #93c5fd;
 }
 
 /* Info */

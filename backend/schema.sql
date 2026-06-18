@@ -139,10 +139,21 @@ CREATE INDEX idx_reset_token ON password_reset_tokens(token);
 
 -- Sample categories
 INSERT INTO categories (name) VALUES ('Ηλεκτρονικά'), ('Ρούχα'), ('Βιβλία'), ('Αθλητικά'), ('Παπούτσια');
-    
+
 -- Indexes for frequent lookups (FK columns already indexed by MySQL automatically)
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_orders_status ON orders(status);
+    
+CREATE TABLE product_images (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  image_url VARCHAR(500) NOT NULL,
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
 
--- To create an admin: register normally, then run:
+CREATE INDEX idx_product_images_product ON product_images(product_id);
+
+-- To create an admin: register normally, then run: 
 -- UPDATE users SET role = 'admin' WHERE email = 'your@email.com';

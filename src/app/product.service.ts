@@ -3,6 +3,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 
+export interface ProductImage {
+  id: number;
+  image_url: string;
+  sort_order: number;
+}
+
 export interface ProductDto {
   id: number;
   name: string;
@@ -75,8 +81,8 @@ export class ProductService {
   }
   // Μέσα στην class ProductService, μετά το getProducts():
 
-getProduct(id: number): Observable<{ success: boolean; product: ProductDto }> {
-  return this.http.get<{ success: boolean; product: ProductDto }>(
+getProduct(id: number): Observable<{ success: boolean; product: ProductDto; galleryImages: ProductImage[] }> {
+  return this.http.get<{ success: boolean; product: ProductDto; galleryImages: ProductImage[] }>(
     `${this.baseUrl}/products/${id}`
   );
 }

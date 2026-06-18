@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ProductService, ProductDto } from '../product.service';
+import { ProductService, ProductDto, ProductImage } from '../product.service';
 import { CartService } from '../cart.service';
 import { WishlistService } from '../wishlist-service';
 import { ReviewsComponent } from '../reviews/reviews';
@@ -21,6 +21,8 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 export class ProductDetailComponent implements OnInit {
 
   product: ProductDto | null = null;
+  galleryImages: ProductImage[] = [];
+  activeImageUrl: string | null = null;
   isLoading = true;
   error = '';
   addedToCart = false;
@@ -80,6 +82,8 @@ export class ProductDetailComponent implements OnInit {
       next: (res) => {
         if (res?.success) {
           this.product = res.product;
+          this.galleryImages = res.galleryImages ?? [];
+          this.activeImageUrl = this.product.image_url;
 
           if (this.product?.name) {
             this.breadcrumbService.updateLastBreadcrumb(this.product.name);

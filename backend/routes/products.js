@@ -108,7 +108,12 @@ router.get('/products/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
-    res.json({ success: true, product: rows[0] });
+    const [galleryImages] = await db.query(
+      'SELECT id, image_url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC',
+      [productId]
+    );
+
+    res.json({ success: true, product: rows[0], galleryImages });
   } catch (error) {
     console.error('Get product error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

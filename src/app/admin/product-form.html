@@ -258,6 +258,34 @@
 
 
 
+      <!-- GALLERY IMAGES (edit mode only) -->
+      <div class="image-block" *ngIf="isEditMode">
+        <div class="image-block-head">
+          <label class="image-title">Gallery Εικόνων</label>
+          <small class="image-hint">Επιπλέον εικόνες προϊόντος</small>
+        </div>
+
+        <div class="gallery-grid" *ngIf="galleryImages.length > 0">
+          <div class="gallery-item" *ngFor="let img of galleryImages">
+            <img [src]="img.image_url | imageUrl" alt="Gallery" (error)="onImgError($event)" />
+            <button type="button" class="gallery-delete-btn" (click)="deleteGalleryImage(img.id)" title="Διαγραφή">✕</button>
+          </div>
+        </div>
+
+        <p class="muted-text" *ngIf="galleryImages.length === 0">Δεν υπάρχουν εικόνες gallery.</p>
+
+        <input type="file" #galleryInput accept="image/*" (change)="onGalleryFileSelected($event)" class="file-hidden" />
+
+        <button
+          type="button"
+          class="btn btn-outline"
+          style="margin-top:10px"
+          [disabled]="uploadingGallery"
+          (click)="galleryInput.click()">
+          {{ uploadingGallery ? 'Ανέβασμα...' : '+ Προσθήκη εικόνας gallery' }}
+        </button>
+      </div>
+
       <!-- BUTTONS -->
       <div class="form-actions">
 

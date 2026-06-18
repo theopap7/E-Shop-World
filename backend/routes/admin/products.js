@@ -143,6 +143,74 @@ router.delete('/admin/products/:id', authenticateToken, isAdmin, async (req, res
   }
 });
 
+router.get('/admin/products/:id/images', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    const [images] = await db.query(
+      'SELECT id, image_url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC',
+      [productId]
+    );
+    res.json({ success: true, images });
+  } catch (error) {
+    console.error('Gallery get error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+router.post('/admin/products/:id/images', authenticateToken, isAdmin, upload.single('image'), async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+
+    const [products] = await db.query('SELECT id FROM products WHERE id = ?', [productId]);
+    if (products.length === 0) {
+      return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Δεν επιλέχθηκε αρχείο' });
+    }
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+
+    const [countRows] = await db.query(
+      'SELECT COUNT(*) as count FROM product_images WHERE product_id = ?',
+      [productId]
+    );
+    const sortOrder = countRows[0].count;
+
+    const [result] = await db.query(
+      'INSERT INTO product_images (product_id, image_url, sort_order) VALUES (?, ?, ?)',
+      [productId, imageUrl, sortOrder]
+    );
+
+    res.status(201).json({ success: true, image: { id: result.insertId, image_url: imageUrl, sort_order: sortOrder } });
+  } catch (error) {
+    console.error('Gallery upload error:', error);
+    res.status(500).json({ success: false, message: 'Αποτυχία ανεβάσματος εικόνας' });
+  }
+});
+
+router.delete('/admin/products/:id/images/:imageId', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    const imageId = Number(req.params.imageId);
+
+    const [result] = await db.query(
+      'DELETE FROM product_images WHERE id = ? AND product_id = ?',
+      [imageId, productId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Η εικόνα δεν βρέθηκε' });
+    }
+
+    res.json({ success: true, message: 'Η εικόνα διαγράφηκε' });
+  } catch (error) {
+    console.error('Gallery delete error:', error);
+    res.status(500).json({ success: false, message: 'Αποτυχία διαγραφής εικόνας' });
+  }
+});
+
 router.post('/upload-image', authenticateToken, isAdmin, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {

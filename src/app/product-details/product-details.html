@@ -46,14 +46,32 @@
     <!-- ✅ REAL PRODUCT -->
     <div *ngIf="!isLoading && !error && product" class="product-detail">
 
-      <!-- Left: Image -->
+      <!-- Left: Image Gallery -->
       <div class="product-image-wrap">
         <img
-          [src]="product.image_url | imageUrl"
+          [src]="(activeImageUrl || product.image_url) | imageUrl"
           [alt]="product.name"
           class="product-image"
           (error)="$any($event.target).src='no-image.svg'"
         />
+
+        <div class="gallery-thumbs" *ngIf="galleryImages.length > 0">
+          <button
+            class="thumb-btn"
+            type="button"
+            [class.active]="activeImageUrl === product.image_url"
+            (click)="activeImageUrl = product.image_url">
+            <img [src]="product.image_url | imageUrl" [alt]="product.name" (error)="$any($event.target).src='no-image.svg'" />
+          </button>
+          <button
+            *ngFor="let img of galleryImages"
+            class="thumb-btn"
+            type="button"
+            [class.active]="activeImageUrl === img.image_url"
+            (click)="activeImageUrl = img.image_url">
+            <img [src]="img.image_url | imageUrl" [alt]="product.name" (error)="$any($event.target).src='no-image.svg'" />
+          </button>
+        </div>
       </div>
 
       <!-- Right: Info -->

@@ -29,7 +29,7 @@
     <!-- Error -->
     <div *ngIf="!isLoading && error" class="panel alert alert-error">
       <div class="alert-text">{{ error }}</div>
-      <button class="btn btn-primary" type="button" (click)="loadStats()">
+      <button class="btn btn-primary" type="button" (click)="loadDashboard()">
         Επανάληψη
       </button>
     </div>
@@ -150,6 +150,39 @@
               <div class="stat-badge">👥</div>
             </div>
             <div class="stat-value">{{ stats.totalUsers }}</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="section">
+        <div class="section-head">
+          <h2 class="section-title">Αναλυτικά Στοιχεία</h2>
+          <p class="section-subtitle">Τελευταίες 30 μέρες</p>
+        </div>
+
+        <div class="charts-grid">
+
+          <div class="chart-card chart-wide">
+            <div class="chart-title">Έσοδα & Παραγγελίες</div>
+            <div class="chart-wrap">
+              <canvas #revenueCanvas></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Κατάσταση Παραγγελιών</div>
+            <div class="chart-wrap">
+              <canvas #statusCanvas></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Top 5 Προϊόντα</div>
+            <div class="chart-wrap">
+              <canvas #topProductsCanvas></canvas>
+            </div>
           </div>
 
         </div>

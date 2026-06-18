@@ -7,7 +7,7 @@ import { AdminService } from '../admin.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../toast.service';
 import { environment } from '../../environments/environment';
-import { Category } from '../product.service';
+import { Category, ProductImage } from '../product.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
@@ -37,6 +37,10 @@ export class ProductFormComponent implements OnInit {
 
   // drag state
   isDragging = false;
+
+  // gallery
+  galleryImages: ProductImage[] = [];
+  uploadingGallery = false;
 
   // sizes
   readonly CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
@@ -153,6 +157,7 @@ export class ProductFormComponent implements OnInit {
           this.uploadError = '';
           this.uploading = false;
           this.selectedSizes = Array.isArray(p.sizes) ? [...p.sizes] : [];
+          this.loadGalleryImages(id);
         }
 
         this.isLoading = false;
@@ -337,6 +342,78 @@ export class ProductFormComponent implements OnInit {
 
     });
 
+  }
+
+  // =========================
+  // GALLERY IMAGES
+  // =========================
+
+  loadGalleryImages(productId: number): void {
+    this.http.get<{ success: boolean; images: ProductImage[] }>(
+      `${environment.apiUrl}/admin/products/${productId}/images`
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => { if (res.success) this.galleryImages = res.images; },
+      error: () => {}
+    });
+  }
+
+  onGalleryFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    this.uploadGalleryImage(file);
+  }
+
+  uploadGalleryImage(file: File): void {
+    if (!this.productId) return;
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.toastService.error('Μόνο εικόνες επιτρέπονται (JPG, PNG, GIF, WEBP)');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.toastService.error('Η εικόνα πρέπει να είναι μικρότερη από 5MB');
+      return;
+    }
+
+    this.uploadingGallery = true;
+    const formData = new FormData();
+    formData.append('image', file);
+
+    this.http.post<{ success: boolean; image: ProductImage }>(
+      `${environment.apiUrl}/admin/products/${this.productId}/images`,
+      formData
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.galleryImages = [...this.galleryImages, res.image];
+          this.toastService.success('Εικόνα προστέθηκε στη gallery');
+        }
+        this.uploadingGallery = false;
+      },
+      error: () => {
+        this.toastService.error('Αποτυχία ανεβάσματος εικόνας');
+        this.uploadingGallery = false;
+      }
+    });
+  }
+
+  deleteGalleryImage(imageId: number): void {
+    if (!this.productId) return;
+
+    this.http.delete<{ success: boolean }>(
+      `${environment.apiUrl}/admin/products/${this.productId}/images/${imageId}`
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.galleryImages = this.galleryImages.filter(img => img.id !== imageId);
+          this.toastService.success('Εικόνα διαγράφηκε');
+        }
+      },
+      error: () => { this.toastService.error('Αποτυχία διαγραφής εικόνας'); }
+    });
   }
 
   // =========================

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../environments/environment';
 
 export interface Product {
@@ -47,6 +47,12 @@ export interface AdminStats {
   pendingOrders: number;
   pendingPayments: number;
   pendingReturns: number;
+}
+
+export interface ChartData {
+  dailyOrders: { day: string; orders: number; revenue: number }[];
+  statusBreakdown: { status: string; count: number }[];
+  topProducts: { name: string; total_sold: number }[];
 }
 
 export interface AdminUser {
@@ -130,8 +136,19 @@ export class AdminService {
 
   // ========== STATS ==========
 
-  getStats(): Observable<{ success: boolean; stats: AdminStats }> {
-    return this.http.get<{ success: boolean; stats: AdminStats }>(`${this.baseUrl}/stats`);
+  private statsCache$: Observable<{ success: boolean; stats: AdminStats; charts: ChartData }> | null = null;
+
+  getDashboardData(): Observable<{ success: boolean; stats: AdminStats; charts: ChartData }> {
+    if (!this.statsCache$) {
+      this.statsCache$ = this.http
+        .get<{ success: boolean; stats: AdminStats; charts: ChartData }>(`${this.baseUrl}/stats`)
+        .pipe(shareReplay(1));
+    }
+    return this.statsCache$;
+  }
+
+  invalidateStatsCache(): void {
+    this.statsCache$ = null;
   }
 
 getAllReviews(): Observable<{ success: boolean; reviews: AdminReviewDto[] }> {
