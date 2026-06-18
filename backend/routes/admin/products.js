@@ -46,6 +46,13 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' });
     }
 
+    if (category_id != null) {
+      const [cats] = await db.query('SELECT id FROM categories WHERE id = ?', [Number(category_id)]);
+      if (cats.length === 0) {
+        return res.status(400).json({ success: false, message: 'Η κατηγορία δεν βρέθηκε' });
+      }
+    }
+
     const sizesJson = Array.isArray(sizes) && sizes.length > 0 ? JSON.stringify(sizes) : null;
 
     const [result] = await db.query(
@@ -68,6 +75,13 @@ router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
 
     if (!name || !price || stock == null) {
       return res.status(400).json({ success: false, message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' });
+    }
+
+    if (category_id != null) {
+      const [cats] = await db.query('SELECT id FROM categories WHERE id = ?', [Number(category_id)]);
+      if (cats.length === 0) {
+        return res.status(400).json({ success: false, message: 'Η κατηγορία δεν βρέθηκε' });
+      }
     }
 
     const sizesJson = Array.isArray(sizes) && sizes.length > 0 ? JSON.stringify(sizes) : null;

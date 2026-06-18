@@ -353,7 +353,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     await conn.beginTransaction();
 
     const [rows] = await conn.query(
-      'SELECT status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
+      'SELECT status, subtotal, discount_amount, total_amount FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
       [orderId, userId]
     );
 
@@ -367,6 +367,10 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Μπορείτε να ζητήσετε επιστροφή μόνο για παραδομένες παραγγελίες' });
     }
 
+    const orderSubtotal = Number(rows[0].subtotal);
+    const orderDiscountAmount = Number(rows[0].discount_amount);
+    const orderTotalAmount = Number(rows[0].total_amount);
+
     const [orderItems] = await conn.query(
       `SELECT oi.product_id, oi.quantity, oi.unit_price, p.name AS product_name
        FROM order_items oi JOIN products p ON p.id = oi.product_id
@@ -379,7 +383,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       orderItemMap[oi.product_id] = oi;
     }
 
-    let refundAmount = 0;
+    let returnedSubtotal = 0;
     const validatedItems = [];
 
     for (const item of items) {
@@ -396,11 +400,15 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
         return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${oi.product_name}"` });
       }
 
-      refundAmount += qty * Number(oi.unit_price);
+      returnedSubtotal += qty * Number(oi.unit_price);
       validatedItems.push({ productId, productName: oi.product_name, quantity: qty, unitPrice: Number(oi.unit_price) });
     }
 
-    refundAmount = Number(refundAmount.toFixed(2));
+    // Apply discount proportionally to returned items
+    const discountRatio = orderSubtotal > 0 ? orderDiscountAmount / orderSubtotal : 0;
+    let refundAmount = Number((returnedSubtotal * (1 - discountRatio)).toFixed(2));
+    // Cap at order total to prevent over-refunding
+    refundAmount = Math.min(refundAmount, orderTotalAmount);
 
     const [result] = await conn.query(
       'INSERT INTO return_requests (order_id, user_id, reason, refund_amount) VALUES (?, ?, ?, ?)',
