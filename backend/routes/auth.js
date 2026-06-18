@@ -23,7 +23,9 @@ router.post('/register', authLimiter, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες' });
     }
 
-    const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [normalizedEmail]);
     if (existingUser.length > 0) {
       return res.status(400).json({ success: false, message: 'Το email υπάρχει ήδη' });
     }
@@ -32,7 +34,7 @@ router.post('/register', authLimiter, async (req, res) => {
 
     const [result] = await db.query(
       'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
-      [firstName, lastName, email, hashedPassword]
+      [firstName, lastName, normalizedEmail, hashedPassword]
     );
 
     res.status(201).json({
@@ -50,7 +52,7 @@ router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email.toLowerCase().trim()]);
     if (users.length === 0) {
       return res.status(401).json({ success: false, message: 'Λάθος email ή κωδικός' });
     }
@@ -68,10 +70,18 @@ router.post('/login', authLimiter, async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
     res.json({
       success: true,
       message: 'Επιτυχής σύνδεση',
-      token,
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000,
       user: {
         id: user.id,
         firstName: user.first_name,
@@ -187,7 +197,13 @@ router.post('/change-password', authenticateToken, passwordLimiter, async (req, 
   } catch (error) {
     console.error('Change password error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
+
   }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', { httpOnly: true, sameSite: 'lax' });
+  res.json({ success: true, message: 'Αποσύνδεση επιτυχής' });
 });
 
 module.exports = router;

@@ -13,7 +13,7 @@ export interface AuthUser {
 
 export interface LoginResponse {
   success: boolean;
-  token: string;
+  expiresAt: number;
   user: AuthUser;
 }
 
@@ -22,24 +22,26 @@ export interface RegisterResponse {
   message?: string;
 }
 
-const TOKEN_KEY = 'token';
 const USER_KEY = 'user';
+const EXPIRES_KEY = 'expiresAt';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = environment.apiUrl;
 
-  // ✅ auth state
   private readonly userSubject = new BehaviorSubject<AuthUser | null>(this.getUser());
   readonly user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res?.token) localStorage.setItem(TOKEN_KEY, res.token);
-        if (res?.user) localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+        if (res?.user) {
+          localStorage.removeItem('token');
+          localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+          localStorage.setItem(EXPIRES_KEY, String(res.expiresAt));
+        }
         this.userSubject.next(res?.user ?? null);
       })
     );
@@ -47,10 +49,6 @@ export class AuthService {
 
   register(firstName: string, lastName: string, email: string, password: string): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, { firstName, lastName, email, password });
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
   }
 
   getUser(): AuthUser | null {
@@ -64,25 +62,16 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 > Date.now();
-    } catch {
-      return false;
-    }
+    const user = this.getUser();
+    if (!user) return false;
+    const expiresAt = Number(localStorage.getItem(EXPIRES_KEY));
+    if (!expiresAt) return false;
+    return expiresAt > Date.now();
   }
 
   isAdmin(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role === 'admin';
-    } catch {
-      return false;
-    }
+    const user = this.getUser();
+    return user?.role === 'admin';
   }
 
   updateUser(user: AuthUser): void {
@@ -91,10 +80,10 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe();
     localStorage.removeItem(USER_KEY);
-
-    // ✅ δεν σβήνουμε carts — απλά δηλώνουμε "κανένας user"
+    localStorage.removeItem(EXPIRES_KEY);
+    localStorage.removeItem('token');
     this.userSubject.next(null);
   }
 }
