@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
+const { sendOrderStatusEmail } = require('../../utils/mailer');
 
 router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -144,6 +145,26 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
 
     await conn.commit();
     res.json({ success: true, message: 'Η κατάσταση παραγγελίας ενημερώθηκε' });
+
+    // Send status notification email (fire-and-forget)
+    const notifyStatuses = ['processing', 'shipped', 'delivered', 'cancelled'];
+    if (notifyStatuses.includes(status)) {
+      try {
+        const [orderInfo] = await db.query(
+          `SELECT u.email, o.payment_status FROM orders o JOIN users u ON u.id = o.user_id WHERE o.id = ?`,
+          [orderId]
+        );
+        if (orderInfo.length > 0) {
+          await sendOrderStatusEmail(orderInfo[0].email, {
+            id: orderId,
+            status,
+            wasRefunded: orderInfo[0].payment_status === 'refunded',
+          });
+        }
+      } catch (emailErr) {
+        console.error('Status email failed (non-critical):', emailErr.message);
+      }
+    }
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Admin update order status error:', error);

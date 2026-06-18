@@ -4,6 +4,7 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
+const { sendOrderConfirmationEmail } = require('../utils/mailer');
 
 router.post('/orders', authenticateToken, async (req, res) => {
   const userId = req.user.id;
@@ -199,6 +200,34 @@ router.post('/orders', authenticateToken, async (req, res) => {
     }
 
     await conn.commit();
+
+    // Send confirmation email (fire-and-forget — don't block response)
+    try {
+      const [userRows] = await db.query('SELECT email, first_name, last_name FROM users WHERE id = ?', [userId]);
+      const [itemRows] = await db.query(
+        `SELECT p.name, oi.quantity, oi.unit_price, oi.size
+         FROM order_items oi JOIN products p ON p.id = oi.product_id
+         WHERE oi.order_id = ?`,
+        [orderId]
+      );
+      if (userRows.length > 0) {
+        await sendOrderConfirmationEmail(userRows[0].email, {
+          id: orderId,
+          recipientName: recipientName.trim(),
+          items: itemRows,
+          subtotal,
+          shippingCost,
+          discountCode: finalDiscountCode,
+          discountAmount,
+          totalAmount: computedTotal,
+          shippingMethod,
+          paymentMethod,
+          address: shippingMethod !== 'pickup' ? `${ship.address1}, ${ship.city} ${ship.zip}` : null,
+        });
+      }
+    } catch (emailErr) {
+      console.error('Order confirmation email failed (non-critical):', emailErr.message);
+    }
 
     return res.status(201).json({
       success: true,
