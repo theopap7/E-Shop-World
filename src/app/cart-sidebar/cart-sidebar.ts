@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../cart.service';
 import { ToastService } from '../toast.service';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-cart-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ImageUrlPipe],
   templateUrl: './cart-sidebar.html',
   styleUrl: './cart-sidebar.css'
 })

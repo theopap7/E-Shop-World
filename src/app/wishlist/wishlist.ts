@@ -7,6 +7,7 @@ import { WishlistService } from '../wishlist-service';
 import { CartService } from '../cart.service';
 import { ProductDto } from '../product.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-wishlist',
@@ -14,7 +15,8 @@ import { SkeletonComponent } from '../skeleton/skeleton';
   imports: [
     CommonModule,
     RouterModule,
-    SkeletonComponent
+    SkeletonComponent,
+    ImageUrlPipe
   ],
   templateUrl: './wishlist.html',
   styleUrl: './wishlist.css'

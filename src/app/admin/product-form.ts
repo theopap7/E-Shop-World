@@ -8,11 +8,12 @@ import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../toast.service';
 import { environment } from '../../environments/environment';
 import { Category } from '../product.service';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, ImageUrlPipe],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })
@@ -42,8 +43,18 @@ export class ProductFormComponent implements OnInit {
   readonly SHOE_SIZES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
   selectedSizes: string[] = [];
 
-  get allSizeOptions(): string[] {
-    return [...this.CLOTHING_SIZES, ...this.SHOE_SIZES];
+  get sizeMode(): 'clothing' | 'shoes' | 'none' {
+    const catId = this.form.get('category_id')?.value;
+    const cat = this.categories.find(c => c.id === catId);
+    if (!cat) return 'none';
+    const name = cat.name.toLowerCase();
+    if (name.includes('ρούχ') || name.includes('ρουχ')) return 'clothing';
+    if (name.includes('παπούτσ') || name.includes('παπουτσ')) return 'shoes';
+    return 'none';
+  }
+
+  onCategoryChange(): void {
+    this.selectedSizes = [];
   }
 
   isSizeSelected(s: string): boolean {
@@ -307,9 +318,7 @@ export class ProductFormComponent implements OnInit {
 
         if (res?.success) {
 
-          const fullUrl = `${environment.baseUrl}${res.imageUrl}`;
-
-          this.form.get('image_url')?.setValue(fullUrl);
+          this.form.get('image_url')?.setValue(res.imageUrl);
 
         } else {
 

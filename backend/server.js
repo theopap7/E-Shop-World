@@ -111,8 +111,11 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }  // 5MB max
 });
 
-// Serve uploaded files statically
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded files statically — allow cross-origin loads (Angular dev server is a different port)
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static('uploads'));
 
 // Route για εγγραφή
 app.post('/api/register', authLimiter, async (req, res) => {

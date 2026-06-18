@@ -7,15 +7,17 @@ import { CartService } from './cart.service';
 import { Router, RouterModule } from '@angular/router';
 import { WishlistService } from './wishlist-service';
 import { SkeletonComponent } from './skeleton/skeleton';
+import { ImageUrlPipe } from './shared/image-url.pipe';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule, 
-    RouterModule ,  
-    SkeletonComponent
+    FormsModule,
+    RouterModule ,
+    SkeletonComponent,
+    ImageUrlPipe
   ],
   templateUrl: './product.list.component.html',
   styleUrl: './product.list.component.css',

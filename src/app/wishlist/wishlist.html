@@ -56,7 +56,7 @@
           <!-- Product Image -->
           <a [routerLink]="['/products', item.id]" class="product-link">
             <img
-              [src]="item.image_url || 'no-image.svg'"
+              [src]="item.image_url | imageUrl"
               [alt]="item.name"
               class="wishlist-image"
               (error)="$any($event.target).src='no-image.svg'"

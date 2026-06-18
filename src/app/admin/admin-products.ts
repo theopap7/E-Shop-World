@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService, Product } from '../admin.service';
 import { ToastService } from '../toast.service';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ImageUrlPipe],
   templateUrl: './admin-products.html',
   styleUrl: './admin-products.css',
 })

@@ -32,7 +32,7 @@
       <a [routerLink]="['/products', item.productId]" (click)="close()">
         <img
           class="item-thumb"
-          [src]="item.image_url || 'no-image.svg'"
+          [src]="item.image_url | imageUrl"
           [alt]="item.name"
           (error)="$any($event.target).src='no-image.svg'"
         />

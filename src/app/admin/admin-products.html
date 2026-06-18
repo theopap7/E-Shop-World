@@ -73,7 +73,7 @@
               <td>
                 <div class="thumb">
                   <img
-                    [src]="product.image_url || 'no-image.svg'"
+                    [src]="product.image_url | imageUrl"
                     [alt]="product.name"
                     (error)="$any($event.target).src='no-image.svg'"
                   />

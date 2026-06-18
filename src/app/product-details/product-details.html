@@ -49,7 +49,7 @@
       <!-- Left: Image -->
       <div class="product-image-wrap">
         <img
-          [src]="product.image_url || 'no-image.svg'"
+          [src]="product.image_url | imageUrl"
           [alt]="product.name"
           class="product-image"
           (error)="$any($event.target).src='no-image.svg'"

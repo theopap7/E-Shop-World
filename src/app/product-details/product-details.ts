@@ -9,12 +9,12 @@ import { WishlistService } from '../wishlist-service';
 import { ReviewsComponent } from '../reviews/reviews';
 import { BreadcrumbService } from '../breadcrumb.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
-
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ReviewsComponent, SkeletonComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ReviewsComponent, SkeletonComponent, ImageUrlPipe],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css'
 })

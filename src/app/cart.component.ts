@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService, CartItem } from './cart.service';
 import { Router, RouterModule } from '@angular/router';
+import { ImageUrlPipe } from './shared/image-url.pipe';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ImageUrlPipe],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css',
 })
