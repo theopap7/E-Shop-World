@@ -28,6 +28,7 @@
           class="search-input"
           placeholder="Αναζήτηση με όνομα ή email..."
           [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
         />
         <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''">✕</button>
       </div>
@@ -52,7 +53,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let u of filteredUsers" [class.active-buyer]="u.order_count > 0">
+            <tr *ngFor="let u of pagedUsers" [class.active-buyer]="u.order_count > 0">
               <td class="mono">{{ u.id }}</td>
               <td>
                 <div class="user-name">{{ u.first_name }} {{ u.last_name }}</div>
@@ -76,6 +77,12 @@
             </tr>
           </tbody>
         </table>
+        <app-pagination
+          [total]="filteredUsers.length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="currentPage = $event"
+        ></app-pagination>
       </div>
 
     </div>

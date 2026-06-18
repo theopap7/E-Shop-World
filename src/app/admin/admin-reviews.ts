@@ -4,11 +4,13 @@ import { CommonModule } from '@angular/common';
 import { AdminService, AdminReviewDto } from '../admin.service';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../toast.service';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-admin-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PaginationComponent, ImageUrlPipe],
   templateUrl: './admin-reviews.html',
   styleUrl: './admin-reviews.css'
 })
@@ -17,6 +19,8 @@ export class AdminReviewsComponent implements OnInit {
   reviews: AdminReviewDto[] = [];
   isLoading = false;
   error = '';
+  currentPage = 1;
+  readonly pageSize = 15;
 
   private destroyRef = inject(DestroyRef);
 
@@ -63,7 +67,11 @@ export class AdminReviewsComponent implements OnInit {
     });
   }
 
-  // Helper: Star display
+  get pagedReviews(): AdminReviewDto[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.reviews.slice(start, start + this.pageSize);
+  }
+
   getStars(rating: number): string {
     return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
   }

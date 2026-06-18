@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AdminService, AdminUser } from '../admin.service';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, PaginationComponent],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.css',
 })
@@ -17,6 +18,8 @@ export class AdminUsersComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   searchTerm = '';
+  currentPage = 1;
+  readonly pageSize = 20;
 
   private destroyRef = inject(DestroyRef);
 
@@ -43,5 +46,14 @@ export class AdminUsersComponent implements OnInit {
       u.last_name?.toLowerCase().includes(term) ||
       u.email?.toLowerCase().includes(term)
     );
+  }
+
+  get pagedUsers(): AdminUser[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredUsers.slice(start, start + this.pageSize);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
   }
 }

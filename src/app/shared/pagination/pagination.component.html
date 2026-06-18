@@ -1,0 +1,19 @@
+<div class="pagination" *ngIf="totalPages > 1">
+  <span class="pagination-info">{{ from }}–{{ to }} από {{ total }}</span>
+
+  <div class="pagination-controls">
+    <button class="page-btn" [disabled]="currentPage === 1" (click)="go(currentPage - 1)">‹</button>
+
+    <ng-container *ngFor="let p of pages">
+      <span *ngIf="p === -1" class="ellipsis">…</span>
+      <button
+        *ngIf="p !== -1"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="go(p)"
+      >{{ p }}</button>
+    </ng-container>
+
+    <button class="page-btn" [disabled]="currentPage === totalPages" (click)="go(currentPage + 1)">›</button>
+  </div>
+</div>

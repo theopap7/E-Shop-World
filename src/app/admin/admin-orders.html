@@ -43,6 +43,7 @@
           class="search-input"
           placeholder="Αναζήτηση με όνομα, email ή #αριθμό..."
           [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
         />
         <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''">✕</button>
       </div>
@@ -54,7 +55,7 @@
           class="status-tab"
           [class.active]="activeFilter === f.key"
           [class.tab--pending]="f.key === 'pending' && count('pending') > 0 && activeFilter !== 'pending'"
-          (click)="activeFilter = f.key"
+          (click)="onFilterChange(f.key)"
           type="button">
           {{ f.label }}
           <span class="tab-count">{{ count(f.key) }}</span>
@@ -85,7 +86,7 @@
           <tbody>
 
             <tr
-              *ngFor="let order of filteredOrders"
+              *ngFor="let order of pagedOrders"
               class="clickable-row"
               [class.row--pending]="order.status === 'pending'"
               (click)="goToOrder(order.id)"
@@ -200,6 +201,12 @@
            </tr>
           </tbody>
         </table>
+        <app-pagination
+          [total]="filteredOrders.length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="currentPage = $event"
+        ></app-pagination>
       </div>
     </div>
   </div>

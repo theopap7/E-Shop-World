@@ -56,7 +56,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let review of reviews">
+          <tr *ngFor="let review of pagedReviews">
 
             <!-- Product -->
             <td>
@@ -64,7 +64,7 @@
                 <div class="thumb">
                   <img
                     *ngIf="review.product_image; else noImg"
-                    [src]="review.product_image"
+                    [src]="review.product_image | imageUrl"
                     [alt]="review.product_name"
                   />
                   <ng-template #noImg>
@@ -125,6 +125,12 @@
           </tr>
         </tbody>
       </table>
+      <app-pagination
+        [total]="reviews.length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="currentPage = $event"
+      ></app-pagination>
     </div>
 
   </div>

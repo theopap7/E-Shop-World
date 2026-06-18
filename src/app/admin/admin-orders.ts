@@ -6,11 +6,12 @@ import { RouterModule, Router } from '@angular/router';
 import { AdminService, AdminOrder } from '../admin.service';
 import { ToastService } from '../toast.service';
 import { statusLabel } from '../order-status.util';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, PaginationComponent],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.css',
 })
@@ -22,6 +23,8 @@ export class AdminOrdersComponent implements OnInit {
   updatingId: number | null = null;
   activeFilter = 'all';
   searchTerm = '';
+  currentPage = 1;
+  readonly pageSize = 20;
 
   readonly filters = [
     { key: 'all',        label: 'Όλες' },
@@ -32,27 +35,39 @@ export class AdminOrdersComponent implements OnInit {
     { key: 'cancelled',  label: 'Ακυρώθηκε' },
   ];
 
-  get filteredOrders(): AdminOrder[] {
-    let result = this.activeFilter === 'all'
-      ? this.orders
-      : this.orders.filter(o => o.status === this.activeFilter);
-
+  get searchFilteredOrders(): AdminOrder[] {
     const term = this.searchTerm.trim().toLowerCase();
-    if (term) {
-      result = result.filter(o =>
-        `#${o.id}`.includes(term) ||
-        o.first_name?.toLowerCase().includes(term) ||
-        o.last_name?.toLowerCase().includes(term) ||
-        o.user_email?.toLowerCase().includes(term)
-      );
-    }
+    if (!term) return this.orders;
+    return this.orders.filter(o =>
+      `#${o.id}`.includes(term) ||
+      o.first_name?.toLowerCase().includes(term) ||
+      o.last_name?.toLowerCase().includes(term) ||
+      o.user_email?.toLowerCase().includes(term)
+    );
+  }
 
-    return result;
+  get filteredOrders(): AdminOrder[] {
+    if (this.activeFilter === 'all') return this.searchFilteredOrders;
+    return this.searchFilteredOrders.filter(o => o.status === this.activeFilter);
+  }
+
+  get pagedOrders(): AdminOrder[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredOrders.slice(start, start + this.pageSize);
+  }
+
+  onFilterChange(key: string): void {
+    this.activeFilter = key;
+    this.currentPage = 1;
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
   }
 
   count(key: string): number {
-    if (key === 'all') return this.orders.length;
-    return this.orders.filter(o => o.status === key).length;
+    if (key === 'all') return this.searchFilteredOrders.length;
+    return this.searchFilteredOrders.filter(o => o.status === key).length;
   }
 
   private destroyRef = inject(DestroyRef);
