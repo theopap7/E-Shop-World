@@ -17,4 +17,12 @@ const passwordLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-module.exports = { authLimiter, passwordLimiter };
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: { success: false, message: 'Πολλά αιτήματα επαναφοράς. Δοκιμάστε ξανά σε 15 λεπτά.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+module.exports = { authLimiter, passwordLimiter, forgotPasswordLimiter };

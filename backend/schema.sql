@@ -125,9 +125,21 @@ CREATE TABLE return_request_items (
   FOREIGN KEY (return_request_id) REFERENCES return_requests(id) ON DELETE CASCADE
 );
 
--- Sample categories
-INSERT INTO categories (name) VALUES ('Ηλεκτρονικά'), ('Ρούχα'), ('Βιβλία'), ('Αθλητικά');
+CREATE TABLE password_reset_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token VARCHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
+CREATE INDEX idx_reset_token ON password_reset_tokens(token);
+
+-- Sample categories
+INSERT INTO categories (name) VALUES ('Ηλεκτρονικά'), ('Ρούχα'), ('Βιβλία'), ('Αθλητικά'), ('Παπούτσια');
+    
 -- Indexes for frequent lookups (FK columns already indexed by MySQL automatically)
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_orders_status ON orders(status);

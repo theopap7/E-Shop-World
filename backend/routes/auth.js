@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
-const { authLimiter, passwordLimiter } = require('../middleware/rateLimiters');
+const { authLimiter, passwordLimiter, forgotPasswordLimiter } = require('../middleware/rateLimiters');
+const { sendPasswordResetEmail } = require('../utils/mailer');
 
 router.post('/register', authLimiter, async (req, res) => {
   try {
@@ -198,6 +200,75 @@ router.post('/change-password', authenticateToken, passwordLimiter, async (req, 
     console.error('Change password error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
 
+  }
+});
+
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Το email είναι υποχρεωτικό' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const [users] = await db.query('SELECT id FROM users WHERE email = ?', [normalizedEmail]);
+
+    // Always respond success to prevent email enumeration
+    if (users.length === 0) {
+      return res.json({ success: true, message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.' });
+    }
+
+    const userId = users[0].id;
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Invalidate any existing tokens for this user
+    await db.query('UPDATE password_reset_tokens SET used = TRUE WHERE user_id = ? AND used = FALSE', [userId]);
+
+    await db.query(
+      'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+      [userId, token, expiresAt]
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+    await sendPasswordResetEmail(normalizedEmail, resetLink);
+
+    res.json({ success: true, message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ success: false, message: 'Σφάλμα κατά την επαναφορά κωδικού' });
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword || newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT * FROM password_reset_tokens WHERE token = ? AND used = FALSE AND expires_at > NOW()',
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ success: false, message: 'Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει' });
+    }
+
+    const resetRecord = rows[0];
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await db.query('UPDATE users SET password = ? WHERE id = ?', [hashed, resetRecord.user_id]);
+    await db.query('UPDATE password_reset_tokens SET used = TRUE WHERE id = ?', [resetRecord.id]);
+
+    res.json({ success: true, message: 'Ο κωδικός άλλαξε επιτυχώς. Μπορείς τώρα να συνδεθείς.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Σφάλμα κατά την αλλαγή κωδικού' });
   }
 });
 

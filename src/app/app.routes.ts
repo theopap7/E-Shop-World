@@ -21,6 +21,8 @@ import { NotFoundComponent } from './not-found/not-found';
 import { AdminDiscountsComponent } from './admin-discounts/admin-discounts';
 import { AdminReturnsComponent } from './admin/admin-returns';
 import { AdminUsersComponent } from './admin/admin-users';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password';
+import { ResetPasswordComponent } from './reset-password/reset-password';
 
 export const routes: Routes = [
 
@@ -29,9 +31,17 @@ export const routes: Routes = [
     path: 'register', 
     component: RegisterComponent 
   },
-  { 
-    path: 'login', 
-    component: LoginComponent 
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent
   },
 
   // ===== REDIRECT ROOT =====

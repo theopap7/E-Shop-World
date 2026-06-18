@@ -77,6 +77,12 @@ p {
   margin-top: 20px;
 }
 
+.forgot-link {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
 a {
   color: #2563eb; /* ίδιο μπλε */
   text-decoration: none;
