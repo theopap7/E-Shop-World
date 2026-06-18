@@ -7,7 +7,7 @@ router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
   try {
     const [users] = await db.query(`
       SELECT
-        u.id, u.first_name, u.last_name, u.email, u.created_at,
+        u.id, u.first_name, u.last_name, u.email, u.role, u.created_at,
         COUNT(o.id) AS order_count,
         COALESCE(SUM(o.total_amount), 0) AS total_spent,
         MAX(o.created_at) AS last_order_at

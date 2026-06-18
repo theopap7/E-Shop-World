@@ -38,6 +38,15 @@ app.use('/api', require('./routes/admin/reviews'));
 app.use('/api', require('./routes/admin/discounts'));
 app.use('/api', require('./routes/admin/returns'));
 
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ success: false, message: 'Internal server error' });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

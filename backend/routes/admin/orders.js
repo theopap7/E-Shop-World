@@ -59,7 +59,13 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
       [orderId]
     );
 
-    res.json({ success: true, order, items });
+    const [returnRows] = await db.query(
+      'SELECT * FROM return_requests WHERE order_id = ? LIMIT 1',
+      [orderId]
+    );
+    const returnRequest = returnRows[0] ?? null;
+
+    res.json({ success: true, order, items, returnRequest });
   } catch (error) {
     console.error('Admin order details error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -124,6 +130,15 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
       );
       for (const item of orderItems) {
         await conn.query('UPDATE products SET stock = stock + ? WHERE id = ?', [item.quantity, item.product_id]);
+      }
+
+      const [orderData] = await conn.query('SELECT discount_code FROM orders WHERE id = ?', [orderId]);
+      if (orderData[0]?.discount_code) {
+        await conn.query(
+          'UPDATE discount_codes SET used_count = GREATEST(used_count - 1, 0) WHERE code = ?',
+          [orderData[0].discount_code]
+        );
+        await conn.query('DELETE FROM discount_code_usages WHERE order_id = ?', [orderId]);
       }
     }
 

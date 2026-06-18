@@ -340,6 +340,37 @@
 
         </div>
 
+        <!-- Return Request Section (Admin view) -->
+        <div class="card full return-card" *ngIf="isAdminPage && order.return_request">
+          <div class="return-top">
+            <div class="return-top-left">
+              <span class="return-icon">↩</span>
+              <div>
+                <h3 class="h3" style="margin:0 0 4px 0">Αίτημα Επιστροφής</h3>
+              </div>
+            </div>
+          </div>
+          <div class="return-status-card">
+            <div class="return-status-row">
+              <span class="return-status-label">Κατάσταση</span>
+              <span class="pill"
+                [class.pill--pending]="order.return_request.status === 'pending'"
+                [class.pill--delivered]="order.return_request.status === 'approved'"
+                [class.pill--cancelled]="order.return_request.status === 'rejected'">
+                {{ returnStatusLabel(order.return_request.status) }}
+              </span>
+            </div>
+            <div class="return-status-row">
+              <span class="return-status-label">Λόγος</span>
+              <span>{{ order.return_request.reason }}</span>
+            </div>
+            <div class="return-status-row" *ngIf="order.return_request.admin_note">
+              <span class="return-status-label">Σχόλιο</span>
+              <span>{{ order.return_request.admin_note }}</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Προϊόντα -->
         <div class="card full">
 
