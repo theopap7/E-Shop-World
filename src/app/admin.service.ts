@@ -151,6 +151,13 @@ export class AdminService {
     this.statsCache$ = null;
   }
 
+  getChartsForRange(range: string): Observable<{ success: boolean; dailyOrders: ChartData['dailyOrders'] }> {
+    return this.http.get<{ success: boolean; dailyOrders: ChartData['dailyOrders'] }>(
+      `${this.baseUrl}/stats/charts`,
+      { params: { range } }
+    );
+  }
+
 getAllReviews(): Observable<{ success: boolean; reviews: AdminReviewDto[] }> {
   return this.http.get<{ success: boolean; reviews: AdminReviewDto[] }>(
     `${this.baseUrl}/reviews`

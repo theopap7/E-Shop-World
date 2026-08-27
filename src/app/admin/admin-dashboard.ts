@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, DestroyRef, inject, AfterViewInit, Elemen
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AdminService, AdminStats, ChartData } from '../admin.service';
 import {
   Chart,
@@ -29,7 +30,7 @@ const STATUS_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
@@ -37,6 +38,14 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   stats: AdminStats | null = null;
   isLoading = true;
   error: string | null = null;
+
+  readonly rangeOptions = [
+    { value: '7', label: '7 μέρες' },
+    { value: '30', label: '30 μέρες' },
+    { value: '90', label: '90 μέρες' },
+    { value: 'all', label: 'Όλα' }
+  ];
+  selectedRange = '30';
 
   @ViewChild('revenueCanvas') revenueCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('statusCanvas') statusCanvas!: ElementRef<HTMLCanvasElement>;
@@ -89,19 +98,41 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.renderTopProductsChart(data.topProducts ?? []);
   }
 
-  private renderRevenueChart(raw: ChartData['dailyOrders']): void {
-    const days = this.getLast30Days();
-    const revenueMap: Record<string, number> = {};
-    const ordersMap: Record<string, number> = {};
-    for (const row of raw) {
-      const key = row.day.slice(0, 10);
-      revenueMap[key] = Number(row.revenue);
-      ordersMap[key] = Number(row.orders);
-    }
+  onRangeChange(range: string): void {
+    this.selectedRange = range;
+    this.adminService.getChartsForRange(range).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.renderRevenueChart(res.dailyOrders ?? []);
+        }
+      }
+    });
+  }
 
-    const labels = days.map(d => d.slice(5));
-    const revenueData = days.map(d => revenueMap[d] ?? 0);
-    const ordersData = days.map(d => ordersMap[d] ?? 0);
+  private renderRevenueChart(raw: ChartData['dailyOrders']): void {
+    let labels: string[];
+    let revenueData: number[];
+    let ordersData: number[];
+
+    if (this.selectedRange === 'all') {
+      const sorted = [...raw].sort((a, b) => a.day.localeCompare(b.day));
+      labels = sorted.map(r => r.day.slice(0, 10));
+      revenueData = sorted.map(r => Number(r.revenue));
+      ordersData = sorted.map(r => Number(r.orders));
+    } else {
+      const days = this.getLastNDays(Number(this.selectedRange) || 30);
+      const revenueMap: Record<string, number> = {};
+      const ordersMap: Record<string, number> = {};
+      for (const row of raw) {
+        const key = row.day.slice(0, 10);
+        revenueMap[key] = Number(row.revenue);
+        ordersMap[key] = Number(row.orders);
+      }
+
+      labels = days.map(d => d.slice(5));
+      revenueData = days.map(d => revenueMap[d] ?? 0);
+      ordersData = days.map(d => ordersMap[d] ?? 0);
+    }
 
     this.revenueChart?.destroy();
     this.revenueChart = new Chart(this.revenueCanvas.nativeElement, {
@@ -194,9 +225,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  private getLast30Days(): string[] {
+  private getLastNDays(n: number): string[] {
     const days: string[] = [];
-    for (let i = 29; i >= 0; i--) {
+    for (let i = n - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       days.push(d.toISOString().slice(0, 10));

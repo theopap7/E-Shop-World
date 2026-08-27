@@ -90,6 +90,24 @@
   margin:2px 0 10px;
 }
 
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+}
+
+.range-select{
+  padding:8px 12px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  background:#fff;
+  font-size:13px;
+  font-weight:600;
+  color:#111827;
+  cursor:pointer;
+}
+
 /* QUICK CARDS */
 
 .quick-grid{

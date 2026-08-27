@@ -57,6 +57,13 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
 
 router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) => {
   try {
+    const range = req.query.range;
+    const isAllTime = range === 'all';
+    const days = isAllTime ? null : Math.min(Math.max(parseInt(range, 10) || 30, 1), 365);
+
+    const dateFilter = isAllTime ? '' : 'WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)';
+    const dateParams = isAllTime ? [] : [days - 1];
+
     const [[dailyOrders], [statusBreakdown], [topProducts]] = await Promise.all([
       db.query(`
         SELECT
@@ -64,10 +71,10 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
           COUNT(*) AS orders,
           ROUND(SUM(CASE WHEN status != 'cancelled' THEN total_amount ELSE 0 END), 2) AS revenue
         FROM orders
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
+        ${dateFilter}
         GROUP BY DATE(created_at)
         ORDER BY day ASC
-      `),
+      `, dateParams),
       db.query(`
         SELECT status, COUNT(*) AS count
         FROM orders

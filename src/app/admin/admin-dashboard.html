@@ -158,8 +158,18 @@
       <!-- Charts -->
       <div class="section">
         <div class="section-head">
-          <h2 class="section-title">Αναλυτικά Στοιχεία</h2>
-          <p class="section-subtitle">Τελευταίες 30 μέρες</p>
+          <div>
+            <h2 class="section-title">Αναλυτικά Στοιχεία</h2>
+            <p class="section-subtitle">Έσοδα & παραγγελίες ανά περίοδο</p>
+          </div>
+
+          <select
+            class="range-select"
+            [ngModel]="selectedRange"
+            (ngModelChange)="onRangeChange($event)"
+          >
+            <option *ngFor="let opt of rangeOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
         </div>
 
         <div class="charts-grid">
