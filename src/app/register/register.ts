@@ -19,7 +19,6 @@ export class RegisterComponent {
   showConfirmPassword = false;
   isSubmitting = false;
 
-  // ✅ INJECT ToastService
   constructor(
     private fb: FormBuilder, 
     private router: Router,
@@ -64,7 +63,6 @@ export class RegisterComponent {
         }
       });
     } else {
-      // ✅ Toast: Validation errors
       if (this.registerForm.errors?.['mismatch']) {
         this.toastService.warning('Οι κωδικοί δεν ταιριάζουν');
       } else {
@@ -73,21 +71,3 @@ export class RegisterComponent {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

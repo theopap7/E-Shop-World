@@ -163,7 +163,7 @@ export class ProductFormComponent implements OnInit {
         this.isLoading = false;
       },
 
-      error: (err) => {
+      error: () => {
         this.error = 'Σφάλμα φόρτωσης προϊόντος';
         this.isLoading = false;
       }

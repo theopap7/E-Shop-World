@@ -2,7 +2,7 @@
 .toast-container {
   position: fixed;
   top: 80px;
-  left: 20px;  /* ✅ Αριστερά */
+  left: 20px;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   pointer-events: auto;
-  animation: slideInLeft 0.3s ease-out;  /* ✅ Νέο animation name */
+  animation: slideInLeft 0.3s ease-out;
   font-size: 14px;
   font-weight: 500;
 }
@@ -82,10 +82,9 @@
   background: rgba(0, 0, 0, 0.1);
 }
 
-/* ✅ Slide-in Animation FROM LEFT */
 @keyframes slideInLeft {
   from {
-    transform: translateX(-400px);  /* Από αριστερά */
+    transform: translateX(-400px);
     opacity: 0;
   }
   to {

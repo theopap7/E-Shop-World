@@ -47,8 +47,6 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   getProducts(filters?: ProductFilters): Observable<{ success: boolean; products: ProductDto[] }> {
-    
-    
     let params = new HttpParams();
 
     if (filters?.search) {
@@ -69,21 +67,19 @@ export class ProductService {
 
     return this.http.get<{ success: boolean; products: ProductDto[] }>(
       `${this.baseUrl}/products`,
-      { params }  // ← Προσθέτει τα params στο URL
+      { params }
     );
   }
 
-  // ✅ ΝΕΟ: Φόρτωσε τις κατηγορίες για το dropdown
   getCategories(): Observable<{ success: boolean; categories: Category[] }> {
     return this.http.get<{ success: boolean; categories: Category[] }>(
       `${this.baseUrl}/categories`
     );
   }
-  // Μέσα στην class ProductService, μετά το getProducts():
 
-getProduct(id: number): Observable<{ success: boolean; product: ProductDto; galleryImages: ProductImage[] }> {
-  return this.http.get<{ success: boolean; product: ProductDto; galleryImages: ProductImage[] }>(
-    `${this.baseUrl}/products/${id}`
-  );
-}
+  getProduct(id: number): Observable<{ success: boolean; product: ProductDto; galleryImages: ProductImage[] }> {
+    return this.http.get<{ success: boolean; product: ProductDto; galleryImages: ProductImage[] }>(
+      `${this.baseUrl}/products/${id}`
+    );
+  }
 }

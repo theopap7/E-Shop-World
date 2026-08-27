@@ -41,7 +41,7 @@ export class AdminReviewsComponent implements OnInit {
         }
         this.isLoading = false;
       },
-      error: (err) => {
+      error: () => {
         this.error = 'Σφάλμα φόρτωσης reviews.';
         this.isLoading = false;
       }

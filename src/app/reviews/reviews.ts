@@ -48,7 +48,6 @@ export class ReviewsComponent implements OnInit {
     return this.reviews.some(r => r.user_id === this.currentUserId);
   }
 
-  // ✅ INJECT ToastService
   private destroyRef = inject(DestroyRef);
 
   constructor(
@@ -120,7 +119,6 @@ export class ReviewsComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
-          // ✅ Toast instead of inline message
           this.toastService.success('Η κριτική σου υποβλήθηκε επιτυχώς! ⭐');
           this.newRating = 0;
           this.newComment = '';
@@ -129,7 +127,6 @@ export class ReviewsComponent implements OnInit {
         this.isSubmitting = false;
       },
       error: (err) => {
-        // ✅ Toast for error
         this.toastService.error(err.error?.message || 'Σφάλμα υποβολής κριτικής');
         this.isSubmitting = false;
       }
@@ -188,7 +185,6 @@ export class ReviewsComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
-          // ✅ Toast: Updated
           this.toastService.success('Η κριτική ενημερώθηκε επιτυχώς!');
           this.cancelEdit();
           this.loadReviews();
@@ -196,7 +192,6 @@ export class ReviewsComponent implements OnInit {
         this.isUpdating = false;
       },
       error: (err) => {
-        // ✅ Toast: Error
         this.toastService.error(err.error?.message || 'Σφάλμα ενημέρωσης κριτικής');
         this.isUpdating = false;
       }
@@ -210,13 +205,11 @@ export class ReviewsComponent implements OnInit {
 
     this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        // ✅ Toast: Deleted
         this.toastService.success('Η κριτική διαγράφηκε');
         this.reviews = this.reviews.filter(r => r.id !== reviewId);
         this.loadReviews();
       },
       error: (err) => {
-        // ✅ Toast: Error
         this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής');
       }
     });

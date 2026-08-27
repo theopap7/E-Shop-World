@@ -34,7 +34,6 @@ export class ProfileComponent {
   showNewPassword = false;
   showConfirmPassword = false;
 
-  // ✅ INJECT ToastService
   constructor(
     private auth: AuthService,
     private http: HttpClient,
@@ -85,10 +84,7 @@ export class ProfileComponent {
 
   logout() {
     this.auth.logout();
-    
-    // ✅ Toast: Logout
     this.toastService.info('Αποσυνδέθηκες επιτυχώς 👋');
-    
     this.router.navigate(['/login']);
   }
 
@@ -98,14 +94,12 @@ export class ProfileComponent {
 
     // Έλεγχος συμπλήρωσης
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
-      // ✅ Toast: Missing fields
       this.toastService.warning('Συμπλήρωσε όλα τα πεδία');
       return;
     }
 
     // Έλεγχος επιβεβαίωσης
     if (this.newPassword !== this.confirmPassword) {
-      // ✅ Toast: Password mismatch
       this.toastService.error('Οι κωδικοί δεν ταιριάζουν');
       return;
     }
@@ -125,19 +119,15 @@ export class ProfileComponent {
       })
       .subscribe({
         next: () => {
-          // ✅ Toast: Success
           this.toastService.success('Ο κωδικός άλλαξε επιτυχώς! 🔐');
-          
           this.currentPassword = '';
           this.newPassword = '';
           this.confirmPassword = '';
           this.changingPassword = false;
         },
         error: (err) => {
-          // ✅ Toast: Error
           const errorMsg = err?.error?.message || 'Σφάλμα αλλαγής κωδικού';
           this.toastService.error(errorMsg);
-          
           this.changingPassword = false;
         },
       });

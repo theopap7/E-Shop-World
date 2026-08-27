@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, distinctUntilChanged } from 'rxjs/operators';
  
@@ -14,10 +14,7 @@ export class BreadcrumbService {
   private readonly breadcrumbsSubject = new BehaviorSubject<Breadcrumb[]>([]);
   readonly breadcrumbs$: Observable<Breadcrumb[]> = this.breadcrumbsSubject.asObservable();
  
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {
+  constructor(private router: Router) {
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),

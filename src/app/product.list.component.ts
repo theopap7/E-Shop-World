@@ -2,7 +2,7 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProductService, ProductDto, ProductFilters, Category } from './product.service';
+import { ProductService, ProductDto, Category } from './product.service';
 import { CartService } from './cart.service';
 import { Router, RouterModule } from '@angular/router';
 import { WishlistService } from './wishlist-service';
@@ -27,10 +27,8 @@ export class ProductListComponent implements OnInit {
   errorMessage = '';
   allProducts: ProductDto[] = [];
 
-  // ✅ ΝΕΟ: Categories για dropdown
   categories: Category[] = [];
 
-  // ✅ ΝΕΟ: Filter state
   searchTerm = '';
   selectedCategory = 'all';
   priceMax = 2000;
@@ -50,7 +48,6 @@ export class ProductListComponent implements OnInit {
     this.fetchCategories();
   }
 
-  // ✅ Updated: φορτώνει χωρίς filters (frontend filtering)
   fetchProducts(): void {
     this.errorMessage = '';
     this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -65,18 +62,15 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  // ✅ ΝΕΟ: Φόρτωσε κατηγορίες
   fetchCategories(): void {
     this.productService.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.categories = res.categories ?? [];
       },
       error: () => {}
-
     });
   }
 
-  // ✅ ΝΕΟ: Computed property - derived state
   get filteredProducts(): ProductDto[] {
     let result = [...this.allProducts]; // Copy!
 
@@ -120,7 +114,6 @@ export class ProductListComponent implements OnInit {
     return result;
   }
 
-  // ✅ ΝΕΟ: Reset όλα τα filters
   resetFilters(): void {
     this.searchTerm = '';
     this.selectedCategory = 'all';
@@ -135,30 +128,29 @@ export class ProductListComponent implements OnInit {
     }
     this.cartService.addToCart(product);
   }
-  // Μέσα στην class ProductListComponent:
 
-getStarClass(star: number, rating: number): string {
-  if (star <= Math.floor(rating)) {
-    return 'star-filled';
-  } else if (star === Math.ceil(rating) && rating % 1 >= 0.5) {
-    return 'star-half';
-  } else {
-    return 'star-empty';
+  getStarClass(star: number, rating: number): string {
+    if (star <= Math.floor(rating)) {
+      return 'star-filled';
+    } else if (star === Math.ceil(rating) && rating % 1 >= 0.5) {
+      return 'star-half';
+    } else {
+      return 'star-empty';
+    }
   }
-}
 
-toggleWishlist(product: ProductDto, event: Event): void {
-  event.stopPropagation();  // Αποφεύγει navigation στο detail page
-  this.wishlistService.toggle(product);
-}
+  toggleWishlist(product: ProductDto, event: Event): void {
+    event.stopPropagation();
+    this.wishlistService.toggle(product);
+  }
 
-isInWishlist(productId: number): boolean {
-  return this.wishlistService.isInWishlist(productId);
-}
+  isInWishlist(productId: number): boolean {
+    return this.wishlistService.isInWishlist(productId);
+  }
 
-cartQty(productId: number): number {
-  return this.cartService.getItems()
-    .filter(i => i.productId === productId)
-    .reduce((sum, i) => sum + i.quantity, 0);
-}
+  cartQty(productId: number): number {
+    return this.cartService.getItems()
+      .filter(i => i.productId === productId)
+      .reduce((sum, i) => sum + i.quantity, 0);
+  }
 }
