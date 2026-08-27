@@ -13,6 +13,15 @@
     <div *ngIf="error" class="alert alert-error">{{ error }}</div>
     <div *ngIf="success" class="alert alert-success">{{ success }}</div>
 
+    <div *ngIf="discountExpiredPrompt" class="alert alert-warning discount-expired-prompt">
+      <p><strong>Ο κωδικός έκπτωσης δεν είναι πλέον διαθέσιμος.</strong></p>
+      <p>Θέλεις να συνεχίσεις χωρίς έκπτωση;</p>
+      <div class="prompt-actions">
+        <button type="button" class="prompt-btn prompt-btn-primary" (click)="continueWithoutDiscount()">Συνέχεια χωρίς έκπτωση</button>
+        <button type="button" class="prompt-btn prompt-btn-outline" (click)="cancelDiscountPrompt()">Ακύρωση</button>
+      </div>
+    </div>
+
     <div class="grid">
       <form [formGroup]="form" (ngSubmit)="submit()" class="card">
         <h3>Στοιχεία παραλήπτη</h3>

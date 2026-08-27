@@ -40,6 +40,7 @@ export class CheckoutComponent implements OnInit {
   isSubmitting = false;
   error: string | null = null;
   success: string | null = null;
+  discountExpiredPrompt = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -240,6 +241,16 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  continueWithoutDiscount(): void {
+    this.discountExpiredPrompt = false;
+    this.removeDiscount();
+    this.submit();
+  }
+
+  cancelDiscountPrompt(): void {
+    this.discountExpiredPrompt = false;
+  }
+
   removeDiscount(): void {
     this.discountCode = '';
     this.discountAmount = 0;
@@ -336,8 +347,17 @@ export class CheckoutComponent implements OnInit {
       },
       error: (err) => {
         const message = err?.error?.message || 'Σφάλμα επικοινωνίας με τον server.';
-        this.error = message;
-        this.toastService.error(message);
+const isDiscountError =
+          message.includes('εξαντληθεί') ||
+          message.includes('λήξει') ||
+          message.includes('κωδικός έκπτωσης');
+
+        if (isDiscountError && this.appliedDiscount) {
+          this.discountExpiredPrompt = true;
+        } else {
+          this.error = message;
+          this.toastService.error(message);
+        }
         this.isSubmitting = false;
       },
     });

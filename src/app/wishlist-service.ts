@@ -1,46 +1,44 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription, EMPTY, forkJoin } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import { ProductDto } from './product.service';
 import { ToastService } from './toast.service';
 import { AuthService, AuthUser } from './auth.service';
+import { environment } from '../environments/environment';
 
 const GUEST_KEY = 'ecom_wishlist_guest';
-const USER_KEY_PREFIX = 'ecom_wishlist_user_';
 
 @Injectable({ providedIn: 'root' })
 export class WishlistService implements OnDestroy {
-
+  private readonly apiUrl = environment.apiUrl;
   private readonly itemsSubject = new BehaviorSubject<ProductDto[]>([]);
   readonly items$ = this.itemsSubject.asObservable();
 
-  private currentStorageKey = GUEST_KEY;
   private authSub: Subscription;
+  private previousUser: AuthUser | null = null;
 
-  constructor(private toastService: ToastService, private auth: AuthService) {
-    this.setStorageKeyFromUser(this.auth.getUser());
-    this.itemsSubject.next(this.loadFromStorage(this.currentStorageKey));
+  constructor(
+    private http: HttpClient,
+    private toastService: ToastService,
+    private auth: AuthService
+  ) {
+    const currentUser = this.auth.getUser();
+    this.previousUser = currentUser;
 
-    this.authSub = this.auth.user$.subscribe((user) => {
-      const prevKey = this.currentStorageKey;
-      this.setStorageKeyFromUser(user);
+    if (currentUser) {
+      this.loadFromApi();
+    } else {
+      this.itemsSubject.next(this.loadGuestFromStorage());
+    }
 
-      if (prevKey !== this.currentStorageKey) {
-        const guestItems = prevKey === GUEST_KEY ? this.loadFromStorage(GUEST_KEY) : [];
-        const userItems = this.loadFromStorage(this.currentStorageKey);
-
-        if (guestItems.length > 0 && user) {
-          const merged = [...userItems];
-          for (const guestItem of guestItems) {
-            if (!merged.some(i => i.id === guestItem.id)) {
-              merged.push(guestItem);
-            }
-          }
-          localStorage.removeItem(GUEST_KEY);
-          this.setItems(merged);
-        } else {
-          this.itemsSubject.next(userItems);
-        }
+    this.authSub = this.auth.user$.subscribe(user => {
+      if (user && !this.previousUser) {
+        this.mergeGuestToApi();
+      } else if (!user && this.previousUser) {
+        this.itemsSubject.next(this.loadGuestFromStorage());
       }
+      this.previousUser = user;
     });
   }
 
@@ -48,8 +46,31 @@ export class WishlistService implements OnDestroy {
     this.authSub.unsubscribe();
   }
 
-  private setStorageKeyFromUser(user: AuthUser | null): void {
-    this.currentStorageKey = user?.id ? `${USER_KEY_PREFIX}${user.id}` : GUEST_KEY;
+  private loadFromApi(): void {
+    this.http
+      .get<{ success: boolean; items: ProductDto[] }>(`${this.apiUrl}/wishlist`, { withCredentials: true })
+      .pipe(catchError(() => EMPTY))
+      .subscribe(res => {
+        if (res?.success) this.itemsSubject.next(res.items);
+      });
+  }
+
+  private mergeGuestToApi(): void {
+    const guestItems = this.loadGuestFromStorage();
+    localStorage.removeItem(GUEST_KEY);
+
+    if (guestItems.length === 0) {
+      this.loadFromApi();
+      return;
+    }
+
+    const requests = guestItems.map(item =>
+      this.http
+        .post<{ success: boolean }>(`${this.apiUrl}/wishlist/${item.id}`, {}, { withCredentials: true })
+        .pipe(catchError(() => EMPTY))
+    );
+
+    forkJoin(requests).subscribe(() => this.loadFromApi());
   }
 
   getItems(): ProductDto[] {
@@ -65,48 +86,96 @@ export class WishlistService implements OnDestroy {
   }
 
   toggle(product: ProductDto): void {
-    const items = [...this.itemsSubject.value];
-    const index = items.findIndex(p => p.id === product.id);
+    const isIn = this.isInWishlist(product.id);
+    const user = this.auth.getUser();
 
-    if (index === -1) {
-      items.push(product);
-      this.toastService.success(`${product.name} προστέθηκε στα αγαπημένα! ❤️`);
+    if (user) {
+      if (isIn) {
+        this.http
+          .delete<{ success: boolean }>(`${this.apiUrl}/wishlist/${product.id}`, { withCredentials: true })
+          .pipe(catchError(() => EMPTY))
+          .subscribe(res => {
+            if (res?.success) {
+              this.itemsSubject.next(this.itemsSubject.value.filter(p => p.id !== product.id));
+              this.toastService.info(`${product.name} αφαιρέθηκε από τα αγαπημένα`);
+            }
+          });
+      } else {
+        this.http
+          .post<{ success: boolean }>(`${this.apiUrl}/wishlist/${product.id}`, {}, { withCredentials: true })
+          .pipe(catchError(() => EMPTY))
+          .subscribe(res => {
+            if (res?.success) {
+              this.itemsSubject.next([...this.itemsSubject.value, product]);
+              this.toastService.success(`${product.name} προστέθηκε στα αγαπημένα! ❤️`);
+            }
+          });
+      }
     } else {
-      items.splice(index, 1);
-      this.toastService.info(`${product.name} αφαιρέθηκε από τα αγαπημένα`);
+      const items = [...this.itemsSubject.value];
+      const index = items.findIndex(p => p.id === product.id);
+      if (index === -1) {
+        items.push(product);
+        this.toastService.success(`${product.name} προστέθηκε στα αγαπημένα! ❤️`);
+      } else {
+        items.splice(index, 1);
+        this.toastService.info(`${product.name} αφαιρέθηκε από τα αγαπημένα`);
+      }
+      this.setGuestItems(items);
     }
-
-    this.setItems(items);
   }
 
   remove(productId: number): void {
-    const items = this.itemsSubject.value.filter(p => p.id !== productId);
-    this.setItems(items);
-    this.toastService.info('Προϊόν αφαιρέθηκε από τα αγαπημένα');
+    const user = this.auth.getUser();
+
+    if (user) {
+      this.http
+        .delete<{ success: boolean }>(`${this.apiUrl}/wishlist/${productId}`, { withCredentials: true })
+        .pipe(catchError(() => EMPTY))
+        .subscribe(res => {
+          if (res?.success) {
+            this.itemsSubject.next(this.itemsSubject.value.filter(p => p.id !== productId));
+            this.toastService.info('Προϊόν αφαιρέθηκε από τα αγαπημένα');
+          }
+        });
+    } else {
+      this.setGuestItems(this.itemsSubject.value.filter(p => p.id !== productId));
+      this.toastService.info('Προϊόν αφαιρέθηκε από τα αγαπημένα');
+    }
   }
 
   clear(): void {
-    this.setItems([]);
-    this.toastService.warning('Όλα τα αγαπημένα διαγράφηκαν');
+    const user = this.auth.getUser();
+
+    if (user) {
+      this.http
+        .delete<{ success: boolean }>(`${this.apiUrl}/wishlist`, { withCredentials: true })
+        .pipe(catchError(() => EMPTY))
+        .subscribe(res => {
+          if (res?.success) {
+            this.itemsSubject.next([]);
+            this.toastService.warning('Όλα τα αγαπημένα διαγράφηκαν');
+          }
+        });
+    } else {
+      this.setGuestItems([]);
+      this.toastService.warning('Όλα τα αγαπημένα διαγράφηκαν');
+    }
   }
 
-  private setItems(items: ProductDto[]): void {
-    this.itemsSubject.next(items);
-    this.saveToStorage(items);
-  }
-
-  private loadFromStorage(key: string): ProductDto[] {
+  private loadGuestFromStorage(): ProductDto[] {
     try {
-      const raw = localStorage.getItem(key);
+      const raw = localStorage.getItem(GUEST_KEY);
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
     }
   }
 
-  private saveToStorage(items: ProductDto[]): void {
+  private setGuestItems(items: ProductDto[]): void {
+    this.itemsSubject.next(items);
     try {
-      localStorage.setItem(this.currentStorageKey, JSON.stringify(items));
+      localStorage.setItem(GUEST_KEY, JSON.stringify(items));
     } catch {}
-}
+  }
 }

@@ -76,6 +76,48 @@
   color: #1b5e20;
 }
 
+.alert-warning {
+  background: #fff8e1;
+  color: #6d4c00;
+}
+
+.discount-expired-prompt p {
+  margin: 0 0 8px;
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.prompt-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.prompt-btn-primary {
+  background: #1976d2;
+  color: #fff;
+}
+
+.prompt-btn-primary:hover {
+  background: #1565c0;
+}
+
+.prompt-btn-outline {
+  background: transparent;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+}
+
+.prompt-btn-outline:hover {
+  background: #e3f2fd;
+}
+
 /* ===== Grid ===== */
 .grid {
   display: grid;

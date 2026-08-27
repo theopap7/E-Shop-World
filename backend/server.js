@@ -30,6 +30,7 @@ app.use('/api', require('./routes/products'));
 app.use('/api', require('./routes/orders'));
 app.use('/api', require('./routes/reviews'));
 app.use('/api', require('./routes/discounts'));
+app.use('/api', require('./routes/wishlist'));
 app.use('/api', require('./routes/admin/products'));
 app.use('/api', require('./routes/admin/orders'));
 app.use('/api', require('./routes/admin/users'));
