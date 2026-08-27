@@ -25,7 +25,7 @@
         <div class="review-product-block">
           <img
             *ngIf="review.product_image"
-            [src]="review.product_image"
+            [src]="review.product_image | imageUrl"
             [alt]="review.product_name || 'Προϊόν'"
             class="product-image"
           />

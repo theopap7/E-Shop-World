@@ -6,11 +6,12 @@ import { FormsModule } from '@angular/forms';
 import { Review, ReviewService } from '../review.service';
 import { ToastService } from '../toast.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-my-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SkeletonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, SkeletonComponent, ImageUrlPipe],
   templateUrl: './my-reviews.html',
   styleUrl: './my-reviews.css'
 })
