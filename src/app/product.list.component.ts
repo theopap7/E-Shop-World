@@ -31,7 +31,10 @@ export class ProductListComponent implements OnInit {
 
   searchTerm = '';
   selectedCategory = 'all';
-  priceMax = 2000;
+  readonly priceFloor = 0;
+  readonly priceCeil = 2000;
+  priceMin: number | null = null;
+  priceMax: number | null = null;
   sortBy = 'newest';
 
   private destroyRef = inject(DestroyRef);
@@ -60,6 +63,45 @@ export class ProductListComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  get priceMinPercent(): number {
+    return this.toPercent(this.priceMin ?? this.priceFloor);
+  }
+
+  get priceMaxPercent(): number {
+    return this.toPercent(this.priceMax ?? this.priceCeil);
+  }
+
+  private toPercent(value: number): number {
+    const clamped = Math.min(Math.max(value, this.priceFloor), this.priceCeil);
+    return ((clamped - this.priceFloor) / (this.priceCeil - this.priceFloor)) * 100;
+  }
+
+  onPriceMinChange(): void {
+    if (this.priceMin != null && this.priceMin < 0) {
+      this.priceMin = 0;
+    }
+    if (this.priceMin != null && this.priceMax != null && this.priceMin > this.priceMax) {
+      this.priceMax = this.priceMin;
+    }
+  }
+
+  onPriceMaxChange(): void {
+    if (this.priceMax != null && this.priceMax < 0) {
+      this.priceMax = 0;
+    }
+    if (this.priceMin != null && this.priceMax != null && this.priceMax < this.priceMin) {
+      this.priceMin = this.priceMax;
+    }
+  }
+
+  onSliderMinChange(value: number): void {
+    this.priceMin = value > (this.priceMax ?? this.priceCeil) ? (this.priceMax ?? this.priceCeil) : value;
+  }
+
+  onSliderMaxChange(value: number): void {
+    this.priceMax = value < (this.priceMin ?? this.priceFloor) ? (this.priceMin ?? this.priceFloor) : value;
   }
 
   fetchCategories(): void {
@@ -92,7 +134,12 @@ export class ProductListComponent implements OnInit {
     }
 
     // 3. Price filter
-    result = result.filter(p => p.price <= this.priceMax);
+    if (this.priceMin != null) {
+      result = result.filter(p => p.price >= this.priceMin!);
+    }
+    if (this.priceMax != null) {
+      result = result.filter(p => p.price <= this.priceMax!);
+    }
 
     // 4. Sort
     switch (this.sortBy) {
@@ -117,7 +164,8 @@ export class ProductListComponent implements OnInit {
   resetFilters(): void {
     this.searchTerm = '';
     this.selectedCategory = 'all';
-    this.priceMax = 2000;
+    this.priceMin = null;
+    this.priceMax = null;
     this.sortBy = 'newest';
   }
 

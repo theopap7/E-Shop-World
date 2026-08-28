@@ -34,15 +34,58 @@
 
     <!-- Price Range -->
     <div class="price-wrap">
-      <label class="price-label">Μέχρι: {{ priceMax }}€</label>
-      <input
-        type="range"
-        class="price-range"
-        min="0"
-        max="2000"
-        step="50"
-        [(ngModel)]="priceMax"
-      />
+      <div class="price-inputs">
+        <div class="price-input-group">
+          <input
+            type="number"
+            class="price-input"
+            placeholder="Από"
+            min="0"
+            [(ngModel)]="priceMin"
+            (ngModelChange)="onPriceMinChange()"
+          />
+          <span class="price-input-suffix">€</span>
+        </div>
+        <span class="price-input-sep">–</span>
+        <div class="price-input-group">
+          <input
+            type="number"
+            class="price-input"
+            placeholder="Έως"
+            min="0"
+            [(ngModel)]="priceMax"
+            (ngModelChange)="onPriceMaxChange()"
+          />
+          <span class="price-input-suffix">€</span>
+        </div>
+      </div>
+
+      <div class="range-slider">
+        <div class="range-track"></div>
+        <div
+          class="range-track-active"
+          [style.left.%]="priceMinPercent"
+          [style.width.%]="priceMaxPercent - priceMinPercent">
+        </div>
+        <input
+          type="range"
+          class="price-range"
+          [min]="priceFloor"
+          [max]="priceCeil"
+          step="10"
+          [ngModel]="priceMin ?? priceFloor"
+          (ngModelChange)="onSliderMinChange($event)"
+        />
+        <input
+          type="range"
+          class="price-range"
+          [min]="priceFloor"
+          [max]="priceCeil"
+          step="10"
+          [ngModel]="priceMax ?? priceCeil"
+          (ngModelChange)="onSliderMaxChange($event)"
+        />
+      </div>
     </div>
 
     <!-- Sort -->
