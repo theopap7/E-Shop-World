@@ -26,7 +26,7 @@ export class WishlistService implements OnDestroy {
     const currentUser = this.auth.getUser();
     this.previousUser = currentUser;
 
-    if (currentUser) {
+    if (this.auth.isLoggedIn()) {
       this.loadFromApi();
     } else {
       this.itemsSubject.next(this.loadGuestFromStorage());
@@ -87,9 +87,8 @@ export class WishlistService implements OnDestroy {
 
   toggle(product: ProductDto): void {
     const isIn = this.isInWishlist(product.id);
-    const user = this.auth.getUser();
 
-    if (user) {
+    if (this.auth.isLoggedIn()) {
       if (isIn) {
         this.http
           .delete<{ success: boolean }>(`${this.apiUrl}/wishlist/${product.id}`, { withCredentials: true })
@@ -126,9 +125,7 @@ export class WishlistService implements OnDestroy {
   }
 
   remove(productId: number): void {
-    const user = this.auth.getUser();
-
-    if (user) {
+    if (this.auth.isLoggedIn()) {
       this.http
         .delete<{ success: boolean }>(`${this.apiUrl}/wishlist/${productId}`, { withCredentials: true })
         .pipe(catchError(() => EMPTY))
@@ -145,9 +142,7 @@ export class WishlistService implements OnDestroy {
   }
 
   clear(): void {
-    const user = this.auth.getUser();
-
-    if (user) {
+    if (this.auth.isLoggedIn()) {
       this.http
         .delete<{ success: boolean }>(`${this.apiUrl}/wishlist`, { withCredentials: true })
         .pipe(catchError(() => EMPTY))
