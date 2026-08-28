@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
-const upload = require('../../middleware/upload');
+const { upload, verifyImageSignature } = require('../../middleware/upload');
 
 router.get('/admin/products', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -157,7 +157,7 @@ router.get('/admin/products/:id/images', authenticateToken, isAdmin, async (req,
   }
 });
 
-router.post('/admin/products/:id/images', authenticateToken, isAdmin, upload.single('image'), async (req, res) => {
+router.post('/admin/products/:id/images', authenticateToken, isAdmin, upload.single('image'), verifyImageSignature, async (req, res) => {
   try {
     const productId = Number(req.params.id);
 
@@ -211,7 +211,7 @@ router.delete('/admin/products/:id/images/:imageId', authenticateToken, isAdmin,
   }
 });
 
-router.post('/upload-image', authenticateToken, isAdmin, upload.single('image'), (req, res) => {
+router.post('/upload-image', authenticateToken, isAdmin, upload.single('image'), verifyImageSignature, (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Δεν επιλέχθηκε αρχείο' });
