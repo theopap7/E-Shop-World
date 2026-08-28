@@ -227,7 +227,13 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     const statusMap = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Απεστάλη', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
     const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };
 
-    const q = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+    const q = (val) => {
+      let str = String(val ?? '');
+      // Neutralize CSV/formula injection: spreadsheet apps treat a cell
+      // starting with these characters as a formula, even inside quotes.
+      if (/^[=+\-@]/.test(str)) str = `'${str}`;
+      return `"${str.replace(/"/g, '""')}"`;
+    };
     const eur = (val) => `€${Number(val).toFixed(2)}`;
     const date = new Date(order.created_at).toLocaleString('el-GR');
     const itemSummary = items.map(({ name, quantity, unit_price }) =>
