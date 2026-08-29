@@ -64,14 +64,14 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    if (!id) {
+    if (!Number.isFinite(id)) {
       this.router.navigate(['/dashboard']);
       return;
     }
 
-    this.loadProduct(Number(id));
+    this.loadProduct(id);
   }
 
   loadProduct(id: number): void {

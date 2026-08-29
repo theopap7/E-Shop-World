@@ -437,7 +437,7 @@ export class ProductFormComponent implements OnInit {
   onImgError(event: Event) {
 
     const img = event.target as HTMLImageElement;
-    img.src = 'assets/no-image.png';
+    img.src = 'no-image.svg';
 
   }
 

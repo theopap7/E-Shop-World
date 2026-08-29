@@ -30,6 +30,10 @@ router.get('/reviews/:productId', async (req, res) => {
   try {
     const productId = Number(req.params.productId);
 
+    if (!Number.isFinite(productId)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο ID προϊόντος' });
+    }
+
     const [reviews] = await db.query(`
       SELECT
         r.id, r.rating, r.comment, r.created_at, r.user_id,

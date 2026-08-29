@@ -36,7 +36,7 @@ router.post('/register', authLimiter, async (req, res) => {
 
     const [result] = await db.query(
       'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
-      [firstName, lastName, normalizedEmail, hashedPassword]
+      [firstName.trim(), lastName.trim(), normalizedEmail, hashedPassword]
     );
 
     res.status(201).json({
@@ -196,6 +196,11 @@ router.post('/change-password', authenticateToken, passwordLimiter, async (req, 
       return res.status(401).json({ success: false, message: 'Λάθος τρέχων κωδικός' });
     }
 
+    const isSame = await bcrypt.compare(newPassword, rows[0].password);
+    if (isSame) {
+      return res.status(400).json({ success: false, message: 'Ο νέος κωδικός πρέπει να διαφέρει από τον τρέχοντα' });
+    }
+
     const hashed = await bcrypt.hash(newPassword, 10);
     await db.query('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
 
@@ -277,7 +282,12 @@ router.post('/reset-password', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  res.clearCookie('token', { httpOnly: true, sameSite: 'lax' });
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'strict' : 'lax'
+  });
   res.json({ success: true, message: 'Αποσύνδεση επιτυχής' });
 });
 
