@@ -54,6 +54,10 @@ router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Λείπει email ή κωδικός' });
+    }
+
     const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email.toLowerCase().trim()]);
     if (users.length === 0) {
       return res.status(401).json({ success: false, message: 'Λάθος email ή κωδικός' });
