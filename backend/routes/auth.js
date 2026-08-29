@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
-const { authLimiter, passwordLimiter, forgotPasswordLimiter } = require('../middleware/rateLimiters');
+const { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter } = require('../middleware/rateLimiters');
 const { sendPasswordResetEmail } = require('../utils/mailer');
 
 router.post('/register', authLimiter, async (req, res) => {
@@ -47,6 +47,23 @@ router.post('/register', authLimiter, async (req, res) => {
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα κατά την εγγραφή' });
+  }
+});
+
+router.get('/check-email', checkEmailLimiter, async (req, res) => {
+  try {
+    const email = String(req.query.email || '').toLowerCase().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return res.json({ success: true, exists: false });
+    }
+
+    const [rows] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    res.json({ success: true, exists: rows.length > 0 });
+  } catch (error) {
+    console.error('Check email error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

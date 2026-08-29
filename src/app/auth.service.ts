@@ -51,6 +51,12 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, { firstName, lastName, email, password });
   }
 
+  checkEmail(email: string): Observable<{ success: boolean; exists: boolean }> {
+    return this.http.get<{ success: boolean; exists: boolean }>(`${this.apiUrl}/check-email`, {
+      params: { email }
+    });
+  }
+
   getUser(): AuthUser | null {
     const raw = localStorage.getItem(USER_KEY);
     if (!raw) return null;

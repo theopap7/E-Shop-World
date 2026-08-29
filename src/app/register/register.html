@@ -27,6 +27,12 @@
       <small class="err" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('email')">
         Μη έγκυρο email
       </small>
+      <small class="err" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('emailTaken')">
+        Το email χρησιμοποιείται ήδη
+      </small>
+      <small *ngIf="registerForm.get('email')?.pending">
+        Έλεγχος διαθεσιμότητας...
+      </small>
     </div>
 
     <div>
@@ -61,7 +67,7 @@
       </small>
     </div>
 
-    <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+    <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || registerForm.get('email')?.pending">
       {{ isSubmitting ? 'Εγγραφή...' : 'Εγγραφή' }}
     </button>
   </form>
