@@ -104,6 +104,8 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       next: (res) => {
         if (res.success) {
           this.renderRevenueChart(res.dailyOrders ?? []);
+          this.renderStatusChart(res.statusBreakdown ?? []);
+          this.renderTopProductsChart(res.topProducts ?? []);
         }
       }
     });

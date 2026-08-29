@@ -62,6 +62,7 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
     const days = isAllTime ? null : Math.min(Math.max(parseInt(range, 10) || 30, 1), 365);
 
     const dateFilter = isAllTime ? '' : 'WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)';
+    const topProductsDateFilter = isAllTime ? '' : 'AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)';
     const dateParams = isAllTime ? [] : [days - 1];
 
     const [[dailyOrders], [statusBreakdown], [topProducts]] = await Promise.all([
@@ -78,18 +79,20 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
       db.query(`
         SELECT status, COUNT(*) AS count
         FROM orders
+        ${dateFilter}
         GROUP BY status
-      `),
+      `, dateParams),
       db.query(`
         SELECT p.name, SUM(oi.quantity) AS total_sold
         FROM order_items oi
         JOIN products p ON p.id = oi.product_id
         JOIN orders o ON o.id = oi.order_id
         WHERE o.status != 'cancelled'
+        ${topProductsDateFilter}
         GROUP BY oi.product_id, p.name
         ORDER BY total_sold DESC
         LIMIT 5
-      `)
+      `, dateParams)
     ]);
 
     res.json({ success: true, dailyOrders, statusBreakdown, topProducts });

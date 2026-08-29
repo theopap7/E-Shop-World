@@ -151,8 +151,8 @@ export class AdminService {
     this.statsCache$ = null;
   }
 
-  getChartsForRange(range: string): Observable<{ success: boolean; dailyOrders: ChartData['dailyOrders'] }> {
-    return this.http.get<{ success: boolean; dailyOrders: ChartData['dailyOrders'] }>(
+  getChartsForRange(range: string): Observable<{ success: boolean } & ChartData> {
+    return this.http.get<{ success: boolean } & ChartData>(
       `${this.baseUrl}/stats/charts`,
       { params: { range } }
     );
