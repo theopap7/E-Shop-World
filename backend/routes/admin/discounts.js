@@ -28,7 +28,12 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
       return res.status(400).json({ success: false, message: 'Τύπος πρέπει να είναι percentage ή fixed' });
     }
 
-    if (type === 'percentage' && (Number(value) < 0 || Number(value) > 100)) {
+    const valueNum = Number(value);
+    if (!Number.isFinite(valueNum) || valueNum < 0) {
+      return res.status(400).json({ success: false, message: 'Η αξία πρέπει να είναι θετικός αριθμός' });
+    }
+
+    if (type === 'percentage' && valueNum > 100) {
       return res.status(400).json({ success: false, message: 'Ποσοστό πρέπει να είναι 0-100' });
     }
 
@@ -47,7 +52,7 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
       [
         String(code).toUpperCase(),
         type,
-        Number(value),
+        valueNum,
         Number(minOrderAmount || 0),
         maxUses ? Number(maxUses) : null,
         expiresAt || null
@@ -74,7 +79,12 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
       return res.status(400).json({ success: false, message: 'Τύπος πρέπει να είναι percentage ή fixed' });
     }
 
-    if (type === 'percentage' && (Number(value) < 0 || Number(value) > 100)) {
+    const valueNum = Number(value);
+    if (!Number.isFinite(valueNum) || valueNum < 0) {
+      return res.status(400).json({ success: false, message: 'Η αξία πρέπει να είναι θετικός αριθμός' });
+    }
+
+    if (type === 'percentage' && valueNum > 100) {
       return res.status(400).json({ success: false, message: 'Ποσοστό πρέπει να είναι 0-100' });
     }
 
@@ -94,7 +104,7 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
       [
         String(code).toUpperCase(),
         type,
-        Number(value),
+        valueNum,
         Number(minOrderAmount || 0),
         maxUses ? Number(maxUses) : null,
         expiresAt || null,
