@@ -62,8 +62,9 @@ router.post('/reviews/:productId', authenticateToken, async (req, res) => {
     const productId = Number(req.params.productId);
     const userId = req.user.id;
     const { rating, comment } = req.body;
+    const ratingNum = Number(rating);
 
-    if (!rating || rating < 1 || rating > 5) {
+    if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) {
       return res.status(400).json({ success: false, message: 'Η βαθμολογία πρέπει να είναι μεταξύ 1 και 5' });
     }
 
@@ -89,7 +90,7 @@ router.post('/reviews/:productId', authenticateToken, async (req, res) => {
 
     await db.query(
       'INSERT INTO reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)',
-      [productId, userId, rating, comment || null]
+      [productId, userId, ratingNum, comment || null]
     );
 
     res.status(201).json({ success: true, message: 'Η κριτική υποβλήθηκε με επιτυχία!' });
@@ -104,8 +105,9 @@ router.put('/reviews/:reviewId', authenticateToken, async (req, res) => {
     const reviewId = Number(req.params.reviewId);
     const userId = req.user.id;
     const { rating, comment } = req.body;
+    const ratingNum = Number(rating);
 
-    if (!rating || rating < 1 || rating > 5) {
+    if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) {
       return res.status(400).json({ success: false, message: 'Η βαθμολογία πρέπει να είναι μεταξύ 1 και 5' });
     }
 
@@ -121,7 +123,7 @@ router.put('/reviews/:reviewId', authenticateToken, async (req, res) => {
 
     await db.query(
       'UPDATE reviews SET rating = ?, comment = ? WHERE id = ?',
-      [rating, comment || null, reviewId]
+      [ratingNum, comment || null, reviewId]
     );
 
     res.json({ success: true, message: 'Η κριτική ενημερώθηκε επιτυχώς!' });
