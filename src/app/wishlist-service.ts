@@ -49,7 +49,10 @@ export class WishlistService implements OnDestroy {
   private loadFromApi(): void {
     this.http
       .get<{ success: boolean; items: ProductDto[] }>(`${this.apiUrl}/wishlist`, { withCredentials: true })
-      .pipe(catchError(() => EMPTY))
+      .pipe(catchError(() => {
+        this.toastService.error('Αποτυχία φόρτωσης αγαπημένων');
+        return EMPTY;
+      }))
       .subscribe(res => {
         if (res?.success) this.itemsSubject.next(res.items);
       });
@@ -92,7 +95,10 @@ export class WishlistService implements OnDestroy {
       if (isIn) {
         this.http
           .delete<{ success: boolean }>(`${this.apiUrl}/wishlist/${product.id}`, { withCredentials: true })
-          .pipe(catchError(() => EMPTY))
+          .pipe(catchError(() => {
+            this.toastService.error('Δεν ήταν δυνατή η αφαίρεση από τα αγαπημένα');
+            return EMPTY;
+          }))
           .subscribe(res => {
             if (res?.success) {
               this.itemsSubject.next(this.itemsSubject.value.filter(p => p.id !== product.id));
@@ -102,7 +108,10 @@ export class WishlistService implements OnDestroy {
       } else {
         this.http
           .post<{ success: boolean }>(`${this.apiUrl}/wishlist/${product.id}`, {}, { withCredentials: true })
-          .pipe(catchError(() => EMPTY))
+          .pipe(catchError(() => {
+            this.toastService.error('Δεν ήταν δυνατή η προσθήκη στα αγαπημένα');
+            return EMPTY;
+          }))
           .subscribe(res => {
             if (res?.success) {
               this.itemsSubject.next([...this.itemsSubject.value, product]);
@@ -128,7 +137,10 @@ export class WishlistService implements OnDestroy {
     if (this.auth.isLoggedIn()) {
       this.http
         .delete<{ success: boolean }>(`${this.apiUrl}/wishlist/${productId}`, { withCredentials: true })
-        .pipe(catchError(() => EMPTY))
+        .pipe(catchError(() => {
+          this.toastService.error('Δεν ήταν δυνατή η αφαίρεση από τα αγαπημένα');
+          return EMPTY;
+        }))
         .subscribe(res => {
           if (res?.success) {
             this.itemsSubject.next(this.itemsSubject.value.filter(p => p.id !== productId));
@@ -145,7 +157,10 @@ export class WishlistService implements OnDestroy {
     if (this.auth.isLoggedIn()) {
       this.http
         .delete<{ success: boolean }>(`${this.apiUrl}/wishlist`, { withCredentials: true })
-        .pipe(catchError(() => EMPTY))
+        .pipe(catchError(() => {
+          this.toastService.error('Δεν ήταν δυνατή η διαγραφή των αγαπημένων');
+          return EMPTY;
+        }))
         .subscribe(res => {
           if (res?.success) {
             this.itemsSubject.next([]);
