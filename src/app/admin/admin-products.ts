@@ -5,11 +5,12 @@ import { RouterModule } from '@angular/router';
 import { AdminService, Product } from '../admin.service';
 import { ToastService } from '../toast.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [CommonModule, RouterModule, ImageUrlPipe],
+  imports: [CommonModule, RouterModule, ImageUrlPipe, PaginationComponent],
   templateUrl: './admin-products.html',
   styleUrl: './admin-products.css',
 })
@@ -18,6 +19,13 @@ export class AdminProductsComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   deletingId: number | null = null;
+  currentPage = 1;
+  readonly pageSize = 20;
+
+  get pagedProducts(): Product[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.products.slice(start, start + this.pageSize);
+  }
 
   private destroyRef = inject(DestroyRef);
 

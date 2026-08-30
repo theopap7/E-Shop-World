@@ -67,7 +67,7 @@
           </thead>
 
           <tbody>
-            <tr *ngFor="let product of products">
+            <tr *ngFor="let product of pagedProducts">
               <td class="mono">#{{ product.id }}</td>
 
               <td>
@@ -131,6 +131,13 @@
           </tbody>
 
         </table>
+
+        <app-pagination
+          [total]="products.length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="currentPage = $event"
+        ></app-pagination>
       </div>
 
     </div>
