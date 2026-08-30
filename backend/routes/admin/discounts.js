@@ -29,7 +29,7 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
     }
 
     const valueNum = Number(value);
-    if (!Number.isFinite(valueNum) || valueNum < 0) {
+    if (!Number.isFinite(valueNum) || valueNum <= 0) {
       return res.status(400).json({ success: false, message: 'Η αξία πρέπει να είναι θετικός αριθμός' });
     }
 
@@ -80,7 +80,7 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
     }
 
     const valueNum = Number(value);
-    if (!Number.isFinite(valueNum) || valueNum < 0) {
+    if (!Number.isFinite(valueNum) || valueNum <= 0) {
       return res.status(400).json({ success: false, message: 'Η αξία πρέπει να είναι θετικός αριθμός' });
     }
 

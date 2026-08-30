@@ -122,6 +122,10 @@ export class AdminDiscountsComponent implements OnInit {
       this.toastService.warning('Συμπλήρωσε όλα τα υποχρεωτικά πεδία');
       return;
     }
+    if (this.form.value <= 0) {
+      this.toastService.warning('Η αξία πρέπει να είναι μεγαλύτερη από 0');
+      return;
+    }
     if (this.isSaving) return;
     this.isSaving = true;
 
