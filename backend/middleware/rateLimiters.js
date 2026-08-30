@@ -33,4 +33,13 @@ const checkEmailLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-module.exports = { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter };
+const discountLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  skipSuccessfulRequests: true,
+  message: { success: false, message: 'Πολλές προσπάθειες. Δοκιμάστε ξανά σε λίγο.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+module.exports = { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter, discountLimiter };

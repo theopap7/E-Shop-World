@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
+const { discountLimiter } = require('../middleware/rateLimiters');
 
-router.post('/validate-discount', authenticateToken, async (req, res) => {
+router.post('/validate-discount', authenticateToken, discountLimiter, async (req, res) => {
   try {
     const userId = req.user.id;
     const { code, orderTotal } = req.body;
