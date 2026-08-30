@@ -260,6 +260,8 @@ export class CheckoutComponent implements OnInit {
   }
 
   submit(): void {
+    if (this.isSubmitting) return;
+
     this.error = null;
     this.success = null;
 
