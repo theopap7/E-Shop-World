@@ -115,7 +115,7 @@
 }
 
 .prompt-btn-outline:hover {
-  background: #e3f2fd;
+  background: #ede9fe;
 }
 
 /* ===== Grid ===== */
@@ -165,7 +165,7 @@ input[type="tel"] {
 
 input:focus {
   outline: none;
-  border-color: #1976d2;
+  border-color: #6366f1;
 }
 
 /* ===== Radio / Checkbox ===== */
@@ -235,7 +235,7 @@ label {
 .link {
   display: inline-block;
   margin-top: 14px;
-  color: #1976d2;
+  color: #6366f1;
   text-decoration: none;
 }
 

@@ -10,13 +10,12 @@
   gap: 8px;
   margin-bottom: 24px;
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: #f3f4f6;
   color: #374151;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 700;
-  border: 1px solid #e5e7eb;
+  font-weight: 600;
   transition: all 0.2s ease;
 }
 
