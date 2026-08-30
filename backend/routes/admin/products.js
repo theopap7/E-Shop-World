@@ -46,6 +46,15 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' });
     }
 
+    const priceNum = Number(price);
+    const stockNum = Number(stock);
+    if (!Number.isFinite(priceNum) || priceNum <= 0) {
+      return res.status(400).json({ success: false, message: 'Η τιμή πρέπει να είναι θετικός αριθμός' });
+    }
+    if (!Number.isFinite(stockNum) || stockNum < 0) {
+      return res.status(400).json({ success: false, message: 'Το απόθεμα πρέπει να είναι μη αρνητικός αριθμός' });
+    }
+
     if (category_id != null) {
       const [cats] = await db.query('SELECT id FROM categories WHERE id = ?', [Number(category_id)]);
       if (cats.length === 0) {
@@ -58,7 +67,7 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
     const [result] = await db.query(
       `INSERT INTO products (name, description, price, stock, category_id, image_url, sizes)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [name, description || null, Number(price), Number(stock), category_id || null, image_url || null, sizesJson]
+      [name, description || null, priceNum, stockNum, category_id || null, image_url || null, sizesJson]
     );
 
     res.status(201).json({ success: true, message: 'Το προϊόν δημιουργήθηκε επιτυχώς', productId: result.insertId });
@@ -77,6 +86,15 @@ router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
       return res.status(400).json({ success: false, message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' });
     }
 
+    const priceNum = Number(price);
+    const stockNum = Number(stock);
+    if (!Number.isFinite(priceNum) || priceNum <= 0) {
+      return res.status(400).json({ success: false, message: 'Η τιμή πρέπει να είναι θετικός αριθμός' });
+    }
+    if (!Number.isFinite(stockNum) || stockNum < 0) {
+      return res.status(400).json({ success: false, message: 'Το απόθεμα πρέπει να είναι μη αρνητικός αριθμός' });
+    }
+
     if (category_id != null) {
       const [cats] = await db.query('SELECT id FROM categories WHERE id = ?', [Number(category_id)]);
       if (cats.length === 0) {
@@ -90,7 +108,7 @@ router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
       `UPDATE products
        SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ?, sizes = ?
        WHERE id = ?`,
-      [name, description || null, Number(price), Number(stock), category_id || null, image_url || null, sizesJson, productId]
+      [name, description || null, priceNum, stockNum, category_id || null, image_url || null, sizesJson, productId]
     );
 
     if (result.affectedRows === 0) {
