@@ -13,7 +13,7 @@ h2 {
   text-align: center;
   font-size: 26px;
   margin-bottom: 20px;
-  font-family: 'Arial', sans-serif;
+  font-weight: 700;
   color: #2563eb; /* ίδιο μπλε με register */
 }
 
@@ -49,22 +49,24 @@ input:focus {
 button {
   width: 100%;
   padding: 12px;
-  background-color: #2563eb; /* ίδιο μπλε με register */
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
   font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 button:disabled {
-  background-color: #2563eb;
-  opacity: 0.6;        
-  
+  opacity: 0.6;
 }
-button:hover {
-  background-color: #1d4ed8; /* λίγο πιο σκούρο hover */
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
 }
 
 .error {

@@ -270,16 +270,20 @@
   text-align: center;
   text-decoration: none;
   display: block;
-  background: #2563eb;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
   border: none;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 .checkout-btn:hover {
-  background: #1d4ed8;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
 }
 
 .view-cart-btn {

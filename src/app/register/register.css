@@ -73,24 +73,25 @@
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
-/* Button - ΜΠΛΕ */
+/* Button */
 .register-container button {
   margin-top: 10px;
   height: 45px;
   border: none;
   border-radius: 12px;
-  background: #2563eb; /* καθαρό μπλε */
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
 }
 
-.register-container button:hover {
-  background: #1d4ed8; /* πιο σκούρο στο hover */
+.register-container button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 8px 18px rgba(99, 102, 241, 0.3);
 }
 
 .register-container button:active {

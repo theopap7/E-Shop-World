@@ -182,12 +182,13 @@
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
 .btn-outline {

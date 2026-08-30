@@ -1,6 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
   /* Spacing scale */
   --space-1: 4px;
   --space-2: 8px;
@@ -24,6 +27,10 @@
   --color-primary: #3b82f6;
   --color-primary-hover: #2563eb;
   --color-primary-light: #60a5fa;
+  --color-accent: #7c3aed;
+  --color-accent-light: #a78bfa;
+  --gradient-brand: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --gradient-brand-hover: linear-gradient(135deg, #4f46e5, #7c3aed);
   --color-text: #1f2937;
   --color-text-muted: #6b7280;
   --color-text-faint: #9ca3af;
@@ -43,6 +50,33 @@
   --radius-pill: 999px;
 
   /* Shadow */
-  --shadow-sm: 0 1px 4px rgba(17, 24, 39, 0.15);
-  --shadow-md: 0 6px 18px rgba(17, 24, 39, 0.06);
+  --shadow-sm: 0 1px 4px rgba(17, 24, 39, 0.06);
+  --shadow-md: 0 6px 18px rgba(17, 24, 39, 0.10);
+  --shadow-lg: 0 12px 32px rgba(17, 24, 39, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg-subtle);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  margin: 0;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
 }

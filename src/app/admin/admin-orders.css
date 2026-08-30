@@ -349,8 +349,8 @@
   gap:8px;
   transition:.2s;
 }
-.btn-primary{ background:#2563eb; color:#fff; }
-.btn-primary:hover{ background:#1d4ed8; }
+.btn-primary{ background: linear-gradient(135deg, #6366f1, #8b5cf6); color:#fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+.btn-primary:hover{ background: linear-gradient(135deg, #4f46e5, #7c3aed); }
 
 /* Responsive */
 @media (max-width:560px){
