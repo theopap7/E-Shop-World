@@ -149,6 +149,46 @@
 
     </div>
 
+    <!-- Related Products -->
+    <div class="related-products" *ngIf="!isLoading && relatedProducts.length > 0">
+      <h2 class="related-title">Σχετικά Προϊόντα</h2>
+      <div class="related-grid">
+        <a
+          class="related-card"
+          *ngFor="let rp of relatedProducts"
+          [routerLink]="['/products', rp.id]">
+          <img
+            [src]="rp.image_url | imageUrl"
+            [alt]="rp.name"
+            class="related-image"
+            (error)="$any($event.target).src='no-image.svg'"
+          />
+          <div class="related-name">{{ rp.name }}</div>
+          <div class="related-price">{{ rp.price | number:'1.2-2' }}€</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recently Viewed -->
+    <div class="related-products" *ngIf="!isLoading && recentlyViewed.length > 0">
+      <h2 class="related-title">Είδες Πρόσφατα</h2>
+      <div class="related-grid">
+        <a
+          class="related-card"
+          *ngFor="let rv of recentlyViewed"
+          [routerLink]="['/products', rv.id]">
+          <img
+            [src]="rv.image_url | imageUrl"
+            [alt]="rv.name"
+            class="related-image"
+            (error)="$any($event.target).src='no-image.svg'"
+          />
+          <div class="related-name">{{ rv.name }}</div>
+          <div class="related-price">{{ rv.price | number:'1.2-2' }}€</div>
+        </a>
+      </div>
+    </div>
+
     <!-- Reviews -->
     <app-reviews
       *ngIf="!isLoading && product"

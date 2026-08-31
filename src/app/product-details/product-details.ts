@@ -10,6 +10,7 @@ import { ReviewsComponent } from '../reviews/reviews';
 import { BreadcrumbService } from '../breadcrumb.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { RecentlyViewedService, RecentlyViewedProduct } from '../recently-viewed.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -25,6 +26,8 @@ export class ProductDetailComponent implements OnInit {
   activeImageUrl: string | null = null;
   isLoading = true;
   error = '';
+  relatedProducts: ProductDto[] = [];
+  recentlyViewed: RecentlyViewedProduct[] = [];
   addedToCart = false;
   selectedQty = 1;
   selectedSize: string | null = null;
@@ -52,7 +55,8 @@ export class ProductDetailComponent implements OnInit {
     private cartService: CartService,
     private wishlistService: WishlistService,
     private router: Router,
-    private breadcrumbService: BreadcrumbService
+    private breadcrumbService: BreadcrumbService,
+    private recentlyViewedService: RecentlyViewedService
   ) {}
 
   isInWishlist(): boolean {
@@ -64,19 +68,25 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const id = Number(params.get('id'));
 
-    if (!Number.isFinite(id)) {
-      this.router.navigate(['/dashboard']);
-      return;
-    }
+      if (!Number.isFinite(id)) {
+        this.router.navigate(['/dashboard']);
+        return;
+      }
 
-    this.loadProduct(id);
+      this.loadProduct(id);
+    });
   }
 
   loadProduct(id: number): void {
     this.isLoading = true;
     this.error = '';
+    this.selectedQty = 1;
+    this.selectedSize = null;
+    this.relatedProducts = [];
+    this.recentlyViewed = [];
 
     this.productService.getProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
@@ -88,6 +98,11 @@ export class ProductDetailComponent implements OnInit {
           if (this.product?.name) {
             this.breadcrumbService.updateLastBreadcrumb(this.product.name);
           }
+
+          this.loadRelatedProducts();
+
+          this.recentlyViewedService.track(this.product);
+          this.recentlyViewed = this.recentlyViewedService.getRecent(this.product.id);
         } else {
           this.error = 'Το προϊόν δεν βρέθηκε.';
         }
@@ -101,6 +116,28 @@ export class ProductDetailComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  loadRelatedProducts(): void {
+    if (!this.product?.category_name) {
+      this.relatedProducts = [];
+      return;
+    }
+
+    this.productService.getProducts({ category: this.product.category_name })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.relatedProducts = res.products
+              .filter(p => p.id !== this.product!.id)
+              .slice(0, 4);
+          }
+        },
+        error: () => {
+          this.relatedProducts = [];
+        }
+      });
   }
 
   addToCart(): void {
