@@ -41,16 +41,21 @@ router.post('/validate-discount', authenticateToken, discountLimiter, async (req
       return res.status(400).json({ success: false, message: 'Ο κωδικός έχει εξαντληθεί' });
     }
 
-    if (Number(orderTotal) < Number(discount.min_order_amount)) {
+    const total = Number(orderTotal);
+    if (!Number.isFinite(total) || total < 0) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο ποσό παραγγελίας' });
+    }
+
+    if (total < Number(discount.min_order_amount)) {
       return res.status(400).json({ success: false, message: `Ελάχιστο ποσό παραγγελίας: ${discount.min_order_amount}€` });
     }
 
     let discountAmount = 0;
 
     if (discount.type === 'percentage') {
-      discountAmount = (Number(orderTotal) * Number(discount.value)) / 100;
+      discountAmount = (total * Number(discount.value)) / 100;
     } else if (discount.type === 'fixed') {
-      discountAmount = Math.min(Number(discount.value), Number(orderTotal));
+      discountAmount = Math.min(Number(discount.value), total);
     }
 
     discountAmount = Math.round(discountAmount * 100) / 100;

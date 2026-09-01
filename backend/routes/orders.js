@@ -4,9 +4,17 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
+const { discountLimiter } = require('../middleware/rateLimiters');
 const { sendOrderConfirmationEmail } = require('../utils/mailer');
 
-router.post('/orders', authenticateToken, async (req, res) => {
+// Only rate-limit checkout attempts that carry a discount code, so a discount-code
+// brute-force can't bypass the /validate-discount limiter by going through /orders instead.
+const discountCodeGate = (req, res, next) => {
+  if (req.body && req.body.discountCode) return discountLimiter(req, res, next);
+  next();
+};
+
+router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => {
   const userId = req.user.id;
 
   const {

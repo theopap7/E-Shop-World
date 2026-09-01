@@ -138,11 +138,13 @@
                   [ngClass]="{
                     'pill--paid': order.payment_status === 'paid',
                     'pill--pendingPay': order.payment_status === 'pending' && order.status !== 'cancelled',
+                    'pill--partial': order.payment_status === 'partially_refunded',
                     'pill--cancelled': order.payment_status === 'refunded' || order.payment_status === 'cancelled' || (order.payment_status === 'pending' && order.status === 'cancelled')
                   }"
                 >
                   {{ order.payment_status === 'paid' ? 'ΠΛΗΡΩΘΗΚΕ'
                     : order.payment_status === 'refunded' ? 'ΕΠΙΣΤΡΟΦΗ'
+                    : order.payment_status === 'partially_refunded' ? 'ΜΕΡΙΚΗ ΕΠΙΣΤΡΟΦΗ'
                     : order.payment_status === 'cancelled' || order.status === 'cancelled' ? 'ΑΚΥΡΩΘΗΚΕ'
                     : 'ΕΚΚΡΕΜΕΙ' }}
                 </span>

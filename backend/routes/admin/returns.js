@@ -48,7 +48,9 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
     await conn.beginTransaction();
 
     const [rows] = await conn.query(
-      'SELECT rr.id, rr.order_id, rr.status AS current_status FROM return_requests rr WHERE rr.id = ? FOR UPDATE',
+      `SELECT rr.id, rr.order_id, rr.status AS current_status, o.subtotal, o.discount_amount
+       FROM return_requests rr JOIN orders o ON o.id = rr.order_id
+       WHERE rr.id = ? FOR UPDATE`,
       [returnId]
     );
 
@@ -70,9 +72,20 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
     );
 
     if (status === 'approved') {
-      await conn.query(
-        `UPDATE orders SET payment_status = 'refunded' WHERE id = ?`,
+      // Refunds never include shipping, so compare against the item total (subtotal minus
+      // discount), not total_amount — otherwise a full-item return would still look "partial".
+      const itemsChargedTotal = Number(returnReq.subtotal) - Number(returnReq.discount_amount);
+
+      const [[{ totalRefunded }]] = await conn.query(
+        `SELECT COALESCE(SUM(refund_amount), 0) AS totalRefunded
+         FROM return_requests WHERE order_id = ? AND status = 'approved'`,
         [returnReq.order_id]
+      );
+
+      const isFullRefund = Number(totalRefunded) >= itemsChargedTotal - 0.01;
+      await conn.query(
+        `UPDATE orders SET payment_status = ? WHERE id = ?`,
+        [isFullRefund ? 'refunded' : 'partially_refunded', returnReq.order_id]
       );
 
       const [returnItems] = await conn.query(

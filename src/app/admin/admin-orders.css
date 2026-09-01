@@ -293,6 +293,7 @@
 /* Payment */
 .pill--paid{ background:#dcfce7; border-color:#86efac; color:#166534; }
 .pill--pendingPay{ background:#ffedd5; border-color:#fdba74; color:#9a3412; }
+.pill--partial{ background:#fef9c3; border-color:#fde047; color:#854d0e; }
 
 /* Select + arrow (βελάκι όπως πριν) */
 .action-cell{
