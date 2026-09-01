@@ -92,22 +92,24 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     try {
       const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
       const res = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        this.status = 'error';
+        return null;
+      }
       const data = await res.json();
-      if (!Array.isArray(data) || data.length === 0) return null;
+      if (!Array.isArray(data) || data.length === 0) {
+        this.status = 'not-found';
+        return null;
+      }
       return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
     } catch {
+      this.status = 'error';
       return null;
     }
   }
 
   private applyResult(result: { lat: number; lon: number } | null): void {
-    if (!this.map) return;
-
-    if (!result) {
-      this.status = 'not-found';
-      return;
-    }
+    if (!this.map || !result) return;
 
     this.status = 'found';
     const latLng: [number, number] = [result.lat, result.lon];
