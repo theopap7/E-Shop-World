@@ -14,6 +14,7 @@ import { CartService, CartItem } from '../cart.service';
 import { OrderService, CreateOrderDto } from '../order.service';
 import { DiscountService, DiscountValidationResponse } from '../discount.service';
 import { ToastService } from '../toast.service';
+import { AddressMapComponent } from '../address-map/address-map';
 
 type ShippingMethod = 'courier_standard' | 'courier_express' | 'pickup';
 type PaymentMethod = 'cod' | 'card_mock' | 'bank_transfer';
@@ -21,7 +22,7 @@ type PaymentMethod = 'cod' | 'card_mock' | 'bank_transfer';
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, AddressMapComponent],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })

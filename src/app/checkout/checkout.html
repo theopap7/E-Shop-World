@@ -81,7 +81,7 @@
           </small>
 
           <label>
-  Όροφος 
+  Όροφος
   <input formControlName="floor"  />
 </label>
 
@@ -89,6 +89,13 @@
             Σημειώσεις (προαιρετικό)
             <input formControlName="notes" />
           </label>
+
+          <app-address-map
+            [city]="form.get('shipping.city')?.value"
+            [zip]="form.get('shipping.zip')?.value"
+            [address1]="form.get('shipping.address1')?.value"
+            [country]="form.get('shipping.country')?.value"
+          ></app-address-map>
         </div>
 
         <hr />

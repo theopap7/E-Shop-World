@@ -1,0 +1,25 @@
+.address-map-wrap {
+  margin: 10px 0 4px;
+}
+
+.address-map {
+  width: 100%;
+  height: 220px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  z-index: 0;
+}
+
+.map-status {
+  display: block;
+  margin-top: 6px;
+  color: #666;
+}
+
+.map-status-warn {
+  color: #b45309;
+}
+
+.map-status-error {
+  color: #c62828;
+}

@@ -1,0 +1,11 @@
+<div class="address-map-wrap">
+  <div #mapEl class="address-map"></div>
+
+  <small class="map-status" *ngIf="status === 'loading'">Αναζήτηση τοποθεσίας...</small>
+  <small class="map-status map-status-warn" *ngIf="status === 'not-found'">
+    Δεν βρέθηκε ακριβής τοποθεσία για αυτή τη διεύθυνση.
+  </small>
+  <small class="map-status map-status-error" *ngIf="status === 'error'">
+    Σφάλμα κατά την αναζήτηση χάρτη.
+  </small>
+</div>
