@@ -223,7 +223,14 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     `, [orderId]);
 
     const paymentMethodMap = { cod: 'Αντικαταβολή', card_mock: 'Πληρωμή με Κάρτα', bank_transfer: 'Τραπεζική Μεταφορά' };
-    const paymentStatusMap = { paid: 'Πληρωμένη', unpaid: 'Μη πληρωμένη', pending: 'Σε εκκρεμότητα' };
+    const paymentStatusMap = {
+      paid: 'Πληρωμένη',
+      unpaid: 'Μη πληρωμένη',
+      pending: 'Σε εκκρεμότητα',
+      refunded: 'Επιστροφή χρημάτων',
+      partially_refunded: 'Μερική επιστροφή',
+      cancelled: 'Ακυρώθηκε'
+    };
     const statusMap = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Απεστάλη', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
     const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };
 
@@ -236,29 +243,33 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     };
     const eur = (val) => `€${Number(val).toFixed(2)}`;
     const date = new Date(order.created_at).toLocaleString('el-GR');
-    const itemSummary = items.map(({ name, quantity, unit_price }) =>
-      `${name} x${quantity} (${eur(unit_price)})`
-    ).join(' | ');
 
-    const csv = [
-      [
-        'Αριθμός', 'Ημερομηνία', 'Κατάσταση',
-        'Πελάτης', 'Email', 'Τηλέφωνο',
-        'Τρόπος Αποστολής', 'Κόστος Μεταφορικών', 'Τρόπος Πληρωμής', 'Κατάσταση Πληρωμής',
-        'Διεύθυνση', 'Πόλη', 'ΤΚ', 'Χώρα', 'Όροφος', 'Σημειώσεις',
-        'Προϊόντα', 'Κόστος Προϊόντων', 'Μεταφορικά', 'Σύνολο'
-      ].join(','),
-      [
-        order.id, q(date), q(statusMap[order.status] || order.status),
-        q(order.recipient_name), q(order.email), q(order.phone),
-        q(shippingMethodMap[order.shipping_method] || order.shipping_method), eur(order.shipping_cost),
-        q(paymentMethodMap[order.payment_method] || order.payment_method),
-        q(paymentStatusMap[order.payment_status?.toLowerCase()] || order.payment_status),
-        q(order.ship_address1), q(order.ship_city), q(order.ship_zip),
-        q(order.ship_country), q(order.floor), q(order.ship_notes),
-        q(itemSummary), eur(order.subtotal), eur(order.shipping_cost), eur(order.total_amount)
-      ].join(',')
-    ].join('\n');
+    const csvRows = [
+      ['Αριθμός', order.id],
+      ['Ημερομηνία', date],
+      ['Κατάσταση', statusMap[order.status] || order.status],
+      ['Πελάτης', order.recipient_name],
+      ['Email', order.email],
+      ['Τηλέφωνο', order.phone],
+      ['Τρόπος Αποστολής', shippingMethodMap[order.shipping_method] || order.shipping_method],
+      ['Κόστος Μεταφορικών', eur(order.shipping_cost)],
+      ['Τρόπος Πληρωμής', paymentMethodMap[order.payment_method] || order.payment_method],
+      ['Κατάσταση Πληρωμής', paymentStatusMap[order.payment_status?.toLowerCase()] || order.payment_status],
+      ['Διεύθυνση', order.ship_address1],
+      ['Πόλη', order.ship_city],
+      ['ΤΚ', order.ship_zip],
+      ['Χώρα', order.ship_country],
+      ['Όροφος', order.floor],
+      ['Σημειώσεις', order.ship_notes],
+      ...items.map(({ name, quantity, unit_price }, i) =>
+        [`Προϊόν ${i + 1}`, `${name} x${quantity} (${eur(unit_price)})`]
+      ),
+      ['Κόστος Προϊόντων', eur(order.subtotal)],
+      ['Μεταφορικά', eur(order.shipping_cost)],
+      ['Σύνολο', eur(order.total_amount)]
+    ];
+
+    const csv = csvRows.map(([label, value]) => `${q(label)},${q(value)}`).join('\n');
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename=paraggelia-${order.id}.csv`);
