@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminStats, ChartData } from '../admin.service';
+import { ToastService } from '../toast.service';
 import {
   Chart,
   LineController, BarController, DoughnutController,
@@ -57,7 +58,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private toastService: ToastService) {}
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -107,7 +108,8 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           this.renderStatusChart(res.statusBreakdown ?? []);
           this.renderTopProductsChart(res.topProducts ?? []);
         }
-      }
+      },
+      error: () => this.toastService.error('Αποτυχία φόρτωσης στατιστικών')
     });
   }
 

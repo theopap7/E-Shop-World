@@ -258,17 +258,18 @@ export class OrderDetailsComponent implements OnInit {
   }
 downloadCSV(orderId: number) {
 
-  this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(blob => {
+  this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    next: blob => {
+      const url = window.URL.createObjectURL(blob);
 
-    const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `order-${orderId}.csv`;
+      a.click();
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `order-${orderId}.csv`;
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-
+      window.URL.revokeObjectURL(url);
+    },
+    error: () => this.toastService.error('Αποτυχία λήψης CSV')
   });
 
 }
