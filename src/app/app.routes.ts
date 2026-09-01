@@ -9,9 +9,7 @@ import { ProfileComponent } from './profile.component';
 import { MyOrdersComponent } from './my-orders/my-orders';
 import { OrderDetailsComponent } from './order-details/order-details';
 import { MyReviewsComponent } from './my-reviews/my-reviews';
-import { CheckoutComponent } from './checkout/checkout';
 import { WishlistComponent } from './wishlist/wishlist';
-import { AdminDashboardComponent } from './admin/admin-dashboard';
 import { AdminProductsComponent } from './admin/admin-products';
 import { ProductFormComponent } from './admin/product-form';
 import { AdminOrdersComponent } from './admin/admin-orders';
@@ -72,7 +70,8 @@ export const routes: Routes = [
 
   {
     path: 'checkout',
-    component: CheckoutComponent,
+    loadComponent: () =>
+      import('./checkout/checkout').then(m => m.CheckoutComponent),
     canActivate: [authGuard],
     data: { breadcrumb: 'Ολοκλήρωση' }
   },
@@ -115,7 +114,8 @@ export const routes: Routes = [
   // ===== ADMIN =====
   {
     path: 'admin',
-    component: AdminDashboardComponent,
+    loadComponent: () =>
+      import('./admin/admin-dashboard').then(m => m.AdminDashboardComponent),
     canActivate: [adminGuard],
     data: { breadcrumb: 'Διαχείριση' }
   },
