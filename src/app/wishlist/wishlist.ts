@@ -1,7 +1,7 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { WishlistService } from '../wishlist-service';
 import { CartService } from '../cart.service';
@@ -30,7 +30,8 @@ export class WishlistComponent implements OnInit {
 
   constructor(
     public wishlistService: WishlistService,
-    private cartService: CartService
+    private cartService: CartService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +48,10 @@ export class WishlistComponent implements OnInit {
   }
 
   addToCart(product: ProductDto): void {
+    if (product.sizes?.length) {
+      this.router.navigate(['/products', product.id]);
+      return;
+    }
     this.cartService.addToCart(product);
     this.cartService.openSidebar();
   }
