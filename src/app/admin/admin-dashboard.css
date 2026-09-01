@@ -256,34 +256,6 @@
 
 /* CHARTS */
 
-.charts-skeleton{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-
-.chart-skeleton-wide,
-.chart-skeleton-half{
-  border-radius:16px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-}
-
-.chart-skeleton-wide{
-  grid-column:1/-1;
-  height:320px;
-}
-
-.chart-skeleton-half{
-  height:300px;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
 .charts-grid{
   display:grid;
   grid-template-columns:1fr 1fr;

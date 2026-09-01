@@ -23,25 +23,11 @@
   margin-bottom:18px;
 }
 
-.kicker{
-  font-size:12px;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:.4px;
-  color:#6b7280;
-}
-
 .page-title{
   margin:4px 0;
   font-size:26px;
   font-weight:900;
   letter-spacing:-.3px;
-}
-
-.page-subtitle{
-  margin:0;
-  font-size:14px;
-  color:#6b7280;
 }
 
 .header-actions{
@@ -318,18 +304,6 @@
   outline:none;
   border-color:#2563eb;
   box-shadow:0 0 0 3px rgba(37,99,235,.10);
-}
-
-.arrow{
-  font-weight:900;
-  color:#9ca3af;
-  transition: transform .2s ease, color .2s ease;
-}
-
-/* hover effect στο row: το βελάκι "γλιστράει" δεξιά */
-.table tbody tr:hover .arrow{
-  transform: translateX(4px);
-  color:#2563eb;
 }
 
 /* Alerts & Buttons */
