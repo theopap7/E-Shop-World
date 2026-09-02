@@ -184,6 +184,7 @@ export class OrderDetailsComponent implements OnInit {
     this.orderService.cancelOrder(this.orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Η παραγγελία ακυρώθηκε επιτυχώς');
+        this.adminService.invalidateStatsCache();
         this.loadDetails();
         this.isCancelling = false;
       },
@@ -283,6 +284,7 @@ downloadCSV(orderId: number) {
       next: () => {
         this.toastService.success('Η πληρωμή επιβεβαιώθηκε!');
         this.isConfirmingPayment = false;
+        this.adminService.invalidateStatsCache();
         this.loadDetails();
       },
       error: (err) => {

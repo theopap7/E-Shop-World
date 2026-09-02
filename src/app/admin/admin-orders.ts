@@ -122,6 +122,7 @@ export class AdminOrdersComponent implements OnInit {
         if (res.success) {
           const order = this.orders.find((o) => o.id === orderId);
           if (order) order.status = newStatus;
+          this.adminService.invalidateStatsCache();
           this.toastService.success('Κατάσταση παραγγελίας ενημερώθηκε!');
         }
         this.updatingId = null;
