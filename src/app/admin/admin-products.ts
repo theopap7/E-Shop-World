@@ -68,6 +68,8 @@ export class AdminProductsComponent implements OnInit {
         this.deletingId = null;
         if (res.success) {
           this.products = this.products.filter((p) => p.id !== id);
+          const maxPage = Math.max(1, Math.ceil(this.products.length / this.pageSize));
+          if (this.currentPage > maxPage) this.currentPage = maxPage;
           this.toastService.success(res.message || 'Το προϊόν διαγράφηκε!');
         } else {
           this.toastService.error(res.message || 'Αποτυχία διαγραφής');

@@ -56,8 +56,9 @@ export class AdminReviewsComponent implements OnInit {
     this.adminService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
-          // Remove από τη λίστα
           this.reviews = this.reviews.filter(r => r.id !== reviewId);
+          const maxPage = Math.max(1, Math.ceil(this.reviews.length / this.pageSize));
+          if (this.currentPage > maxPage) this.currentPage = maxPage;
           this.toastService.success('Review διαγράφηκε επιτυχώς!');
         }
       },
