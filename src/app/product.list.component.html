@@ -14,6 +14,7 @@
         class="search-input"
         placeholder="Αναζήτηση προϊόντος..."
         [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
       />
       <button
         *ngIf="searchTerm"
@@ -25,7 +26,7 @@
     </div>
 
     <!-- Category -->
-    <select class="filter-select" [(ngModel)]="selectedCategory">
+    <select class="filter-select" [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()">
       <option value="all">Όλες οι κατηγορίες</option>
       <option *ngFor="let cat of categories" [value]="cat.name">
         {{ cat.name }}
@@ -89,7 +90,7 @@
     </div>
 
     <!-- Sort -->
-    <select class="filter-select" [(ngModel)]="sortBy">
+    <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
       <option value="newest">Νεότερα πρώτα</option>
       <option value="price_asc">Τιμή: Χαμηλή → Υψηλή</option>
       <option value="price_desc">Τιμή: Υψηλή → Χαμηλή</option>
@@ -139,7 +140,7 @@
 
     <article
       class="card clickable"
-      *ngFor="let p of filteredProducts"
+      *ngFor="let p of pagedProducts"
       [routerLink]="['/products', p.id]">
 
       <button
@@ -213,4 +214,12 @@
     </article>
 
   </div>
+
+  <app-pagination
+    *ngIf="!isLoading && !errorMessage && filteredProducts.length > 0"
+    [total]="filteredProducts.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="currentPage = $event"
+  ></app-pagination>
 </section>

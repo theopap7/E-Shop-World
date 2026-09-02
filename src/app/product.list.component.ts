@@ -8,6 +8,7 @@ import { Router, RouterModule } from '@angular/router';
 import { WishlistService } from './wishlist-service';
 import { SkeletonComponent } from './skeleton/skeleton';
 import { ImageUrlPipe } from './shared/image-url.pipe';
+import { PaginationComponent } from './shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-product-list',
@@ -17,7 +18,8 @@ import { ImageUrlPipe } from './shared/image-url.pipe';
     FormsModule,
     RouterModule ,
     SkeletonComponent,
-    ImageUrlPipe
+    ImageUrlPipe,
+    PaginationComponent
   ],
   templateUrl: './product.list.component.html',
   styleUrl: './product.list.component.css',
@@ -36,6 +38,9 @@ export class ProductListComponent implements OnInit {
   priceMin: number | null = null;
   priceMax: number | null = null;
   sortBy = 'newest';
+
+  currentPage = 1;
+  readonly pageSize = 20;
 
   private destroyRef = inject(DestroyRef);
 
@@ -85,6 +90,7 @@ export class ProductListComponent implements OnInit {
     if (this.priceMin != null && this.priceMax != null && this.priceMin > this.priceMax) {
       this.priceMax = this.priceMin;
     }
+    this.currentPage = 1;
   }
 
   onPriceMaxChange(): void {
@@ -94,14 +100,17 @@ export class ProductListComponent implements OnInit {
     if (this.priceMin != null && this.priceMax != null && this.priceMax < this.priceMin) {
       this.priceMin = this.priceMax;
     }
+    this.currentPage = 1;
   }
 
   onSliderMinChange(value: number): void {
     this.priceMin = value > (this.priceMax ?? this.priceCeil) ? (this.priceMax ?? this.priceCeil) : value;
+    this.currentPage = 1;
   }
 
   onSliderMaxChange(value: number): void {
     this.priceMax = value < (this.priceMin ?? this.priceFloor) ? (this.priceMin ?? this.priceFloor) : value;
+    this.currentPage = 1;
   }
 
   fetchCategories(): void {
@@ -161,12 +170,30 @@ export class ProductListComponent implements OnInit {
     return result;
   }
 
+  get pagedProducts(): ProductDto[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredProducts.slice(start, start + this.pageSize);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+  }
+
+  onCategoryChange(): void {
+    this.currentPage = 1;
+  }
+
+  onSortChange(): void {
+    this.currentPage = 1;
+  }
+
   resetFilters(): void {
     this.searchTerm = '';
     this.selectedCategory = 'all';
     this.priceMin = null;
     this.priceMax = null;
     this.sortBy = 'newest';
+    this.currentPage = 1;
   }
 
   addToCart(product: ProductDto): void {
