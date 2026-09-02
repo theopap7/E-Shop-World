@@ -113,17 +113,18 @@ export class OrderDetailsComponent implements OnInit {
     // ελέγχει αν είμαστε στο admin panel
     this.isAdminPage = this.router.url.startsWith('/admin');
 
-    const idParam = this.route.snapshot.paramMap.get('orderId');
-    const id = Number(idParam);
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const id = Number(params.get('orderId'));
 
-    if (!Number.isFinite(id)) {
-      this.error = 'Μη έγκυρο order id.';
-      this.isLoading = false;
-      return;
-    }
+      if (!Number.isFinite(id)) {
+        this.error = 'Μη έγκυρο order id.';
+        this.isLoading = false;
+        return;
+      }
 
-    this.orderId = id;
-    this.loadDetails();
+      this.orderId = id;
+      this.loadDetails();
+    });
   }
 
   loadDetails(): void {
