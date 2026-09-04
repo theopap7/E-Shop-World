@@ -102,13 +102,19 @@ export class ProductFormComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
 
-    const id = this.route.snapshot.paramMap.get('id');
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const id = params.get('id');
 
-    if (id) {
-      this.isEditMode = true;
-      this.productId = Number(id);
-      this.loadProduct(this.productId);
-    }
+      if (id) {
+        this.isEditMode = true;
+        this.productId = Number(id);
+        this.loadProduct(this.productId);
+      } else {
+        this.isEditMode = false;
+        this.productId = null;
+        this.form.reset({ name: '', description: '', price: 0, stock: 0, category_id: null, image_url: '' });
+      }
+    });
   }
 
   // =========================
