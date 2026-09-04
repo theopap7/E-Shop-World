@@ -232,7 +232,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     const order = rows[0];
 
     const [items] = await db.query(`
-      SELECT p.name, oi.quantity, oi.unit_price
+      SELECT p.name, oi.quantity, oi.unit_price, oi.size
       FROM order_items oi JOIN products p ON oi.product_id = p.id
       WHERE oi.order_id = ?
     `, [orderId]);
@@ -276,8 +276,8 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       ['Χώρα', order.ship_country],
       ['Όροφος', order.floor],
       ['Σημειώσεις', order.ship_notes],
-      ...items.map(({ name, quantity, unit_price }, i) =>
-        [`Προϊόν ${i + 1}`, `${name} x${quantity} (${eur(unit_price)})`]
+      ...items.map(({ name, quantity, unit_price, size }, i) =>
+        [`Προϊόν ${i + 1}`, `${name}${size ? ` (${size})` : ''} x${quantity} (${eur(unit_price)})`]
       ),
       ['Κόστος Προϊόντων', eur(order.subtotal)],
       ['Μεταφορικά', eur(order.shipping_cost)],
