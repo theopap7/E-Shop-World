@@ -390,30 +390,47 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       [orderId]
     );
 
-    const orderItemMap = {};
+    // Aggregate actually purchased quantity per product (an order can have the
+    // same product across multiple order_items rows, e.g. different sizes).
+    const purchasedByProduct = {};
     for (const oi of orderItems) {
-      orderItemMap[oi.product_id] = oi;
+      if (!purchasedByProduct[oi.product_id]) {
+        purchasedByProduct[oi.product_id] = { quantity: 0, unitPrice: Number(oi.unit_price), productName: oi.product_name };
+      }
+      purchasedByProduct[oi.product_id].quantity += oi.quantity;
+    }
+
+    // Aggregate requested quantity per product so duplicate/split lines for the
+    // same product in one request can't each pass validation independently.
+    const requestedByProduct = {};
+    for (const item of items) {
+      const productId = Number(item.productId);
+      const qty = Number(item.quantity);
+      if (!Number.isInteger(productId) || !Number.isInteger(qty) || qty < 1) {
+        await conn.rollback();
+        return res.status(400).json({ success: false, message: 'Μη έγκυρη γραμμή επιστροφής' });
+      }
+      requestedByProduct[productId] = (requestedByProduct[productId] || 0) + qty;
     }
 
     let returnedSubtotal = 0;
     const validatedItems = [];
 
-    for (const item of items) {
-      const productId = Number(item.productId);
-      const qty = Number(item.quantity);
-      const oi = orderItemMap[productId];
+    for (const [productIdStr, totalQty] of Object.entries(requestedByProduct)) {
+      const productId = Number(productIdStr);
+      const purchased = purchasedByProduct[productId];
 
-      if (!oi) {
+      if (!purchased) {
         await conn.rollback();
         return res.status(400).json({ success: false, message: `Προϊόν ${productId} δεν ανήκει σε αυτή την παραγγελία` });
       }
-      if (qty < 1 || qty > oi.quantity) {
+      if (totalQty > purchased.quantity) {
         await conn.rollback();
-        return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${oi.product_name}"` });
+        return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${purchased.productName}"` });
       }
 
-      returnedSubtotal += qty * Number(oi.unit_price);
-      validatedItems.push({ productId, productName: oi.product_name, quantity: qty, unitPrice: Number(oi.unit_price) });
+      returnedSubtotal += totalQty * purchased.unitPrice;
+      validatedItems.push({ productId, productName: purchased.productName, quantity: totalQty, unitPrice: purchased.unitPrice });
     }
 
     // Apply discount proportionally to returned items
