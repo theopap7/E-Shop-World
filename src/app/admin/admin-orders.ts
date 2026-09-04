@@ -139,6 +139,30 @@ export class AdminOrdersComponent implements OnInit {
     this.router.navigate(['/admin/orders', orderId]);
   }
 
+  confirmingPaymentId: number | null = null;
+
+  confirmPayment(orderId: number, event: Event): void {
+    event.stopPropagation();
+    if (this.confirmingPaymentId === orderId) return;
+
+    this.confirmingPaymentId = orderId;
+    this.adminService.confirmPayment(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        if (res.success) {
+          const order = this.orders.find((o) => o.id === orderId);
+          if (order) order.payment_status = 'paid';
+          this.adminService.invalidateStatsCache();
+          this.toastService.success('Η πληρωμή επιβεβαιώθηκε!');
+        }
+        this.confirmingPaymentId = null;
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message || 'Αποτυχία επιβεβαίωσης πληρωμής');
+        this.confirmingPaymentId = null;
+      },
+    });
+  }
+
   statusLabel = statusLabel;
 
 }

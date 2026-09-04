@@ -326,6 +326,17 @@
 }
 .btn-primary{ background: linear-gradient(135deg, #6366f1, #8b5cf6); color:#fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
 .btn-primary:hover{ background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+.btn-outline{ background:#fff; border-color:#e5e7eb; color:#111827; }
+.btn-outline:hover{ background:#f9fafb; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+.confirm-payment-btn{
+  display:block;
+  margin-top:6px;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:8px;
+}
 
 /* Responsive */
 @media (max-width:560px){

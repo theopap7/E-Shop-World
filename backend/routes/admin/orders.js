@@ -9,7 +9,7 @@ router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
     const [rows] = await db.query(
       `SELECT
          o.id, o.total_amount, o.status, o.created_at,
-         o.recipient_name, o.phone, o.payment_status,
+         o.recipient_name, o.phone, o.payment_status, o.payment_method,
          u.email as user_email, u.first_name, u.last_name
        FROM orders o
        LEFT JOIN users u ON u.id = o.user_id
@@ -127,6 +127,15 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
     if (!allowedTransitions[currentStatus].includes(status)) {
       await conn.rollback();
       return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από ${currentStatus} σε ${status}` });
+    }
+
+    // COD auto-marks paid on delivery and card_mock is paid at checkout, but a
+    // bank_transfer order can otherwise reach "delivered" while payment is
+    // still unconfirmed — block that so a later return can't mark it
+    // "refunded" for money that was never actually received.
+    if (status === 'delivered' && paymentMethod === 'bank_transfer' && currentPaymentStatus !== 'paid') {
+      await conn.rollback();
+      return res.status(400).json({ success: false, message: 'Επιβεβαιώστε πρώτα την πληρωμή πριν σημειώσετε την παραγγελία ως παραδομένη' });
     }
 
     if (status === 'delivered' && paymentMethod === 'cod') {
