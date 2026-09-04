@@ -223,6 +223,7 @@ export class OrderDetailsComponent implements OnInit {
         this.toastService.success('Το αίτημα επιστροφής υποβλήθηκε!');
         this.showReturnForm = false;
         this.returnReason = '';
+        this.adminService.invalidateStatsCache();
         this.loadDetails();
         this.isSubmittingReturn = false;
       },

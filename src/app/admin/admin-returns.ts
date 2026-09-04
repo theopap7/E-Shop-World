@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../toast.service';
+import { AdminService } from '../admin.service';
 import { environment } from '../../environments/environment';
 
 interface ReturnItem {
@@ -47,7 +48,7 @@ export class AdminReturnsComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private http: HttpClient, private toastService: ToastService) {}
+  constructor(private http: HttpClient, private toastService: ToastService, private adminService: AdminService) {}
 
   ngOnInit(): void {
     this.loadReturns();
@@ -78,6 +79,7 @@ export class AdminReturnsComponent implements OnInit {
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.toastService.success(res.message);
+        this.adminService.invalidateStatsCache();
         this.loadReturns();
         this.processingId = null;
       },
