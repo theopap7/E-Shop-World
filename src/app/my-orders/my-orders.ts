@@ -5,6 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { OrderService } from '../order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { statusLabel } from '../order-status.util';
 
 type OrderRow = {
@@ -12,14 +13,14 @@ type OrderRow = {
   total_amount: number;
   status: string;
   created_at: string;
-  return_status?: string | null;
+  return_statuses?: ('pending' | 'approved' | 'rejected')[];
 };
 
 
 @Component({
   selector: 'app-my-orders',
   standalone: true,
-  imports: [CommonModule, RouterModule, OrderTimelineComponent, SkeletonComponent],  
+  imports: [CommonModule, RouterModule, OrderTimelineComponent, SkeletonComponent, PaginationComponent],
   templateUrl: './my-orders.html',
   styleUrl: './my-orders.css',
 })
@@ -27,7 +28,14 @@ export class MyOrdersComponent implements OnInit {
   orders: OrderRow[] = [];
   isLoading = true;
   error: string | null = null;
+  currentPage = 1;
+  readonly pageSize = 20;
   private destroyRef = inject(DestroyRef);
+
+  get pagedOrders(): OrderRow[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.orders.slice(start, start + this.pageSize);
+  }
 
   constructor(
     private orderService: OrderService,
@@ -45,6 +53,7 @@ export class MyOrdersComponent implements OnInit {
     this.orderService.getMyOrders().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.orders = res.orders ?? [];
+        this.currentPage = 1;
         this.isLoading = false;
       },
       error: (err) => {

@@ -16,8 +16,9 @@ router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
     );
 
     const [itemRows] = await db.query(
-      `SELECT return_request_id, product_id, product_name, quantity, unit_price
-       FROM return_request_items`
+      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, p.image_url
+       FROM return_request_items rri
+       LEFT JOIN products p ON p.id = rri.product_id`
     );
 
     const itemsByRequest = {};

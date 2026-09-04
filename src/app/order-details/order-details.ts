@@ -8,6 +8,7 @@ import { AdminService } from '../admin.service';
 import { ToastService } from '../toast.service';
 import { CartService } from '../cart.service';
 import { statusLabel } from '../order-status.util';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 type OrderDto = {
   id: number;
@@ -41,6 +42,10 @@ type OrderDto = {
   } | null;
 };
 
+function lineKey(productId: number, size: string | null | undefined): string {
+  return `${productId}::${size || ''}`;
+}
+
 type OrderItemDto = {
   product_id: number;
   product_name: string;
@@ -55,7 +60,7 @@ type OrderItemDto = {
 @Component({
   selector: 'app-order-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ImageUrlPipe],
   templateUrl: './order-details.html',
   styleUrl: './order-details.css',
 })
@@ -77,7 +82,9 @@ export class OrderDetailsComponent implements OnInit {
   showReturnForm = false;
   returnReason = '';
   isSubmittingReturn = false;
-  returnItems: { productId: number; productName: string; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number }[] = [];
+  returnItems: { productId: number; productName: string; size: string | null; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number; blockedStatus: 'approved' | 'rejected' | null }[] = [];
+  returnResolvedByLine: Record<string, 'approved' | 'rejected'> = {};
+  returnRequests: NonNullable<OrderDetailResponse['returnRequests']> = [];
 
   get returnTotal(): number {
     return this.returnItems
@@ -94,7 +101,9 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   get canReturn(): boolean {
-    return !this.isAdminPage && this.order?.status === 'delivered' && !this.order?.return_request;
+    if (this.isAdminPage || this.order?.status !== 'delivered') return false;
+    if (this.order?.return_request?.status === 'pending') return false;
+    return this.items.some(i => !this.returnResolvedByLine[lineKey(i.product_id, i.size)]);
   }
 
   private destroyRef = inject(DestroyRef);
@@ -141,6 +150,11 @@ export class OrderDetailsComponent implements OnInit {
         this.order = res?.order ?? null;
         if (this.order) this.order.return_request = res?.returnRequest ?? null;
         this.items = res?.items ?? [];
+        this.returnResolvedByLine = {};
+        for (const r of res?.returnResolvedItems ?? []) {
+          this.returnResolvedByLine[lineKey(r.product_id, r.size)] = r.status;
+        }
+        this.returnRequests = res?.returnRequests ?? [];
         this.isLoading = false;
       },
       error: (err) => {
@@ -199,12 +213,18 @@ export class OrderDetailsComponent implements OnInit {
     this.returnItems = this.items.map(i => ({
       productId: i.product_id,
       productName: i.product_name,
+      size: i.size ?? null,
       maxQty: i.quantity,
       selectedQty: i.quantity,
       selected: false,
-      unitPrice: i.unit_price
+      unitPrice: i.unit_price,
+      blockedStatus: this.returnResolvedByLine[lineKey(i.product_id, i.size)] ?? null
     }));
     this.showReturnForm = true;
+  }
+
+  blockedStatusLabel(status: 'approved' | 'rejected'): string {
+    return status === 'approved' ? 'Έχει ήδη επιστραφεί' : 'Έχει ήδη απορριφθεί';
   }
 
   submitReturn(): void {
@@ -217,7 +237,7 @@ export class OrderDetailsComponent implements OnInit {
       return;
     }
     this.isSubmittingReturn = true;
-    const items = this.selectedReturnItems.map(i => ({ productId: i.productId, quantity: i.selectedQty }));
+    const items = this.selectedReturnItems.map(i => ({ productId: i.productId, quantity: i.selectedQty, size: i.size }));
     this.orderService.submitReturnRequest(this.orderId, this.returnReason, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Το αίτημα επιστροφής υποβλήθηκε!');

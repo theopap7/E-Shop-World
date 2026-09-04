@@ -104,7 +104,7 @@ CREATE TABLE discount_code_usages (
 
 CREATE TABLE return_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT NOT NULL UNIQUE,
+  order_id INT NOT NULL,
   user_id INT NOT NULL,
   reason TEXT NOT NULL,
   status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
@@ -122,6 +122,7 @@ CREATE TABLE return_request_items (
   product_name VARCHAR(255) NOT NULL,
   quantity INT NOT NULL,
   unit_price DECIMAL(10,2) NOT NULL,
+  size VARCHAR(20) NULL,
   FOREIGN KEY (return_request_id) REFERENCES return_requests(id) ON DELETE CASCADE
 );
 

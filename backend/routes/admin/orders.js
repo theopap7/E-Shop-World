@@ -52,7 +52,8 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
       `SELECT
          oi.product_id, p.name AS product_name,
          oi.quantity, oi.unit_price, oi.size,
-         (oi.quantity * oi.unit_price) AS line_total
+         (oi.quantity * oi.unit_price) AS line_total,
+         p.image_url
        FROM order_items oi
        JOIN products p ON p.id = oi.product_id
        WHERE oi.order_id = ?
@@ -61,12 +62,26 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
     );
 
     const [returnRows] = await db.query(
-      'SELECT * FROM return_requests WHERE order_id = ? LIMIT 1',
+      'SELECT * FROM return_requests WHERE order_id = ? ORDER BY created_at DESC',
       [orderId]
     );
     const returnRequest = returnRows[0] ?? null;
 
-    res.json({ success: true, order, items, returnRequest });
+    const returnItemRows = returnRows.length ? (await db.query(
+      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, p.image_url
+       FROM return_request_items rri
+       LEFT JOIN products p ON p.id = rri.product_id
+       WHERE rri.return_request_id IN (${returnRows.map(() => '?').join(',')})`,
+      returnRows.map(r => r.id)
+    ))[0] : [];
+    const itemsByRequestId = {};
+    for (const item of returnItemRows) {
+      if (!itemsByRequestId[item.return_request_id]) itemsByRequestId[item.return_request_id] = [];
+      itemsByRequestId[item.return_request_id].push(item);
+    }
+    const returnRequestsWithItems = returnRows.map(r => ({ ...r, items: itemsByRequestId[r.id] || [] }));
+
+    res.json({ success: true, order, items, returnRequest, returnRequests: returnRequestsWithItems });
   } catch (error) {
     console.error('Admin order details error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

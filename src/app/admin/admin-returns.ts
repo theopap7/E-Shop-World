@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../toast.service';
 import { AdminService } from '../admin.service';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { environment } from '../../environments/environment';
 
 interface ReturnItem {
@@ -13,6 +14,8 @@ interface ReturnItem {
   product_name: string;
   quantity: number;
   unit_price: number;
+  size?: string | null;
+  image_url?: string | null;
 }
 
 interface ReturnRequest {
@@ -34,7 +37,7 @@ interface ReturnRequest {
 @Component({
   selector: 'app-admin-returns',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ImageUrlPipe],
   templateUrl: './admin-returns.html',
   styleUrl: './admin-returns.css'
 })

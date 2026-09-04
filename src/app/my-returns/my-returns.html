@@ -1,0 +1,94 @@
+<section class="page">
+  <div class="container">
+
+    <a routerLink="/profile" class="back-button">
+      <span>← Πίσω στο προφίλ μου</span>
+    </a>
+
+    <div class="header">
+      <h2 class="page-title">↩ Οι Επιστροφές μου</h2>
+    </div>
+
+    <div *ngIf="isLoading" class="card">Φόρτωση...</div>
+
+    <div *ngIf="!isLoading && error" class="card empty-state">
+      <p>{{ error }}</p>
+    </div>
+
+    <div *ngIf="!isLoading && !error && groups.length === 0" class="card empty-state">
+      <p>Δεν έχεις υποβάλει κανένα αίτημα επιστροφής.</p>
+      <a routerLink="/profile/orders" class="btn btn-outline">Δες τις παραγγελίες σου</a>
+    </div>
+
+    <div *ngIf="!isLoading && !error && groups.length > 0" class="order-groups">
+      <div class="order-group" *ngFor="let g of pagedGroups">
+
+        <div class="order-group-header">
+          <a [routerLink]="'/profile/orders/' + g.orderId" class="order-link">Παραγγελία #{{ g.orderId }}</a>
+        </div>
+
+        <div class="returns-list">
+          <div class="return-card" *ngFor="let r of g.requests">
+
+            <div class="return-header">
+              <div class="return-meta">
+                <span class="return-id">Αίτημα #{{ r.id }}</span>
+                <span class="dot">•</span>
+                <span class="return-date">{{ r.created_at | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <span class="pill"
+                [ngClass]="{
+                  'pill--pending': r.status === 'pending',
+                  'pill--approved': r.status === 'approved',
+                  'pill--rejected': r.status === 'rejected'
+                }">
+                {{ statusLabel(r.status) }}
+              </span>
+            </div>
+
+            <div class="return-body">
+              <div class="info-row">
+                <span class="info-label">Λόγος</span>
+                <span class="return-reason">{{ r.reason }}</span>
+              </div>
+              <div class="info-row" *ngIf="r.items && r.items.length > 0">
+                <span class="info-label">Προϊόντα</span>
+                <div class="return-items">
+                  <div class="return-item" *ngFor="let item of r.items">
+                    <img
+                      [src]="item.image_url | imageUrl"
+                      [alt]="item.product_name"
+                      class="return-item-thumb"
+                      (error)="$any($event.target).src='no-image.svg'"
+                    />
+                    <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
+                    <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | number:'1.2-2' }} € = <strong>{{ (item.quantity * item.unit_price) | number:'1.2-2' }} €</strong></span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row" *ngIf="r.status === 'approved'">
+                <span class="info-label">Επιστροφή</span>
+                <strong style="color:#059669">{{ r.refund_amount | number:'1.2-2' }} €</strong>
+              </div>
+              <div class="info-row" *ngIf="r.admin_note">
+                <span class="info-label">Σχόλιο Διαχειριστή</span>
+                <span>{{ r.admin_note }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <app-pagination
+      *ngIf="!isLoading && !error && groups.length > pageSize"
+      [total]="groups.length"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="currentPage = $event"
+    ></app-pagination>
+
+  </div>
+</section>

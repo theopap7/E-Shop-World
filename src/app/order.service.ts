@@ -58,7 +58,7 @@ export interface OrderSummary {
   total_amount: number;
   status: string;
   created_at: string;
-  return_status?: string | null;
+  return_statuses?: ('pending' | 'approved' | 'rejected')[];
 }
 
 export interface OrderDetailItem {
@@ -106,6 +106,26 @@ export interface OrderDetailResponse {
     admin_note?: string | null;
     created_at: string;
   } | null;
+  returnResolvedItems?: { product_id: number; size: string | null; status: 'approved' | 'rejected' }[];
+  returnRequests?: {
+    id: number;
+    status: 'pending' | 'approved' | 'rejected';
+    reason: string;
+    admin_note?: string | null;
+    created_at: string;
+    items: { product_id: number; product_name: string; quantity: number; unit_price: number; size?: string | null; image_url?: string | null }[];
+  }[];
+}
+
+export interface MyReturnRow {
+  id: number;
+  order_id: number;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  admin_note: string | null;
+  refund_amount: number;
+  created_at: string;
+  items: { product_id: number; product_name: string; quantity: number; unit_price: number; size?: string | null; image_url?: string | null }[];
 }
 
 interface ApiResponse {
@@ -135,11 +155,15 @@ export class OrderService {
     return this.http.get<OrderDetailResponse>(`${this.baseUrl}/admin/orders/${orderId}`);
   }
 
+  getMyReturns(): Observable<{ success: boolean; returns: MyReturnRow[] }> {
+    return this.http.get<{ success: boolean; returns: MyReturnRow[] }>(`${this.baseUrl}/my-returns`);
+  }
+
   cancelOrder(orderId: number): Observable<ApiResponse> {
     return this.http.patch<ApiResponse>(`${this.baseUrl}/orders/${orderId}/cancel`, {});
   }
 
-  submitReturnRequest(orderId: number, reason: string, items: { productId: number; quantity: number }[]): Observable<ApiResponse> {
+  submitReturnRequest(orderId: number, reason: string, items: { productId: number; quantity: number; size?: string | null }[]): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/orders/${orderId}/return`, { reason, items });
   }
 

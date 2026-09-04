@@ -59,12 +59,18 @@
             <span class="info-label">Προϊόντα</span>
             <div class="return-items">
               <div class="return-item" *ngFor="let item of r.items">
-                <span>{{ item.product_name }}</span>
+                <img
+                  [src]="item.image_url | imageUrl"
+                  [alt]="item.product_name"
+                  class="return-item-thumb"
+                  (error)="$any($event.target).src='no-image.svg'"
+                />
+                <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
                 <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | number:'1.2-2' }} € = <strong>{{ (item.quantity * item.unit_price) | number:'1.2-2' }} €</strong></span>
               </div>
             </div>
           </div>
-          <div class="info-row">
+          <div class="info-row" *ngIf="r.status === 'approved'">
             <span class="info-label">Επιστροφή</span>
             <strong style="color:#059669">{{ r.refund_amount | number:'1.2-2' }} €</strong>
           </div>

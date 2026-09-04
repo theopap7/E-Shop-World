@@ -9,6 +9,7 @@ import { ProfileComponent } from './profile.component';
 import { MyOrdersComponent } from './my-orders/my-orders';
 import { OrderDetailsComponent } from './order-details/order-details';
 import { MyReviewsComponent } from './my-reviews/my-reviews';
+import { MyReturnsComponent } from './my-returns/my-returns';
 import { WishlistComponent } from './wishlist/wishlist';
 import { AdminProductsComponent } from './admin/admin-products';
 import { ProductFormComponent } from './admin/product-form';
@@ -109,6 +110,13 @@ export const routes: Routes = [
     component: MyReviewsComponent,
     canActivate: [authGuard],
     data: { breadcrumb: 'Οι Κριτικές μου' }
+  },
+
+  {
+    path: 'profile/returns',
+    component: MyReturnsComponent,
+    canActivate: [authGuard],
+    data: { breadcrumb: 'Οι Επιστροφές μου' }
   },
 
   // ===== ADMIN =====

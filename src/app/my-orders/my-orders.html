@@ -62,7 +62,7 @@
     <!-- ✅ REAL ORDERS -->
     <div *ngIf="!isLoading && !error && orders.length > 0" class="orders-list">
 
-      <div *ngFor="let o of orders" class="order-card clickable-card" (click)="goToOrder(o.id)">
+      <div *ngFor="let o of pagedOrders" class="order-card clickable-card" (click)="goToOrder(o.id)">
 
         <!-- ORDER HEADER -->
         <div class="order-header">
@@ -76,9 +76,9 @@
                 {{ statusLabel(o.status) }}
               </span>
 
-              <span *ngIf="o.return_status === 'pending'" class="return-badge">↩ Αίτημα Επιστροφής</span>
-              <span *ngIf="o.return_status === 'approved'" class="return-badge return-badge--approved">✓ Εγκρίθηκε</span>
-              <span *ngIf="o.return_status === 'rejected'" class="return-badge return-badge--rejected">✕ Απορρίφθηκε</span>
+              <span *ngIf="o.return_statuses?.includes('pending')" class="return-badge">↩ Αίτημα Επιστροφής</span>
+              <span *ngIf="o.return_statuses?.includes('approved')" class="return-badge return-badge--approved">✓ Εγκρίθηκε</span>
+              <span *ngIf="o.return_statuses?.includes('rejected')" class="return-badge return-badge--rejected">✕ Απορρίφθηκε</span>
             </div>
 
             <div class="order-date">
@@ -104,6 +104,14 @@
       </div>
 
     </div>
+
+    <app-pagination
+      *ngIf="!isLoading && !error && orders.length > pageSize"
+      [total]="orders.length"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="currentPage = $event"
+    ></app-pagination>
 
   </div>
 </section>

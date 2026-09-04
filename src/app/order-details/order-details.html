@@ -12,37 +12,41 @@
         </span>
       </a>
 
-      <div class="hero-title">
+      <div class="hero">
 
-        <h2 class="title">Παραγγελία{{ orderId ? ' #' + orderId : '' }}</h2>
+        <div class="hero-title">
 
-    <div class="export-buttons" *ngIf="!isLoading && order">
+          <h2 class="title">Παραγγελία{{ orderId ? ' #' + orderId : '' }}</h2>
 
-        <!-- PDF για όλους -->
-        <button class="btn btn-primary" (click)="downloadPDF(orderId)">
-          📄 Κατέβασμα PDF
-        </button>
+          <div class="meta" *ngIf="order">
+            <span class="meta-text">{{ order.created_at | date:'short' }}</span>
+            <span class="dot">•</span>
 
-        <!-- CSV μόνο για admin -->
-        <button
-          *ngIf="isAdminPage"
-          class="btn btn-secondary"
-          (click)="downloadCSV(orderId)">
-          📊 Κατέβασμα CSV
-        </button>
+            <span
+              class="pill"
+              [ngClass]="'pill--' + order.status"
+            >
+              {{ statusLabel(order.status) }}
+            </span>
 
-    </div>    
+          </div>
 
-        <div class="meta" *ngIf="order">
-          <span class="meta-text">{{ order.created_at | date:'short' }}</span>
-          <span class="dot">•</span>
+        </div>
 
-          <span
-            class="pill"
-            [ngClass]="'pill--' + order.status"
-          >
-            {{ statusLabel(order.status) }}
-          </span>
+        <div class="export-buttons" *ngIf="!isLoading && order">
+
+          <!-- PDF για όλους -->
+          <button class="btn btn-primary" (click)="downloadPDF(orderId)">
+            📄 Κατέβασμα PDF
+          </button>
+
+          <!-- CSV μόνο για admin -->
+          <button
+            *ngIf="isAdminPage"
+            class="btn btn-secondary"
+            (click)="downloadCSV(orderId)">
+            📊 Κατέβασμα CSV
+          </button>
 
         </div>
 
@@ -71,6 +75,57 @@
     <ng-container *ngIf="!isLoading && !error && order">
 
       <div class="grid">
+
+        <!-- Προϊόντα -->
+        <div class="card full">
+
+          <div class="items-header">
+            <h3 class="h3">Προϊόντα</h3>
+            <button
+              *ngIf="!isAdminPage && order.status !== 'cancelled' && items.length > 0"
+              class="btn btn-outline reorder-btn"
+              type="button"
+              (click)="reorderAll()">
+              🔁 Αγόρασε ξανά
+            </button>
+          </div>
+
+          <div *ngIf="items.length === 0" class="muted">
+            Δεν βρέθηκαν προϊόντα.
+          </div>
+
+          <div *ngIf="items.length > 0" class="items">
+
+            <div
+              class="item"
+              *ngFor="let it of items"
+            >
+              <img
+                [src]="it.image_url | imageUrl"
+                [alt]="it.product_name"
+                class="item-thumb"
+                (error)="$any($event.target).src='no-image.svg'"
+              />
+
+              <div>
+                <div class="name">{{ it.product_name }}</div>
+                <div *ngIf="it.size" class="item-size-tag">{{ it.size }}</div>
+                <div class="muted">
+                  Ποσότητα: {{ it.quantity }}
+                  × {{ it.unit_price | number:'1.2-2' }} €
+                </div>
+              </div>
+
+              <div class="line">
+                <span class="line-label">Σύνολο</span>
+                {{ it.line_total | number:'1.2-2' }} €
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
 
         <!-- Στοιχεία Πελάτη (μόνο admin) -->
         <div class="card" *ngIf="isAdminPage && (order.first_name || order.email)">
@@ -139,15 +194,6 @@
 
         </div>
 
-        <!-- Pickup info -->
-        <div class="card" *ngIf="order.shipping_method === 'pickup'">
-          <h3 class="h3">Τρόπος Παραλαβής</h3>
-          <div class="row">
-            <span>Παραλαβή από το κατάστημα</span>
-            <strong>Δωρεάν</strong>
-          </div>
-        </div>
-
         <!-- Αποστολή & Πληρωμή -->
         <div class="card">
 
@@ -156,11 +202,6 @@
           <div class="row">
             <span>Τρόπος αποστολής</span>
             <strong>{{ shippingMethodLabel(order.shipping_method) }}</strong>
-          </div>
-
-          <div class="row">
-            <span>Κόστος μεταφορικών</span>
-            <strong>{{ order.shipping_cost | number:'1.2-2' }} €</strong>
           </div>
 
           <div class="row">
@@ -196,18 +237,6 @@
         <div class="card">
 
           <h3 class="h3">Σύνοψη Παραγγελίας</h3>
-
-          <div class="row">
-            <span>Κατάσταση</span>
-
-            <span
-              class="pill"
-              [ngClass]="'pill--' + order.status"
-            >
-              {{ statusLabel(order.status) }}
-            </span>
-
-          </div>
 
           <div class="row">
             <span>Κόστος Προϊόντων</span>
@@ -259,7 +288,7 @@
                 <p class="return-hint">Έχεις πρόβλημα με την παραγγελία; Υπόβαλε αίτημα επιστροφής.</p>
               </div>
             </div>
-            <div *ngIf="!order.return_request && !showReturnForm">
+            <div *ngIf="canReturn && !showReturnForm">
               <button class="btn btn-warning" (click)="initReturnForm()">
                 ↩ Αίτημα Επιστροφής
               </button>
@@ -267,24 +296,28 @@
           </div>
 
           <!-- Form -->
-          <ng-container *ngIf="!order.return_request">
+          <ng-container *ngIf="canReturn">
             <div *ngIf="showReturnForm" class="return-form">
 
               <p class="return-section-label">Επίλεξε προϊόντα προς επιστροφή:</p>
 
               <div class="return-items-list">
-                <div class="return-item-row" *ngFor="let item of returnItems">
+                <div class="return-item-row" *ngFor="let item of returnItems" [class.return-item-blocked]="item.blockedStatus">
                   <label class="return-item-check">
-                    <input type="checkbox" [(ngModel)]="item.selected" [name]="'sel_' + item.productId" />
+                    <input type="checkbox" [(ngModel)]="item.selected" [name]="'sel_' + item.productId + '_' + item.size" [disabled]="!!item.blockedStatus" />
                     <span class="return-item-name">{{ item.productName }}</span>
+                    <span class="item-size-tag" *ngIf="item.size">{{ item.size }}</span>
                   </label>
-                  <div class="return-item-qty" *ngIf="item.selected">
+                  <span class="pill" [class.pill--delivered]="item.blockedStatus === 'approved'" [class.pill--cancelled]="item.blockedStatus === 'rejected'" *ngIf="item.blockedStatus">
+                    {{ blockedStatusLabel(item.blockedStatus) }}
+                  </span>
+                  <div class="return-item-qty" *ngIf="item.selected && !item.blockedStatus">
                     <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty > 1 ? item.selectedQty - 1 : 1">−</button>
                     <span class="qty-val">{{ item.selectedQty }}</span>
                     <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty < item.maxQty ? item.selectedQty + 1 : item.maxQty">+</button>
                     <span class="return-item-price">{{ (item.selectedQty * item.unitPrice) | number:'1.2-2' }} €</span>
                   </div>
-                  <div class="return-item-qty" *ngIf="!item.selected">
+                  <div class="return-item-qty" *ngIf="!item.selected && !item.blockedStatus">
                     <span class="muted">{{ item.maxQty }} τεμ.</span>
                   </div>
                 </div>
@@ -314,27 +347,41 @@
             </div>
           </ng-container>
 
-          <!-- Status -->
-          <ng-container *ngIf="order.return_request">
-            <div class="return-status-card">
+          <!-- Status: όλα τα requests αυτής της παραγγελίας -->
+          <ng-container *ngIf="returnRequests.length > 0">
+            <div class="return-status-card" *ngFor="let rr of returnRequests" style="margin-top:10px">
               <div class="return-status-row">
                 <span class="return-status-label">Κατάσταση</span>
                 <span class="pill"
                   [ngClass]="{
-                    'pill--pending': order.return_request.status === 'pending',
-                    'pill--delivered': order.return_request.status === 'approved',
-                    'pill--cancelled': order.return_request.status === 'rejected'
+                    'pill--pending': rr.status === 'pending',
+                    'pill--delivered': rr.status === 'approved',
+                    'pill--cancelled': rr.status === 'rejected'
                   }">
-                  {{ returnStatusLabel(order.return_request.status) }}
+                  {{ returnStatusLabel(rr.status) }}
                 </span>
+              </div>
+              <div class="return-status-row return-status-items-row" *ngIf="rr.items && rr.items.length > 0">
+                <span class="return-status-label">Προϊόντα</span>
+                <div class="return-status-items">
+                  <div class="return-status-item" *ngFor="let it of rr.items">
+                    <img
+                      [src]="it.image_url | imageUrl"
+                      [alt]="it.product_name"
+                      class="return-status-item-thumb"
+                      (error)="$any($event.target).src='no-image.svg'"
+                    />
+                    <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container></span>
+                  </div>
+                </div>
               </div>
               <div class="return-status-row">
                 <span class="return-status-label">Λόγος</span>
-                <span>{{ order.return_request.reason }}</span>
+                <span>{{ rr.reason }}</span>
               </div>
-              <div class="return-status-row" *ngIf="order.return_request.admin_note">
+              <div class="return-status-row" *ngIf="rr.admin_note">
                 <span class="return-status-label">Σχόλιο</span>
-                <span>{{ order.return_request.admin_note }}</span>
+                <span>{{ rr.admin_note }}</span>
               </div>
             </div>
           </ng-container>
@@ -342,78 +389,48 @@
         </div>
 
         <!-- Return Request Section (Admin view) -->
-        <div class="card full return-card" *ngIf="isAdminPage && order.return_request">
+        <div class="card full return-card" *ngIf="isAdminPage && returnRequests.length > 0">
           <div class="return-top">
             <div class="return-top-left">
               <span class="return-icon">↩</span>
               <div>
-                <h3 class="h3" style="margin:0 0 4px 0">Αίτημα Επιστροφής</h3>
+                <h3 class="h3" style="margin:0 0 4px 0">Αιτήματα Επιστροφής</h3>
               </div>
             </div>
           </div>
-          <div class="return-status-card">
+          <div class="return-status-card" *ngFor="let rr of returnRequests" style="margin-top:10px">
             <div class="return-status-row">
               <span class="return-status-label">Κατάσταση</span>
               <span class="pill"
-                [class.pill--pending]="order.return_request.status === 'pending'"
-                [class.pill--delivered]="order.return_request.status === 'approved'"
-                [class.pill--cancelled]="order.return_request.status === 'rejected'">
-                {{ returnStatusLabel(order.return_request.status) }}
+                [class.pill--pending]="rr.status === 'pending'"
+                [class.pill--delivered]="rr.status === 'approved'"
+                [class.pill--cancelled]="rr.status === 'rejected'">
+                {{ returnStatusLabel(rr.status) }}
               </span>
+            </div>
+            <div class="return-status-row return-status-items-row" *ngIf="rr.items && rr.items.length > 0">
+              <span class="return-status-label">Προϊόντα</span>
+              <div class="return-status-items">
+                <div class="return-status-item" *ngFor="let it of rr.items">
+                  <img
+                    [src]="it.image_url | imageUrl"
+                    [alt]="it.product_name"
+                    class="return-status-item-thumb"
+                    (error)="$any($event.target).src='no-image.svg'"
+                  />
+                  <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container></span>
+                </div>
+              </div>
             </div>
             <div class="return-status-row">
               <span class="return-status-label">Λόγος</span>
-              <span>{{ order.return_request.reason }}</span>
+              <span>{{ rr.reason }}</span>
             </div>
-            <div class="return-status-row" *ngIf="order.return_request.admin_note">
+            <div class="return-status-row" *ngIf="rr.admin_note">
               <span class="return-status-label">Σχόλιο</span>
-              <span>{{ order.return_request.admin_note }}</span>
+              <span>{{ rr.admin_note }}</span>
             </div>
           </div>
-        </div>
-
-        <!-- Προϊόντα -->
-        <div class="card full">
-
-          <div class="items-header">
-            <h3 class="h3">Προϊόντα</h3>
-            <button
-              *ngIf="!isAdminPage && order.status !== 'cancelled' && items.length > 0"
-              class="btn btn-outline reorder-btn"
-              type="button"
-              (click)="reorderAll()">
-              🔁 Αγόρασε ξανά
-            </button>
-          </div>
-
-          <div *ngIf="items.length === 0" class="muted">
-            Δεν βρέθηκαν προϊόντα.
-          </div>
-
-          <div *ngIf="items.length > 0" class="items">
-
-            <div
-              class="item"
-              *ngFor="let it of items"
-            >
-
-              <div>
-                <div class="name">{{ it.product_name }}</div>
-                <div *ngIf="it.size" class="item-size-tag">{{ it.size }}</div>
-                <div class="muted">
-                  Ποσότητα: {{ it.quantity }}
-                  × {{ it.unit_price | number:'1.2-2' }} €
-                </div>
-              </div>
-
-              <div class="line">
-                {{ it.line_total | number:'1.2-2' }} €
-              </div>
-
-            </div>
-
-          </div>
-
         </div>
 
       </div>

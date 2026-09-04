@@ -272,17 +272,60 @@ router.get('/my-orders', authenticateToken, async (req, res) => {
          o.ship_city, o.ship_zip, o.ship_address1,
          o.shipping_method, o.shipping_cost,
          o.payment_method, o.payment_status,
-         rr.status AS return_status
+         (
+           SELECT GROUP_CONCAT(DISTINCT rr.status)
+           FROM return_requests rr
+           WHERE rr.order_id = o.id
+         ) AS return_statuses
        FROM orders o
-       LEFT JOIN return_requests rr ON rr.order_id = o.id
        WHERE o.user_id = ?
        ORDER BY o.created_at DESC`,
       [userId]
     );
 
-    return res.json({ success: true, orders: rows });
+    const orders = rows.map(r => ({
+      ...r,
+      return_statuses: r.return_statuses ? r.return_statuses.split(',') : []
+    }));
+
+    return res.json({ success: true, orders });
   } catch (error) {
     console.error('My orders error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+router.get('/my-returns', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [returnRows] = await db.query(
+      `SELECT id, order_id, reason, status, admin_note, refund_amount, created_at
+       FROM return_requests
+       WHERE user_id = ?
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    const [itemRows] = await db.query(
+      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, p.image_url
+       FROM return_request_items rri
+       JOIN return_requests rr ON rr.id = rri.return_request_id
+       LEFT JOIN products p ON p.id = rri.product_id
+       WHERE rr.user_id = ?`,
+      [userId]
+    );
+
+    const itemsByRequest = {};
+    for (const item of itemRows) {
+      if (!itemsByRequest[item.return_request_id]) itemsByRequest[item.return_request_id] = [];
+      itemsByRequest[item.return_request_id].push(item);
+    }
+
+    const returns = returnRows.map(r => ({ ...r, items: itemsByRequest[r.id] || [] }));
+    return res.json({ success: true, returns });
+  } catch (error) {
+    console.error('My returns error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -334,12 +377,35 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
     );
 
     const [returnRows] = await db.query(
-      'SELECT id, status, reason, admin_note, created_at FROM return_requests WHERE order_id = ?',
+      'SELECT id, status, reason, admin_note, created_at FROM return_requests WHERE order_id = ? ORDER BY created_at DESC',
       [orderId]
     );
     const returnRequest = returnRows.length ? returnRows[0] : null;
 
-    return res.json({ success: true, order, items, returnRequest });
+    const [resolvedItemRows] = await db.query(
+      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, rr.status, p.image_url
+       FROM return_request_items rri
+       JOIN return_requests rr ON rr.id = rri.return_request_id
+       LEFT JOIN products p ON p.id = rri.product_id
+       WHERE rr.order_id = ?`,
+      [orderId]
+    );
+
+    const itemsByRequestId = {};
+    for (const item of resolvedItemRows) {
+      if (!itemsByRequestId[item.return_request_id]) itemsByRequestId[item.return_request_id] = [];
+      itemsByRequestId[item.return_request_id].push(item);
+    }
+    const returnRequestsWithItems = returnRows.map(r => ({ ...r, items: itemsByRequestId[r.id] || [] }));
+
+    return res.json({
+      success: true,
+      order,
+      items,
+      returnRequest,
+      returnRequests: returnRequestsWithItems,
+      returnResolvedItems: resolvedItemRows.filter(r => r.status === 'approved' || r.status === 'rejected')
+    });
   } catch (error) {
     console.error('Order details error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
@@ -379,58 +445,98 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Μπορείτε να ζητήσετε επιστροφή μόνο για παραδομένες παραγγελίες' });
     }
 
+    const [pendingReturn] = await conn.query(
+      "SELECT id FROM return_requests WHERE order_id = ? AND status = 'pending'",
+      [orderId]
+    );
+    if (pendingReturn.length > 0) {
+      await conn.rollback();
+      return res.status(400).json({ success: false, message: 'Έχετε ήδη ένα εκκρεμές αίτημα επιστροφής για αυτή την παραγγελία' });
+    }
+
     const orderSubtotal = Number(rows[0].subtotal);
     const orderDiscountAmount = Number(rows[0].discount_amount);
     const orderTotalAmount = Number(rows[0].total_amount);
 
     const [orderItems] = await conn.query(
-      `SELECT oi.product_id, oi.quantity, oi.unit_price, p.name AS product_name
+      `SELECT oi.product_id, oi.size, oi.quantity, oi.unit_price, p.name AS product_name
        FROM order_items oi JOIN products p ON p.id = oi.product_id
        WHERE oi.order_id = ?`,
       [orderId]
     );
 
-    // Aggregate actually purchased quantity per product (an order can have the
-    // same product across multiple order_items rows, e.g. different sizes).
-    const purchasedByProduct = {};
+    // Key by product+size, not just product_id — an order can have the same
+    // product in multiple sizes, and each size is a physically distinct line
+    // that must be validated/blocked independently of the others.
+    const lineKey = (productId, size) => `${productId}::${size || ''}`;
+
+    const purchasedByLine = {};
     for (const oi of orderItems) {
-      if (!purchasedByProduct[oi.product_id]) {
-        purchasedByProduct[oi.product_id] = { quantity: 0, unitPrice: Number(oi.unit_price), productName: oi.product_name };
+      const key = lineKey(oi.product_id, oi.size);
+      if (!purchasedByLine[key]) {
+        purchasedByLine[key] = { productId: oi.product_id, size: oi.size || null, quantity: 0, unitPrice: Number(oi.unit_price), productName: oi.product_name };
       }
-      purchasedByProduct[oi.product_id].quantity += oi.quantity;
+      purchasedByLine[key].quantity += oi.quantity;
     }
 
-    // Aggregate requested quantity per product so duplicate/split lines for the
-    // same product in one request can't each pass validation independently.
-    const requestedByProduct = {};
+    // Aggregate requested quantity per (product, size) so duplicate/split lines
+    // for the same line in one request can't each pass validation independently.
+    const requestedByLine = {};
     for (const item of items) {
       const productId = Number(item.productId);
       const qty = Number(item.quantity);
+      const size = item.size ? String(item.size) : null;
       if (!Number.isInteger(productId) || !Number.isInteger(qty) || qty < 1) {
         await conn.rollback();
         return res.status(400).json({ success: false, message: 'Μη έγκυρη γραμμή επιστροφής' });
       }
-      requestedByProduct[productId] = (requestedByProduct[productId] || 0) + qty;
+      const key = lineKey(productId, size);
+      requestedByLine[key] = (requestedByLine[key] || 0) + qty;
+    }
+
+    // Lines already resolved (approved or rejected) in a past return request
+    // for this order stay permanently blocked from being requested again —
+    // approved means it was already refunded, rejected means the admin already
+    // decided against it for that specific product+size.
+    const [resolvedRows] = await conn.query(
+      `SELECT rri.product_id, rri.size, rr.status
+       FROM return_request_items rri
+       JOIN return_requests rr ON rr.id = rri.return_request_id
+       WHERE rr.order_id = ? AND rr.status IN ('approved', 'rejected')`,
+      [orderId]
+    );
+    const resolvedStatusByLine = {};
+    for (const r of resolvedRows) {
+      resolvedStatusByLine[lineKey(r.product_id, r.size)] = r.status;
     }
 
     let returnedSubtotal = 0;
     const validatedItems = [];
 
-    for (const [productIdStr, totalQty] of Object.entries(requestedByProduct)) {
-      const productId = Number(productIdStr);
-      const purchased = purchasedByProduct[productId];
+    for (const [key, totalQty] of Object.entries(requestedByLine)) {
+      const purchased = purchasedByLine[key];
 
       if (!purchased) {
         await conn.rollback();
-        return res.status(400).json({ success: false, message: `Προϊόν ${productId} δεν ανήκει σε αυτή την παραγγελία` });
+        return res.status(400).json({ success: false, message: 'Μία από τις γραμμές επιστροφής δεν ανήκει σε αυτή την παραγγελία' });
+      }
+      const sizeSuffix = purchased.size ? ` (${purchased.size})` : '';
+      const resolvedStatus = resolvedStatusByLine[key];
+      if (resolvedStatus === 'approved') {
+        await conn.rollback();
+        return res.status(400).json({ success: false, message: `Το προϊόν "${purchased.productName}${sizeSuffix}" έχει ήδη επιστραφεί` });
+      }
+      if (resolvedStatus === 'rejected') {
+        await conn.rollback();
+        return res.status(400).json({ success: false, message: `Το αίτημα επιστροφής για το προϊόν "${purchased.productName}${sizeSuffix}" έχει ήδη απορριφθεί` });
       }
       if (totalQty > purchased.quantity) {
         await conn.rollback();
-        return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${purchased.productName}"` });
+        return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${purchased.productName}${sizeSuffix}"` });
       }
 
       returnedSubtotal += totalQty * purchased.unitPrice;
-      validatedItems.push({ productId, productName: purchased.productName, quantity: totalQty, unitPrice: purchased.unitPrice });
+      validatedItems.push({ productId: purchased.productId, productName: purchased.productName, size: purchased.size, quantity: totalQty, unitPrice: purchased.unitPrice });
     }
 
     // Apply discount proportionally to returned items
@@ -448,8 +554,8 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
 
     for (const item of validatedItems) {
       await conn.query(
-        'INSERT INTO return_request_items (return_request_id, product_id, product_name, quantity, unit_price) VALUES (?, ?, ?, ?, ?)',
-        [returnRequestId, item.productId, item.productName, item.quantity, item.unitPrice]
+        'INSERT INTO return_request_items (return_request_id, product_id, product_name, quantity, unit_price, size) VALUES (?, ?, ?, ?, ?, ?)',
+        [returnRequestId, item.productId, item.productName, item.quantity, item.unitPrice, item.size]
       );
     }
 
@@ -457,9 +563,6 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     return res.json({ success: true, message: 'Το αίτημα επιστροφής υποβλήθηκε επιτυχώς' });
   } catch (error) {
     if (conn) await conn.rollback();
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ success: false, message: 'Έχετε ήδη υποβάλει αίτημα επιστροφής για αυτή την παραγγελία' });
-    }
     console.error('Return request error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   } finally {
@@ -556,7 +659,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     const order = orders[0];
 
     const [items] = await db.query(`
-      SELECT oi.quantity, oi.unit_price AS price, p.name AS title
+      SELECT oi.quantity, oi.unit_price AS price, oi.size, p.name AS title
       FROM order_items oi
       JOIN products p ON oi.product_id = p.id
       WHERE oi.order_id = ?
@@ -628,8 +731,9 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     doc.moveTo(50, tableY - 5).lineTo(550, tableY - 5).stroke();
 
     doc.font('Roboto').fontSize(12);
-    items.forEach(({ title, quantity, price }) => {
-      doc.text(title, cols.product, tableY)
+    items.forEach(({ title, quantity, price, size }) => {
+      const label = size ? `${title} (${size})` : title;
+      doc.text(label, cols.product, tableY, { width: 260 })
         .text(quantity.toString(), cols.qty, tableY, { width: 60, align: 'right' })
         .text(`€${Number(price).toFixed(2)}`, cols.price, tableY, { width: 60, align: 'right' })
         .text(`€${(quantity * price).toFixed(2)}`, cols.total, tableY, { width: 60, align: 'right' });
