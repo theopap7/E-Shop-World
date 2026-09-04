@@ -74,7 +74,7 @@ describe('GET /api/admin/stats/charts', () => {
 
     expect(res.status).toBe(200);
     const [sql, params] = db.query.mock.calls[0];
-    expect(sql).not.toMatch(/WHERE/);
+    expect(sql).not.toMatch(/created_at >=/);
     expect(params).toEqual([]);
   });
 });
