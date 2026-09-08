@@ -152,7 +152,6 @@
           Τραπεζική κατάθεση
         </label>
 
-        <!-- Bank transfer -->
         <div *ngIf="form.get('paymentMethod')?.value === 'bank_transfer'"
              formGroupName="paymentDetails"
              style="margin-top: 10px;">
@@ -166,7 +165,6 @@
           </small>
         </div>
 
-        <!-- Card mock -->
         <div *ngIf="form.get('paymentMethod')?.value === 'card_mock'"
              formGroupName="paymentDetails"
              style="margin-top: 10px;">

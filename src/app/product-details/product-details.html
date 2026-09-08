@@ -1,24 +1,18 @@
 <section class="page">
   <div class="container">
 
-
-
-    <!-- Back button -->
     <a routerLink="/dashboard" class="back-button">
       <span class="back-icon">←</span>
       <span>Πίσω στο κατάστημα</span>
     </a>
 
-    <!-- ✅ LOADING SKELETON -->
     <div *ngIf="isLoading" class="product-detail-skeleton">
       <div class="skeleton-layout">
 
-        <!-- Image Skeleton -->
         <div class="skeleton-image-section">
           <app-skeleton type="image" height="400px"></app-skeleton>
         </div>
 
-        <!-- Info Skeleton -->
         <div class="skeleton-info-section">
           <app-skeleton type="title" width="300px"></app-skeleton>
 
@@ -38,15 +32,12 @@
       </div>
     </div>
 
-    <!-- Error state -->
     <div *ngIf="!isLoading && error" class="error-card">
       <p>{{ error }}</p>
     </div>
 
-    <!-- ✅ REAL PRODUCT -->
     <div *ngIf="!isLoading && !error && product" class="product-detail">
 
-      <!-- Left: Image Gallery -->
       <div class="product-image-wrap">
         <img
           [src]="(activeImageUrl || product.image_url) | imageUrl"
@@ -74,7 +65,6 @@
         </div>
       </div>
 
-      <!-- Right: Info -->
       <div class="product-info">
 
         <span class="badge">
@@ -101,7 +91,6 @@
           {{ product.description || 'Δεν υπάρχει περιγραφή.' }}
         </p>
 
-        <!-- Size selector (only for clothing) -->
         <div class="size-selector" *ngIf="sizes.length > 0">
           <label class="size-label">
             Μέγεθος
@@ -149,7 +138,6 @@
 
     </div>
 
-    <!-- Related Products -->
     <div class="related-products" *ngIf="!isLoading && relatedProducts.length > 0">
       <h2 class="related-title">Σχετικά Προϊόντα</h2>
       <div class="related-grid">
@@ -169,7 +157,6 @@
       </div>
     </div>
 
-    <!-- Recently Viewed -->
     <div class="related-products" *ngIf="!isLoading && recentlyViewed.length > 0">
       <h2 class="related-title">Είδες Πρόσφατα</h2>
       <div class="related-grid">
@@ -189,7 +176,6 @@
       </div>
     </div>
 
-    <!-- Reviews -->
     <app-reviews
       *ngIf="!isLoading && product"
       [productId]="product.id">

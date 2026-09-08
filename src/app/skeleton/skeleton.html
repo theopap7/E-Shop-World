@@ -1,6 +1,5 @@
 <div class="skeleton-wrapper" [ngClass]="{ 'skeleton-wrapper--grid': type === 'card' }">
 
-  <!-- CARD -->
   <ng-container *ngIf="type === 'card'">
     <div
       class="skeleton-card skeleton-item"
@@ -23,7 +22,6 @@
     </div>
   </ng-container>
 
-  <!-- TEXT -->
   <ng-container *ngIf="type === 'text'">
     <div
       class="skeleton-line"
@@ -33,7 +31,6 @@
     </div>
   </ng-container>
 
-  <!-- TITLE -->
   <ng-container *ngIf="type === 'title'">
     <div
       class="skeleton-line skeleton-title-large"
@@ -43,7 +40,6 @@
     </div>
   </ng-container>
 
-  <!-- IMAGE -->
   <ng-container *ngIf="type === 'image'">
     <div
       class="skeleton-image-box"
@@ -53,7 +49,6 @@
     </div>
   </ng-container>
 
-  <!-- CIRCLE -->
   <ng-container *ngIf="type === 'circle'">
     <div
       class="skeleton-circle"

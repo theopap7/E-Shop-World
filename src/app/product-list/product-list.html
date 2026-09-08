@@ -3,10 +3,8 @@
     <h2>Προϊόντα</h2>
   </div>
 
-  <!-- Filters Bar -->
   <div class="filters-bar">
 
-    <!-- Search -->
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input
@@ -25,7 +23,6 @@
       </button>
     </div>
 
-    <!-- Category -->
     <select class="filter-select" [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()">
       <option value="all">Όλες οι κατηγορίες</option>
       <option *ngFor="let cat of categories" [value]="cat.name">
@@ -33,7 +30,6 @@
       </option>
     </select>
 
-    <!-- Price Range -->
     <div class="price-wrap">
       <div class="price-inputs">
         <div class="price-input-group">
@@ -89,7 +85,6 @@
       </div>
     </div>
 
-    <!-- Sort -->
     <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
       <option value="newest">Νεότερα πρώτα</option>
       <option value="price_asc">Τιμή: Χαμηλή → Υψηλή</option>
@@ -97,7 +92,6 @@
       <option value="name_asc">Όνομα: Α → Ω</option>
     </select>
 
-    <!-- Reset -->
     <button
       class="btn-outline reset-btn"
       type="button"
@@ -106,7 +100,6 @@
     </button>
   </div>
 
-  <!-- Results count -->
   <div class="results-info" *ngIf="!isLoading && !errorMessage">
     <span>{{ filteredProducts.length }} προϊόντα βρέθηκαν</span>
     <span *ngIf="filteredProducts.length !== allProducts.length" class="filter-active">
@@ -114,12 +107,10 @@
     </span>
   </div>
 
-  <!-- ✅ LOADING SKELETONS -->
   <div *ngIf="isLoading" class="grid">
     <app-skeleton type="card" [count]="6"></app-skeleton>
   </div>
 
-  <!-- Error -->
   <div *ngIf="!isLoading && errorMessage" class="error">
     {{ errorMessage }}
     <button class="btn-outline" type="button" (click)="fetchProducts()">
@@ -127,7 +118,6 @@
     </button>
   </div>
 
-  <!-- Empty -->
   <div *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0" class="empty">
     <p>😕 Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα.</p>
     <button class="btn-outline" type="button" (click)="resetFilters()">
@@ -135,7 +125,6 @@
     </button>
   </div>
 
-  <!-- Products -->
   <div *ngIf="!isLoading && !errorMessage && filteredProducts.length > 0" class="grid">
 
     <article
@@ -151,7 +140,6 @@
         [attr.aria-label]="isInWishlist(p.id) ? 'Αφαίρεση από αγαπημένα' : 'Προσθήκη στα αγαπημένα'">
         <span class="heart-icon">{{ isInWishlist(p.id) ? '❤️' : '🤍' }}</span>
       </button>
-
 
       <div class="image-wrap">
         <img
@@ -207,7 +195,6 @@
             </button>
           </div>
         </div>
-
 
       </div>
 

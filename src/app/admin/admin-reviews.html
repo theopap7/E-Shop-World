@@ -1,7 +1,6 @@
 <section class="page">
   <div class="container">
 
-    <!-- Header -->
     <header class="header">
       <div class="header-left">
   
@@ -16,7 +15,6 @@
       </div>
     </header>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="panel">
       <div class="panel-title">Φόρτωση κριτικών...</div>
       <div class="skeleton-lines">
@@ -26,7 +24,6 @@
       </div>
     </div>
 
-    <!-- Error -->
     <div *ngIf="!isLoading && error" class="panel alert alert-error">
       <div class="alert-text">{{ error }}</div>
       <button class="btn btn-primary" type="button" (click)="loadReviews()">
@@ -34,14 +31,12 @@
       </button>
     </div>
 
-    <!-- Empty -->
     <div *ngIf="!isLoading && !error && reviews.length === 0" class="panel empty">
       <div class="empty-icon">📝</div>
       <h3>Δεν υπάρχουν κριτικές ακόμα</h3>
       <p>Όταν οι χρήστες αφήσουν κριτικές, θα εμφανιστούν εδώ.</p>
     </div>
 
-    <!-- Table -->
     <div *ngIf="!isLoading && !error && reviews.length > 0" class="panel table-wrap">
       <table class="table">
         <thead>
@@ -58,7 +53,6 @@
         <tbody>
           <tr *ngFor="let review of pagedReviews">
 
-            <!-- Product -->
             <td>
               <div class="product-cell">
                 <div class="thumb">
@@ -79,7 +73,6 @@
               </div>
             </td>
 
-            <!-- User -->
             <td>
               <div class="user-cell">
                 <div class="user-name">{{ review.first_name }} {{ review.last_name }}</div>
@@ -87,7 +80,6 @@
               </div>
             </td>
 
-            <!-- Rating -->
             <td>
               <div class="rating-cell">
                 <span class="stars">{{ getStars(review.rating) }}</span>
@@ -95,14 +87,12 @@
               </div>
             </td>
 
-            <!-- Comment -->
             <td>
               <div class="comment-cell" [class.is-empty]="!review.comment">
                 {{ review.comment || '—' }}
               </div>
             </td>
 
-            <!-- Date -->
             <td>
               <div class="date-cell">
                 <div>{{ review.created_at | date:'dd/MM/yyyy' }}</div>
@@ -110,7 +100,6 @@
               </div>
             </td>
 
-            <!-- Actions -->
             <td class="right">
               <button
                 class="icon-btn danger"

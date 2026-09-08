@@ -134,7 +134,6 @@ export class AdminOrdersComponent implements OnInit {
     });
   }
 
-  // 🔵 CLICKABLE ROW NAVIGATION
   goToOrder(orderId: number): void {
     this.router.navigate(['/admin/orders', orderId]);
   }

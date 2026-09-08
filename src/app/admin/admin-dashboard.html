@@ -1,7 +1,6 @@
 <section class="page">
   <div class="container">
 
-    <!-- Header -->
     <header class="header">
       <div class="header-left">
         <div class="kicker">Διαχείριση</div>
@@ -16,7 +15,6 @@
       </div>
     </header>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="panel">
       <div class="panel-title">Φόρτωση...</div>
       <div class="skeleton-lines">
@@ -26,7 +24,6 @@
       </div>
     </div>
 
-    <!-- Error -->
     <div *ngIf="!isLoading && error" class="panel alert alert-error">
       <div class="alert-text">{{ error }}</div>
       <button class="btn btn-primary" type="button" (click)="loadDashboard()">
@@ -34,10 +31,8 @@
       </button>
     </div>
 
-    <!-- Content -->
     <ng-container *ngIf="!isLoading && !error && stats">
 
-      <!-- Γρήγορες Ενέργειες -->
       <div class="section">
         <div class="section-head">
           <h2 class="section-title">Γρήγορες Ενέργειες</h2>
@@ -109,7 +104,6 @@
         </div>
       </div>
 
-      <!-- Στατιστικά -->
       <div class="section">
         <div class="section-head">
           <h2 class="section-title">Επισκόπηση Καταστήματος</h2>
@@ -155,7 +149,6 @@
         </div>
       </div>
 
-      <!-- Charts -->
       <div class="section">
         <div class="section-head">
           <div>

@@ -18,7 +18,6 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
   styleUrl: './product-form.css',
 })
 export class ProductFormComponent implements OnInit {
-
   form: FormGroup;
 
   isEditMode = false;
@@ -87,7 +86,6 @@ export class ProductFormComponent implements OnInit {
     private http: HttpClient,
     private toastService: ToastService
   ) {
-
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
@@ -96,7 +94,6 @@ export class ProductFormComponent implements OnInit {
       category_id: [null],
       image_url: [''],
     });
-
   }
 
   ngOnInit(): void {
@@ -117,36 +114,23 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  // =========================
-  // LOAD DATA
-  // =========================
-
   loadCategories(): void {
-
     this.http.get<{ success: boolean; categories: Category[] }>(`${environment.apiUrl}/categories`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-
       next: (res) => {
         if (res.success) {
           this.categories = res.categories;
         }
       },
-
       error: () => {},
-
     });
-
   }
 
   loadProduct(id: number): void {
-
     this.isLoading = true;
 
     this.adminService.getProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-
       next: (res) => {
-
         if (res.success) {
-
           const p = res.product;
 
           this.form.patchValue({
@@ -168,22 +152,14 @@ export class ProductFormComponent implements OnInit {
 
         this.isLoading = false;
       },
-
       error: () => {
         this.error = 'Σφάλμα φόρτωσης προϊόντος';
         this.isLoading = false;
       }
-
     });
-
   }
 
-  // =========================
-  // SAVE PRODUCT
-  // =========================
-
   submit(): void {
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -203,9 +179,7 @@ export class ProductFormComponent implements OnInit {
       : this.adminService.createProduct(productData);
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-
       next: (res) => {
-
         if (res.success) {
           this.toastService.success(this.isEditMode ? 'Προϊόν ενημερώθηκε!' : 'Προϊόν δημιουργήθηκε!');
           this.router.navigate(['/admin/products']);
@@ -213,19 +187,12 @@ export class ProductFormComponent implements OnInit {
 
         this.isLoading = false;
       },
-
       error: (err) => {
         this.error = err?.error?.message || 'Σφάλμα αποθήκευσης προϊόντος';
         this.isLoading = false;
       }
-
     });
-
   }
-
-  // =========================
-  // DRAG & DROP
-  // =========================
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
@@ -238,54 +205,31 @@ export class ProductFormComponent implements OnInit {
   }
 
   onDrop(event: DragEvent) {
-
     event.preventDefault();
     this.isDragging = false;
 
     const file = event.dataTransfer?.files?.[0];
-
     if (!file) return;
 
     this.handleFile(file);
-
   }
-
-  // =========================
-  // FILE SELECT
-  // =========================
 
   onFileSelected(event: Event): void {
-
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-
     if (!file) return;
 
     this.handleFile(file);
-
   }
 
-  // =========================
-  // HANDLE FILE
-  // =========================
-
   handleFile(file: File) {
-
-    const allowedTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/gif',
-      'image/webp'
-    ];
-
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       this.uploadError = 'Μόνο εικόνες επιτρέπονται (JPG, PNG, GIF, WEBP)';
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
-
     if (file.size > maxSize) {
       this.uploadError = 'Η εικόνα πρέπει να είναι μικρότερη από 5MB';
       return;
@@ -295,23 +239,15 @@ export class ProductFormComponent implements OnInit {
     this.uploadError = '';
 
     const reader = new FileReader();
-
     reader.onload = () => {
       this.imagePreview = String(reader.result || '');
     };
-
     reader.readAsDataURL(file);
 
     this.uploadImage();
-
   }
 
-  // =========================
-  // UPLOAD IMAGE
-  // =========================
-
   uploadImage(): void {
-
     if (!this.selectedFile) return;
 
     this.uploading = true;
@@ -324,35 +260,21 @@ export class ProductFormComponent implements OnInit {
       `${environment.apiUrl}/upload-image`,
       formData
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-
       next: (res) => {
-
         if (res?.success) {
-
           this.form.get('image_url')?.setValue(res.imageUrl);
-
         } else {
-
-          this.uploadError = res?.message || 'Upload failed';
-
+          this.uploadError = res?.message || 'Ανέβασμα απέτυχε';
         }
 
         this.uploading = false;
-
       },
-
       error: (err) => {
         this.uploadError = err?.error?.message || 'Σφάλμα ανεβάσματος εικόνας';
         this.uploading = false;
       }
-
     });
-
   }
-
-  // =========================
-  // GALLERY IMAGES
-  // =========================
 
   loadGalleryImages(productId: number): void {
     this.http.get<{ success: boolean; images: ProductImage[] }>(
@@ -422,29 +344,15 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  // =========================
-  // REMOVE IMAGE
-  // =========================
-
   removeImage(): void {
-
     this.form.get('image_url')?.setValue('');
-
     this.imagePreview = '';
     this.selectedFile = null;
     this.uploadError = '';
-
   }
-
-  // =========================
-  // IMAGE FALLBACK
-  // =========================
 
   onImgError(event: Event) {
-
     const img = event.target as HTMLImageElement;
     img.src = 'no-image.svg';
-
   }
-
 }

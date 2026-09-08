@@ -7,7 +7,6 @@
         </a>
       </div>
 
-      <!-- Header -->
       <div class="page-header">
         <h2>🎟️ Κωδικοί Έκπτωσης</h2>
         <button class="btn btn-primary" type="button" (click)="openCreateModal()">
@@ -15,12 +14,10 @@
         </button>
       </div>  
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="card">
       Φόρτωση...
     </div>
 
-    <!-- Codes List -->
     <div *ngIf="!isLoading" class="card table-wrap">
 
       <div *ngIf="codes.length === 0" class="empty-state">
@@ -121,7 +118,6 @@
   </div>
 </section>
 
-<!-- MODAL -->
 <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
 

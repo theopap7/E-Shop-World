@@ -61,7 +61,6 @@ export class BreadcrumbService {
       return breadcrumbs;
     }
  
-    // ===== ADMIN ROUTES =====
     if (segments[0] === 'admin') {
       breadcrumbs.push({
         label: 'Διαχείριση',
@@ -126,7 +125,6 @@ export class BreadcrumbService {
       return breadcrumbs;
     }
  
-    // ===== PROFILE ROUTES =====
     if (segments[0] === 'profile') {
       breadcrumbs.push({
         label: 'Προφίλ',
@@ -159,7 +157,6 @@ export class BreadcrumbService {
       return breadcrumbs;
     }
  
-    // ===== CART & CHECKOUT =====
     if (segments[0] === 'cart') {
       breadcrumbs.push({
         label: 'Καλάθι',
@@ -183,7 +180,6 @@ export class BreadcrumbService {
       return breadcrumbs;
     }
  
-    // ===== WISHLIST =====
     if (segments[0] === 'wishlist') {
       breadcrumbs.push({
         label: 'Αγαπημένα',
@@ -193,7 +189,6 @@ export class BreadcrumbService {
       return breadcrumbs;
     }
  
-    // ===== PRODUCT DETAILS =====
     if (segments[0] === 'products' && segments[1]) {
       breadcrumbs.push({
         label: 'Προϊόντα',

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-// ===== TYPES =====
-
 // Toast Type: Καθορίζει το στυλ (success/error/info/warning)
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -13,7 +11,6 @@ export interface Toast {
   message: string;      // Το μήνυμα που θα δει ο user
   duration?: number;    // Πόσο θα μείνει (ms), default 3000
 }
-// ===== SERVICE =====
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {

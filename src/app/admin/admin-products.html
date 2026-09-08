@@ -1,7 +1,6 @@
 <section class="page">
   <div class="container">
 
-    <!-- Header -->
     <header class="header">
       <div class="header-left">
        
@@ -20,7 +19,6 @@
       </div>
     </header>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="panel">
       <div class="panel-title">Φόρτωση προϊόντων...</div>
       <div class="skeleton-lines">
@@ -30,7 +28,6 @@
       </div>
     </div>
 
-    <!-- Error -->
     <div *ngIf="!isLoading && error" class="panel alert alert-error">
       <div class="alert-text">{{ error }}</div>
       <button class="btn btn-primary" type="button" (click)="loadProducts()">
@@ -38,10 +35,8 @@
       </button>
     </div>
 
-    <!-- Content -->
     <div *ngIf="!isLoading && !error" class="panel">
 
-      <!-- Empty -->
       <div *ngIf="products.length === 0" class="empty">
         <div class="empty-icon">📦</div>
         <h3>Δεν βρέθηκαν προϊόντα</h3>
@@ -51,7 +46,6 @@
         </a>
       </div>
 
-      <!-- Table -->
       <div *ngIf="products.length > 0" class="table-wrap">
         <table class="table">
           <thead>

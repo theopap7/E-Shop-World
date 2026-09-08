@@ -1,7 +1,6 @@
 <section class="page">
   <div class="container">
 
-    <!-- Header -->
     <header class="header">
       <div class="header-left">     
         <h1 class="page-title">Παραγγελίες</h1>      
@@ -14,7 +13,6 @@
       </div>
     </header>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="panel">
       <div class="panel-title">Φόρτωση παραγγελιών...</div>
       <div class="skeleton-lines">
@@ -24,7 +22,6 @@
       </div>
     </div>
 
-    <!-- Error -->
     <div *ngIf="!isLoading && error" class="panel alert alert-error">
       <div class="alert-text">{{ error }}</div>
       <button class="btn btn-primary" type="button" (click)="loadOrders()">
@@ -32,10 +29,8 @@
       </button>
     </div>
 
-    <!-- Content -->
     <div *ngIf="!isLoading && !error" class="panel">
 
-      <!-- Search -->
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
         <input
@@ -48,7 +43,6 @@
         <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''">✕</button>
       </div>
 
-      <!-- Status Tabs -->
       <div class="status-tabs">
         <button
           *ngFor="let f of filters"
@@ -158,7 +152,6 @@
                 </button>
               </td>
 
-              <!-- Actions -->
               <td class="right">
 
                 <div

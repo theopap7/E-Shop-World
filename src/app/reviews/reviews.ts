@@ -79,8 +79,6 @@ export class ReviewsComponent implements OnInit {
     });
   }
 
-  // ===== NEW REVIEW METHODS =====
-  
   setRating(rating: number): void {
     this.newRating = rating;
   }
@@ -132,8 +130,6 @@ export class ReviewsComponent implements OnInit {
       }
     });
   }
-
-  // ===== EDIT REVIEW METHODS =====
 
   startEdit(review: Review): void {
     this.editingReviewId = review.id;
@@ -198,8 +194,6 @@ export class ReviewsComponent implements OnInit {
     });
   }
 
-  // ===== DELETE REVIEW =====
-
   deleteReview(reviewId: number): void {
     if (!confirm('Διαγραφή κριτικής;')) return;
 
@@ -214,8 +208,6 @@ export class ReviewsComponent implements OnInit {
       }
     });
   }
-
-  // ===== HELPERS =====
 
   get starsArray(): number[] {
     return [1, 2, 3, 4, 5];

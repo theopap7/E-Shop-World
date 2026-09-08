@@ -6,20 +6,16 @@
       <span>Πίσω στο κατάστημα</span>
     </a>
 
-    <!-- Page Header -->
     <div class="page-header">
       <h2>👤 Το Προφίλ μου</h2>
     </div>
 
-    <!-- Loading State -->
     <div *ngIf="loading" class="loading">
       Φόρτωση...
     </div>
 
-    <!-- Profile Content -->
     <div *ngIf="!loading && user" class="profile-layout">
 
-      <!-- Left: Profile Card -->
       <div class="profile-card">
 
         <div class="avatar">
@@ -38,10 +34,8 @@
 
       </div>
 
-      <!-- Right Column -->
       <div class="profile-actions">
 
-        <!-- Quick Actions -->
         <div class="actions-section">
           <h3 class="section-title">Γρήγορες Ενέργειες</h3>
 
@@ -93,7 +87,6 @@
           </a>
         </div>
 
-        <!-- Edit Profile Section -->
         <div class="edit-profile-section">
           <div class="section-header">
             <div>
@@ -103,7 +96,6 @@
             <span class="section-icon">✏️</span>
           </div>
 
-          <!-- View mode -->
           <div *ngIf="!editMode" class="profile-info">
             <div class="profile-info-row">
               <span class="info-label">Όνομα</span>
@@ -133,7 +125,6 @@
             </button>
           </div>
 
-          <!-- Edit mode -->
           <form *ngIf="editMode" class="edit-form">
             <div class="form-row">
               <div class="form-group">
@@ -189,7 +180,6 @@
           </form>
         </div>
 
-        <!-- Password Change Section -->
         <div class="password-section">
           <div class="section-header">
             <div>
@@ -201,7 +191,6 @@
 
           <form class="password-form">
 
-            <!-- Current Password -->
             <div class="form-group">
               <label class="form-label">
                 Τρέχων κωδικός
@@ -225,7 +214,6 @@
               </div>
             </div>
 
-            <!-- New Password -->
             <div class="form-group">
               <label class="form-label">
                 Νέος κωδικός
@@ -249,7 +237,6 @@
               </div>
             </div>
 
-            <!-- Confirm Password -->
             <div class="form-group">
               <label class="form-label">
                 Επιβεβαίωση νέου κωδικού
@@ -279,7 +266,6 @@
               </p>
             </div>
 
-            <!-- Submit -->
             <button
               class="btn btn-primary btn-block"
               type="button"
@@ -298,7 +284,6 @@
           </form>
         </div>
 
-        <!-- Logout -->
         <div class="logout-section">
           <button
             class="btn btn-outline btn-block logout-btn"

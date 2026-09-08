@@ -1,35 +1,28 @@
 <section class="page">
   <div class="container">
 
-     <!-- Back Button -->
     <a routerLink="/profile" class="back-button">
       <span class="back-icon">←</span>
       <span>Πίσω στο προφίλ μου</span>
     </a>
 
-    <!-- Page Header -->
     <div class="page-header">
       <h2>❤️ Τα Αγαπημένα μου</h2>
       <p>Προϊόντα που σου αρέσουν</p>
     </div>
     
-
-    <!-- ✅ LOADING SKELETONS -->
     <div *ngIf="isLoading" class="wishlist-grid">
       <app-skeleton type="card" [count]="4"></app-skeleton>
     </div>
 
-    <!-- Empty State -->
     <div *ngIf="!isLoading && items.length === 0" class="empty-state">
       <div class="empty-icon">🤍</div>
       <h3>Δεν έχεις αγαπημένα προϊόντα</h3>
       <p>Πάτησε την καρδιά στα προϊόντα που σου αρέσουν για να τα προσθέσεις εδώ!</p>
     </div>
 
-    <!-- ✅ REAL WISHLIST -->
     <div *ngIf="!isLoading && items.length > 0">
 
-      <!-- Actions Bar -->
       <div class="actions-bar">
         <span class="count">{{ items.length }} {{ items.length === 1 ? 'προϊόν' : 'προϊόντα' }}</span>
         <button
@@ -40,11 +33,9 @@
         </button>
       </div>
 
-      <!-- Products Grid -->
       <div class="wishlist-grid">
         <article class="wishlist-card" *ngFor="let item of items">
 
-          <!-- Remove Button -->
           <button
             class="remove-btn"
             type="button"
@@ -53,7 +44,6 @@
             ✕
           </button>
 
-          <!-- Product Image -->
           <a [routerLink]="['/products', item.id]" class="product-link">
             <img
               [src]="item.image_url | imageUrl"
@@ -63,7 +53,6 @@
             />
           </a>
 
-          <!-- Product Info -->
           <div class="wishlist-info">
 
             <span class="category-badge">
@@ -74,7 +63,6 @@
               <h3 class="product-name">{{ item.name }}</h3>
             </a>
 
-            <!-- Reviews -->
             <div class="product-reviews" *ngIf="item.review_count > 0">
               <div class="stars-mini">
                 <span *ngFor="let star of [1,2,3,4,5]"
@@ -92,13 +80,11 @@
               {{ item.description }}
             </p>
 
-            <!-- Stock Status -->
             <div class="stock-badge" [class.in-stock]="item.stock > 0">
               <span *ngIf="item.stock > 0">✅ Διαθέσιμο</span>
               <span *ngIf="item.stock === 0">❌ Μη διαθέσιμο</span>
             </div>
 
-            <!-- Price & Actions -->
             <div class="wishlist-footer">
               <div class="price">{{ item.price | number:'1.2-2' }}€</div>
               <button

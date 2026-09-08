@@ -10,7 +10,6 @@
       class="breadcrumb-item"
       [class.active]="crumb.active">
       
-      <!-- Link (for non-active breadcrumbs) -->
       <a 
         *ngIf="!crumb.active"
         [routerLink]="crumb.url"
@@ -18,14 +17,12 @@
         {{ crumb.label }}
       </a>
       
-      <!-- Text (for active/current breadcrumb) -->
       <span 
         *ngIf="crumb.active"
         class="breadcrumb-text">
         {{ crumb.label }}
       </span>
       
-      <!-- Separator (not for last item) -->
       <span 
         *ngIf="!last"
         class="breadcrumb-separator"

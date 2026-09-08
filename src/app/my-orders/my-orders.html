@@ -1,9 +1,7 @@
 <section class="page">
   <div class="container">
 
-    <!-- Header -->
     <header class="orders-header orders-hero">
-     <!-- Back Button -->
     <a routerLink="/profile" class="back-button">
       <span class="back-icon">←</span>
       <span>Πίσω στο προφίλ μου</span>
@@ -25,7 +23,6 @@
       </div>
     </header>
 
-    <!-- ✅ LOADING SKELETONS -->
     <div *ngIf="isLoading" class="orders-skeleton">
       <div class="skeleton-order-card" *ngFor="let i of [1,2,3]">
         <div class="skeleton-order-header">
@@ -34,17 +31,14 @@
           <app-skeleton type="text" width="80px"></app-skeleton>
         </div>
 
-        <!-- timeline placeholder -->
         <app-skeleton type="image" height="60px"></app-skeleton>
 
-        <!-- details button placeholder -->
         <div style="margin-top: 12px;">
           <app-skeleton type="text" width="180px" height="36px"></app-skeleton>
         </div>
       </div>
     </div>
 
-    <!-- Error -->
     <div *ngIf="!isLoading && error" class="card alert alert-error">
       <div>{{ error }}</div>
       <button class="btn btn-primary" type="button" (click)="loadOrders()">
@@ -52,19 +46,16 @@
       </button>
     </div>
 
-    <!-- Empty -->
     <div *ngIf="!isLoading && !error && orders.length === 0" class="card">
       Δεν έχεις κάνει ακόμα παραγγελίες.
       <div class="spacer"></div>
       <a class="btn btn-primary" routerLink="/dashboard">Πήγαινε στα προϊόντα</a>
     </div>
 
-    <!-- ✅ REAL ORDERS -->
     <div *ngIf="!isLoading && !error && orders.length > 0" class="orders-list">
 
       <div *ngFor="let o of pagedOrders" class="order-card clickable-card" (click)="goToOrder(o.id)">
 
-        <!-- ORDER HEADER -->
         <div class="order-header">
 
           <div class="order-left">
@@ -95,11 +86,9 @@
 
         </div>
 
-        <!-- Timeline -->
         <div class="order-timeline-section" *ngIf="o.status !== 'cancelled'">
           <app-order-timeline [currentStatus]="normalizeStatus(o.status)"></app-order-timeline>
         </div>
-
 
       </div>
 

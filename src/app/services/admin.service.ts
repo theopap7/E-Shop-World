@@ -93,8 +93,6 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  // ========== PRODUCTS ==========
-
   getProducts(): Observable<{ success: boolean; products: Product[] }> {
     return this.http.get<{ success: boolean; products: Product[] }>(`${this.baseUrl}/products`);
   }
@@ -115,8 +113,6 @@ export class AdminService {
     return this.http.delete<ApiResponse>(`${this.baseUrl}/products/${id}`);
   }
 
-  // ========== ORDERS ==========
-
   getOrders(): Observable<{ success: boolean; orders: AdminOrder[] }> {
     return this.http.get<{ success: boolean; orders: AdminOrder[] }>(`${this.baseUrl}/orders`);
   }
@@ -129,13 +125,9 @@ export class AdminService {
     return this.http.patch<ApiResponse>(`${this.baseUrl}/orders/${orderId}/confirm-payment`, {});
   }
 
-  // ========== USERS ==========
-
   getUsers(): Observable<{ success: boolean; users: AdminUser[] }> {
     return this.http.get<{ success: boolean; users: AdminUser[] }>(`${this.baseUrl}/users`);
   }
-
-  // ========== STATS ==========
 
   private statsCache$: Observable<{ success: boolean; stats: AdminStats; charts: ChartData }> | null = null;
 

@@ -25,7 +25,6 @@ import { ResetPasswordComponent } from './reset-password/reset-password';
 
 export const routes: Routes = [
 
-  // ===== AUTH (no breadcrumbs) =====
   { 
     path: 'register', 
     component: RegisterComponent 
@@ -43,14 +42,12 @@ export const routes: Routes = [
     component: ResetPasswordComponent
   },
 
-  // ===== REDIRECT ROOT =====
   {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full'
   },
 
-  // ===== MAIN ROUTES =====
   {
     path: 'dashboard',
     component: Dashboard,
@@ -83,7 +80,6 @@ export const routes: Routes = [
     data: { breadcrumb: 'Αγαπημένα' }
   },
 
-  // ===== PROFILE =====
   {
     path: 'profile',
     component: ProfileComponent,
@@ -119,7 +115,6 @@ export const routes: Routes = [
     data: { breadcrumb: 'Οι Επιστροφές μου' }
   },
 
-  // ===== ADMIN =====
   {
     path: 'admin',
     loadComponent: () =>
@@ -192,7 +187,6 @@ export const routes: Routes = [
     data: { breadcrumb: 'Χρήστες' }
   },
 
-  // ===== ERROR (no breadcrumbs) =====
   { 
     path: '404', 
     component: NotFoundComponent 

@@ -282,24 +282,19 @@ export class OrderDetailsComponent implements OnInit {
   get itemsTotal(): number {
     return this.items.reduce((sum, i) => sum + (Number(i.line_total) || 0), 0);
   }
-downloadCSV(orderId: number) {
-
-  this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-    next: blob => {
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `order-${orderId}.csv`;
-      a.click();
-
-      window.URL.revokeObjectURL(url);
-    },
-    error: () => this.toastService.error('Αποτυχία λήψης CSV')
-  });
-
-}
-
+  downloadCSV(orderId: number) {
+    this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order-${orderId}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => this.toastService.error('Αποτυχία λήψης CSV')
+    });
+  }
 
   confirmPayment(): void {
     if (this.isConfirmingPayment) return;
@@ -318,17 +313,17 @@ downloadCSV(orderId: number) {
     });
   }
 
-downloadPDF(orderId: number) {
-  this.orderService.downloadOrderPDF(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-    next: blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `order-${orderId}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    },
-    error: () => this.toastService.error('Αποτυχία λήψης PDF')
-  });
-}
+  downloadPDF(orderId: number) {
+    this.orderService.downloadOrderPDF(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order-${orderId}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => this.toastService.error('Αποτυχία λήψης PDF')
+    });
+  }
 }

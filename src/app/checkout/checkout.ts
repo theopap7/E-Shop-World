@@ -394,7 +394,7 @@ export class CheckoutComponent implements OnInit {
       },
       error: (err) => {
         const message = err?.error?.message || 'Σφάλμα επικοινωνίας με τον server.';
-const isDiscountError =
+        const isDiscountError =
           message.includes('εξαντληθεί') ||
           message.includes('λήξει') ||
           message.includes('κωδικός έκπτωσης');

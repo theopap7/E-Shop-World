@@ -12,15 +12,12 @@
       </div>
     </header>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="panel">
       <div class="panel-title">Φόρτωση χρηστών...</div>
     </div>
 
-    <!-- Error -->
     <div *ngIf="!isLoading && error" class="panel alert">{{ error }}</div>
 
-    <!-- Content -->
     <div *ngIf="!isLoading && !error" class="panel">
 
       <div class="search-wrap">

@@ -1,14 +1,11 @@
-<!-- Overlay (σκοτεινό background) -->
 <div
   class="overlay"
   *ngIf="isOpen"
   (click)="close()">
 </div>
 
-<!-- Sidebar -->
 <div class="sidebar" [class.open]="isOpen">
 
-  <!-- Header -->
   <div class="sidebar-header">
     <h3>🛒 Καλάθι ({{ cartService.getCount() }})</h3>
     <div class="header-actions">
@@ -17,7 +14,6 @@
     </div>
   </div>
 
-  <!-- Empty state -->
   <div *ngIf="items.length === 0" class="empty-cart">
     <p>🛒</p>
     <p>Το καλάθι σου είναι άδειο</p>
@@ -26,7 +22,6 @@
     </button>
   </div>
 
-  <!-- Items -->
   <div class="sidebar-items" *ngIf="items.length > 0">
     <div class="cart-item" *ngFor="let item of items">
       <a [routerLink]="['/products', item.productId]" (click)="close()">
@@ -56,7 +51,6 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="sidebar-footer" *ngIf="items.length > 0">
     <div class="total-row">
       <span>Σύνολο:</span>
