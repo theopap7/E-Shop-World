@@ -30,6 +30,8 @@ type OrderDto = {
   subtotal: number;
   discount_code?: string | null;
   discount_amount?: number | null;
+  is_gift?: boolean | number;
+  gift_message?: string | null;
   first_name?: string;
   last_name?: string;
   email?: string;

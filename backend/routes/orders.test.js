@@ -101,4 +101,49 @@ describe('POST /api/orders', () => {
 
     expect(res.status).toBe(400);
   });
+
+  it('rejects a gift message over 500 characters', async () => {
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Cookie', authCookie())
+      .send({ ...basePayload, isGift: true, giftMessage: 'x'.repeat(501) });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('persists is_gift and the trimmed gift message when isGift is true', async () => {
+    const conn = makeConn({
+      productRows: [{ id: 5, price: 49.99, stock: 10, name: 'Test Product' }]
+    });
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Cookie', authCookie())
+      .send({ ...basePayload, isGift: true, giftMessage: '  Happy birthday!  ' });
+
+    expect(res.status).toBe(201);
+
+    const orderInsertCall = conn.query.mock.calls[1];
+    expect(orderInsertCall[1]).toContain(true);
+    expect(orderInsertCall[1]).toContain('Happy birthday!');
+  });
+
+  it('ignores a gift message when isGift is not set', async () => {
+    const conn = makeConn({
+      productRows: [{ id: 5, price: 49.99, stock: 10, name: 'Test Product' }]
+    });
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Cookie', authCookie())
+      .send({ ...basePayload, giftMessage: 'Should be ignored' });
+
+    expect(res.status).toBe(201);
+
+    const orderInsertCall = conn.query.mock.calls[1];
+    expect(orderInsertCall[1]).toContain(false);
+    expect(orderInsertCall[1]).not.toContain('Should be ignored');
+  });
 });

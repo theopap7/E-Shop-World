@@ -154,16 +154,21 @@ form label {
 
 input[type="text"],
 input:not([type]),
-input[type="tel"] {
+input[type="tel"],
+textarea {
   width: 100%;
   padding: 8px 10px;
   margin-top: 4px;
   border-radius: 4px;
   border: 1px solid #ccc;
   font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
 }
 
-input:focus {
+input:focus,
+textarea:focus {
   outline: none;
   border-color: #6366f1;
 }

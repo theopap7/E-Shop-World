@@ -68,6 +68,9 @@ export class CheckoutComponent implements OnInit {
       shippingMethod: ['courier_standard' as ShippingMethod, [Validators.required]],
       paymentMethod: ['cod' as PaymentMethod, [Validators.required]],
 
+      isGift: [false],
+      giftMessage: ['', [Validators.maxLength(500)]],
+
       paymentDetails: this.fb.group({
         iban: [''],
         cardNumber: [''],
@@ -323,7 +326,10 @@ export class CheckoutComponent implements OnInit {
         : undefined,
       
       discountCode: this.appliedDiscount?.code || undefined,
-      discountAmount: this.discountAmount || 0
+      discountAmount: this.discountAmount || 0,
+
+      isGift: !!v.isGift,
+      giftMessage: v.isGift ? String(v.giftMessage || '').trim() || undefined : undefined,
     };
 
     this.isSubmitting = true;

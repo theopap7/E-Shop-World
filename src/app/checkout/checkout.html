@@ -100,6 +100,23 @@
 
         <hr />
 
+        <label class="terms">
+          <input type="checkbox" formControlName="isGift" />
+          Αποστολή ως δώρο
+        </label>
+
+        <div *ngIf="form.get('isGift')?.value" style="margin-top: 8px;">
+          <label>
+            Μήνυμα δώρου (προαιρετικό)
+            <textarea formControlName="giftMessage" maxlength="500" rows="3"></textarea>
+          </label>
+          <small class="err" *ngIf="form.get('giftMessage')?.touched && form.get('giftMessage')?.invalid">
+            Το μήνυμα δεν μπορεί να ξεπερνά τους 500 χαρακτήρες
+          </small>
+        </div>
+
+        <hr />
+
         <h3>Αποστολή</h3>
         <label>
           <input type="radio" value="courier_standard" formControlName="shippingMethod" />

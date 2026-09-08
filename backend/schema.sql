@@ -51,6 +51,8 @@ CREATE TABLE orders (
   payment_status ENUM('pending', 'paid', 'refunded', 'partially_refunded', 'cancelled') DEFAULT 'pending',
   discount_code VARCHAR(100),
   discount_amount DECIMAL(10,2) DEFAULT 0,
+  is_gift TINYINT(1) NOT NULL DEFAULT 0,
+  gift_message VARCHAR(500),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );

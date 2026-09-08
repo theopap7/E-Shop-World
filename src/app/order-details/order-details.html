@@ -155,6 +155,11 @@
             <strong>{{ order.phone }}</strong>
           </div>
 
+          <div class="row" *ngIf="order.is_gift">
+            <span>Δώρο</span>
+            <strong>🎁 {{ order.gift_message || 'Ναι' }}</strong>
+          </div>
+
         </div>
 
         <!-- Διεύθυνση Αποστολής -->

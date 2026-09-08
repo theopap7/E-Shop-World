@@ -40,7 +40,8 @@ export interface CreateOrderDto {
   card?: CardDto;
   discountCode?: string;
   discountAmount?: number;
-
+  isGift?: boolean;
+  giftMessage?: string;
 }
 
 export interface CreateOrderResponse {
@@ -94,6 +95,8 @@ export interface OrderDetailResponse {
     subtotal: number;
     discount_code?: string | null;
     discount_amount?: number | null;
+    is_gift?: boolean | number;
+    gift_message?: string | null;
     first_name?: string;
     last_name?: string;
     email?: string;

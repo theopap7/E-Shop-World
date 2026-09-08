@@ -24,7 +24,9 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
     shipping,
     shippingMethod,
     paymentMethod,
-    discountCode
+    discountCode,
+    isGift,
+    giftMessage
   } = req.body;
 
   if (!Array.isArray(items) || items.length === 0) {
@@ -52,6 +54,12 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
   const allowedPayment = new Set(['cod', 'card_mock', 'bank_transfer']);
   if (!allowedPayment.has(paymentMethod)) {
     return res.status(400).json({ success: false, message: 'Μη έγκυρος τρόπος πληρωμής' });
+  }
+
+  const giftFlag = !!isGift;
+  const trimmedGiftMessage = giftFlag && giftMessage ? String(giftMessage).trim() : null;
+  if (trimmedGiftMessage && trimmedGiftMessage.length > 500) {
+    return res.status(400).json({ success: false, message: 'Το μήνυμα δώρου είναι πολύ μεγάλο (μέγιστο 500 χαρακτήρες)' });
   }
 
   for (const item of items) {
@@ -170,8 +178,8 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
          user_id, total_amount, status, recipient_name, phone,
          ship_country, ship_city, ship_zip, ship_address1, ship_notes,
          shipping_method, shipping_cost, payment_method, payment_status,
-         subtotal, floor, discount_code, discount_amount
-       ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         subtotal, floor, discount_code, discount_amount, is_gift, gift_message
+       ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId, computedTotal,
         recipientName.trim(), String(phone).trim(),
@@ -179,7 +187,8 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
         shippingMethod, shippingCost,
         paymentMethod, paymentStatus,
         subtotal, ship.floor || null,
-        finalDiscountCode, discountAmount
+        finalDiscountCode, discountAmount,
+        giftFlag, trimmedGiftMessage
       ]
     );
 
@@ -346,7 +355,7 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
          payment_method, payment_status,
          recipient_name, phone,
          ship_country, ship_city, ship_zip, ship_address1, ship_notes, floor,
-         discount_code, discount_amount
+         discount_code, discount_amount, is_gift, gift_message
        FROM orders
        WHERE id = ? AND user_id = ?
        LIMIT 1`,
@@ -691,6 +700,10 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       .text(`Email: ${order.email}`, 50, 166, { width: 230, lineBreak: false })
       .text(`Τρόπος Πληρωμής: ${paymentMethod}`, 50, 181, { width: 230, lineBreak: false })
       .text(`Τρόπος Αποστολής: ${shippingMethod}`, 50, 196, { width: 230, lineBreak: false });
+
+    if (order.is_gift) {
+      doc.font('RobotoBold').fontSize(10).text('Δώρο: Ναι', 50, 211, { width: 230, lineBreak: false });
+    }
 
     doc.font('RobotoBold').fontSize(11).text('ΔΙΕΥΘΥΝΣΗ ΑΠΟΣΤΟΛΗΣ', 300, 120);
     doc.font('Roboto').fontSize(10)

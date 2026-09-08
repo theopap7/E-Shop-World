@@ -33,8 +33,8 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
          o.payment_method, o.payment_status,
          o.recipient_name, o.phone,
          o.ship_country, o.ship_city, o.ship_zip, o.ship_address1, o.ship_notes, o.floor,
-         o.discount_code, o.discount_amount,
-         u.email, u.first_name, u.last_name
+         o.discount_code, o.discount_amount, o.is_gift, o.gift_message,
+         u.email, u.first_name, u.last_name, u.phone AS customer_phone
        FROM orders o
        LEFT JOIN users u ON u.id = o.user_id
        WHERE o.id = ?
@@ -230,7 +230,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
              o.total_amount, o.subtotal, o.shipping_cost, o.shipping_method,
              o.ship_address1, o.ship_city, o.ship_zip,
              o.ship_country, o.floor, o.ship_notes,
-             o.recipient_name, o.phone,
+             o.recipient_name, o.phone, o.is_gift, o.gift_message,
              u.first_name, u.last_name, u.email
       FROM orders o JOIN users u ON o.user_id = u.id
       WHERE o.id = ?
@@ -275,6 +275,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       ['Πελάτης', order.recipient_name],
       ['Email', order.email],
       ['Τηλέφωνο', order.phone],
+      ['Δώρο', order.is_gift ? (order.gift_message || 'Ναι') : 'Όχι'],
       ['Τρόπος Αποστολής', shippingMethodMap[order.shipping_method] || order.shipping_method],
       ['Κόστος Μεταφορικών', eur(order.shipping_cost)],
       ['Τρόπος Πληρωμής', paymentMethodMap[order.payment_method] || order.payment_method],
