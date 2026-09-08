@@ -2,16 +2,16 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartService, CartItem } from './cart.service';
+import { CartService, CartItem } from '../cart.service';
 import { Router, RouterModule } from '@angular/router';
-import { ImageUrlPipe } from './shared/image-url.pipe';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, ImageUrlPipe],
-  templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css',
+  templateUrl: './cart.html',
+  styleUrl: './cart.css',
 })
 export class CartComponent implements OnInit {
   items: CartItem[] = [];

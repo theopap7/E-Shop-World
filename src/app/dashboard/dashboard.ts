@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ProductListComponent } from '../product.list.component';
+import { ProductListComponent } from '../product-list/product-list';
 
 @Component({
   selector: 'app-dashboard',

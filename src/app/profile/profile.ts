@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService, AuthUser } from './auth.service';
+import { AuthService, AuthUser } from '../auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
-import { ToastService } from './toast.service';
-import { environment } from '../environments/environment';
+import { ToastService } from '../toast.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   standalone: true,
   selector: 'app-profile',
   imports: [CommonModule, FormsModule, RouterModule],
-  styleUrl: './profile.component.css',
-  templateUrl: './profile.component.html',
+  styleUrl: './profile.css',
+  templateUrl: './profile.html',
 })
 export class ProfileComponent {
   user: AuthUser | null;

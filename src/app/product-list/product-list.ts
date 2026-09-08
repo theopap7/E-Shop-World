@@ -2,13 +2,13 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProductService, ProductDto, Category } from './product.service';
-import { CartService } from './cart.service';
+import { ProductService, ProductDto, Category } from '../product.service';
+import { CartService } from '../cart.service';
 import { Router, RouterModule } from '@angular/router';
-import { WishlistService } from './wishlist-service';
-import { SkeletonComponent } from './skeleton/skeleton';
-import { ImageUrlPipe } from './shared/image-url.pipe';
-import { PaginationComponent } from './shared/pagination/pagination.component';
+import { WishlistService } from '../wishlist-service';
+import { SkeletonComponent } from '../skeleton/skeleton';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-product-list',
@@ -21,8 +21,8 @@ import { PaginationComponent } from './shared/pagination/pagination.component';
     ImageUrlPipe,
     PaginationComponent
   ],
-  templateUrl: './product.list.component.html',
-  styleUrl: './product.list.component.css',
+  templateUrl: './product-list.html',
+  styleUrl: './product-list.css',
 })
 export class ProductListComponent implements OnInit {
   isLoading = true;
