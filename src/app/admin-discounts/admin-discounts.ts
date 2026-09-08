@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ToastService } from '../toast.service';
+import { ToastService } from '../services/toast.service';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
 

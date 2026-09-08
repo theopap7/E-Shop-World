@@ -2,11 +2,11 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { OrderService } from '../order.service';
+import { OrderService } from '../services/order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
-import { statusLabel } from '../order-status.util';
+import { statusLabel } from '../services/order-status.util';
 
 type OrderRow = {
   id: number;

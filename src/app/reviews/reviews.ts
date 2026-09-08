@@ -3,9 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ReviewService, Review } from '../review.service';
-import { AuthService } from '../auth.service';
-import { ToastService } from '../toast.service';
+import { ReviewService, Review } from '../services/review.service';
+import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-reviews',

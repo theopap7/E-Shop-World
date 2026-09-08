@@ -1,7 +1,7 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { ToastService, Toast } from '../toast.service';
+import { ToastService, Toast } from '../services/toast.service';
 
 @Component({
   selector: 'app-toast-container',

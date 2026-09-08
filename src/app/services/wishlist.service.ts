@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ProductDto } from './product.service';
 import { ToastService } from './toast.service';
 import { AuthService, AuthUser } from './auth.service';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 
 const GUEST_KEY = 'ecom_wishlist_guest';
 

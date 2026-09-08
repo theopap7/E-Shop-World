@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { BreadcrumbService, Breadcrumb } from '../breadcrumb.service';
+import { BreadcrumbService, Breadcrumb } from '../services/breadcrumb.service';
 
 @Component({
   selector: 'app-breadcrumb',

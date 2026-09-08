@@ -3,9 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { AdminService, AdminOrder } from '../admin.service';
-import { ToastService } from '../toast.service';
-import { statusLabel } from '../order-status.util';
+import { AdminService, AdminOrder } from '../services/admin.service';
+import { ToastService } from '../services/toast.service';
+import { statusLabel } from '../services/order-status.util';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({

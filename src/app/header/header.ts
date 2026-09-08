@@ -2,10 +2,10 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { CartService } from '../cart.service';
-import { AuthService } from '../auth.service';
-import { WishlistService } from '../wishlist-service';
-import { ToastService } from '../toast.service';
+import { CartService } from '../services/cart.service';
+import { AuthService } from '../services/auth.service';
+import { WishlistService } from '../services/wishlist.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-header',

@@ -3,9 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
-import { WishlistService } from '../wishlist-service';
-import { CartService } from '../cart.service';
-import { ProductDto } from '../product.service';
+import { WishlistService } from '../services/wishlist.service';
+import { CartService } from '../services/cart.service';
+import { ProductDto } from '../services/product.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 

@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AdminService, AdminStats, ChartData } from '../admin.service';
-import { ToastService } from '../toast.service';
+import { AdminService, AdminStats, ChartData } from '../services/admin.service';
+import { ToastService } from '../services/toast.service';
 import {
   Chart,
   LineController, BarController, DoughnutController,

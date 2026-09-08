@@ -3,14 +3,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ProductService, ProductDto, ProductImage } from '../product.service';
-import { CartService } from '../cart.service';
-import { WishlistService } from '../wishlist-service';
+import { ProductService, ProductDto, ProductImage } from '../services/product.service';
+import { CartService } from '../services/cart.service';
+import { WishlistService } from '../services/wishlist.service';
 import { ReviewsComponent } from '../reviews/reviews';
-import { BreadcrumbService } from '../breadcrumb.service';
+import { BreadcrumbService } from '../services/breadcrumb.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
-import { RecentlyViewedService, RecentlyViewedProduct } from '../recently-viewed.service';
+import { RecentlyViewedService, RecentlyViewedProduct } from '../services/recently-viewed.service';
 
 @Component({
   selector: 'app-product-detail',

@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Review, ReviewService } from '../review.service';
-import { ToastService } from '../toast.service';
+import { Review, ReviewService } from '../services/review.service';
+import { ToastService } from '../services/toast.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 

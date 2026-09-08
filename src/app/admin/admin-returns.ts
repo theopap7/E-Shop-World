@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { ToastService } from '../toast.service';
-import { AdminService } from '../admin.service';
+import { ToastService } from '../services/toast.service';
+import { AdminService } from '../services/admin.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { environment } from '../../environments/environment';
 

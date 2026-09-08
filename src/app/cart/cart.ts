@@ -2,7 +2,7 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartService, CartItem } from '../cart.service';
+import { CartService, CartItem } from '../services/cart.service';
 import { Router, RouterModule } from '@angular/router';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 

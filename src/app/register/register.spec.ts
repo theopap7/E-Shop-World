@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { RegisterComponent } from './register';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 
 describe('Register', () => {
   let component: RegisterComponent;

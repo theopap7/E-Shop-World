@@ -3,11 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AdminService } from '../admin.service';
+import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
-import { ToastService } from '../toast.service';
+import { ToastService } from '../services/toast.service';
 import { environment } from '../../environments/environment';
-import { Category, ProductImage } from '../product.service';
+import { Category, ProductImage } from '../services/product.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({

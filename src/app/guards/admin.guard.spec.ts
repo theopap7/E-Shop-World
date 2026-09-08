@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { adminGuard } from './admin.guard';
-import { AuthService } from './auth.service';
-import { ToastService } from './toast.service';
+import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
 
 describe('adminGuard', () => {
   let authSpy: jasmine.SpyObj<AuthService>;

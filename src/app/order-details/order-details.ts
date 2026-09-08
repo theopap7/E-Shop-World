@@ -3,11 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { OrderService, OrderDetailResponse } from '../order.service';
-import { AdminService } from '../admin.service';
-import { ToastService } from '../toast.service';
-import { CartService } from '../cart.service';
-import { statusLabel } from '../order-status.util';
+import { OrderService, OrderDetailResponse } from '../services/order.service';
+import { AdminService } from '../services/admin.service';
+import { ToastService } from '../services/toast.service';
+import { CartService } from '../services/cart.service';
+import { statusLabel } from '../services/order-status.util';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 type OrderDto = {

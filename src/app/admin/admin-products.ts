@@ -2,8 +2,8 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AdminService, Product } from '../admin.service';
-import { ToastService } from '../toast.service';
+import { AdminService, Product } from '../services/admin.service';
+import { ToastService } from '../services/toast.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 

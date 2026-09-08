@@ -10,12 +10,12 @@ import {
   FormsModule
 } from '@angular/forms';
 
-import { CartService, CartItem } from '../cart.service';
-import { OrderService, CreateOrderDto, ShippingMethod, PaymentMethod } from '../order.service';
-import { DiscountService, DiscountValidationResponse } from '../discount.service';
-import { ToastService } from '../toast.service';
+import { CartService, CartItem } from '../services/cart.service';
+import { OrderService, CreateOrderDto, ShippingMethod, PaymentMethod } from '../services/order.service';
+import { DiscountService, DiscountValidationResponse } from '../services/discount.service';
+import { ToastService } from '../services/toast.service';
 import { AddressMapComponent } from '../address-map/address-map';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-checkout',

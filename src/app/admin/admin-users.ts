@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AdminService, AdminUser } from '../admin.service';
+import { AdminService, AdminUser } from '../services/admin.service';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 @Component({
