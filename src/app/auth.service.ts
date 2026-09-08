@@ -3,11 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 
+export interface AuthAddress {
+  country?: string | null;
+  city?: string | null;
+  zip?: string | null;
+  address1?: string | null;
+  floor?: string | null;
+}
+
 export interface AuthUser {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string | null;
+  address?: AuthAddress | null;
   role?: string;
 }
 

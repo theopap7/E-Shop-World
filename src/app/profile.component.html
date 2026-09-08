@@ -117,6 +117,17 @@
               <span class="info-label">Email</span>
               <span class="info-value">{{ user!.email }}</span>
             </div>
+            <div class="profile-info-row">
+              <span class="info-label">Τηλέφωνο</span>
+              <span class="info-value">{{ user!.phone || '—' }}</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="info-label">Διεύθυνση</span>
+              <span class="info-value" *ngIf="user!.address?.address1; else noAddress">
+                {{ user!.address?.address1 }}, {{ user!.address?.city }} {{ user!.address?.zip }}
+              </span>
+              <ng-template #noAddress><span class="info-value">—</span></ng-template>
+            </div>
             <button class="btn btn-outline btn-edit" type="button" (click)="startEdit()">
               ✏️ Επεξεργασία
             </button>
@@ -138,6 +149,34 @@
               <label class="form-label">Email <span class="required">*</span></label>
               <input class="form-input" type="email" [(ngModel)]="editForm.email" name="email" placeholder="Email" />
             </div>
+            <div class="form-group">
+              <label class="form-label">Τηλέφωνο</label>
+              <input class="form-input" type="tel" [(ngModel)]="editForm.phone" name="phone"/>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Χώρα</label>
+              <input class="form-input" type="text" [(ngModel)]="editForm.address.country" name="addressCountry" readonly />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Πόλη</label>
+                <input class="form-input" type="text" [(ngModel)]="editForm.address.city" name="addressCity" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">ΤΚ</label>
+                <input class="form-input" type="text" [(ngModel)]="editForm.address.zip" name="addressZip" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Διεύθυνση</label>
+              <input class="form-input" type="text" [(ngModel)]="editForm.address.address1" name="addressLine1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Όροφος</label>
+              <input class="form-input" type="text" [(ngModel)]="editForm.address.floor" name="addressFloor" />
+            </div>
+
             <div class="edit-actions">
               <button class="btn btn-outline" type="button" (click)="cancelEdit()" [disabled]="isUpdating">
                 Ακύρωση

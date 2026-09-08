@@ -15,6 +15,7 @@ import { OrderService, CreateOrderDto, ShippingMethod, PaymentMethod } from '../
 import { DiscountService, DiscountValidationResponse } from '../discount.service';
 import { ToastService } from '../toast.service';
 import { AddressMapComponent } from '../address-map/address-map';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-checkout',
@@ -39,6 +40,7 @@ export class CheckoutComponent implements OnInit {
   error: string | null = null;
   success: string | null = null;
   discountExpiredPrompt = false;
+  orderingForOther = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -50,7 +52,8 @@ export class CheckoutComponent implements OnInit {
     private orders: OrderService,
     private router: Router,
     private discountService: DiscountService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authService: AuthService
   ) {
     this.form = this.fb.group({
       recipientName: ['', [Validators.required, Validators.minLength(2)]],
@@ -84,6 +87,8 @@ export class CheckoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.applyMyDetails();
+
     this.cart.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
       this.subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -107,6 +112,42 @@ export class CheckoutComponent implements OnInit {
 
     if (this.cart.getItems().length === 0) {
       this.router.navigate(['/cart']);
+    }
+  }
+
+  private applyMyDetails(): void {
+    const currentUser = this.authService.getUser();
+    if (currentUser?.firstName || currentUser?.lastName) {
+      this.form.get('recipientName')!.setValue(`${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim());
+    }
+    if (currentUser?.phone) {
+      this.form.get('phone')!.setValue(currentUser.phone);
+    }
+    if (currentUser?.address?.address1) {
+      this.form.get('shipping')!.patchValue({
+        country: currentUser.address.country || 'ΕΛΛΑΔΑ',
+        city: currentUser.address.city || '',
+        zip: currentUser.address.zip || '',
+        address1: currentUser.address.address1 || '',
+        floor: currentUser.address.floor || ''
+      });
+    }
+  }
+
+  toggleForOther(): void {
+    this.orderingForOther = !this.orderingForOther;
+
+    if (this.orderingForOther) {
+      this.form.get('recipientName')!.setValue('');
+      this.form.get('phone')!.setValue('');
+      this.form.get('shipping')!.patchValue({
+        city: '',
+        zip: '',
+        address1: '',
+        floor: ''
+      });
+    } else {
+      this.applyMyDetails();
     }
   }
 

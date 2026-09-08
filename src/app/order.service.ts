@@ -100,6 +100,7 @@ export interface OrderDetailResponse {
     first_name?: string;
     last_name?: string;
     email?: string;
+    customer_phone?: string | null;
   };
   items: OrderDetailItem[];
   returnRequest?: {

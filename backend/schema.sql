@@ -7,6 +7,12 @@ CREATE TABLE users (
   last_name VARCHAR(100) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
+  phone VARCHAR(50),
+  address_country VARCHAR(100) DEFAULT 'ΕΛΛΑΔΑ',
+  address_city VARCHAR(100),
+  address_zip VARCHAR(20),
+  address1 VARCHAR(255),
+  address_floor VARCHAR(50),
   role ENUM('user', 'admin') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

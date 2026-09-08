@@ -35,6 +35,7 @@ type OrderDto = {
   first_name?: string;
   last_name?: string;
   email?: string;
+  customer_phone?: string | null;
   return_request?: {
     id: number;
     status: 'pending' | 'approved' | 'rejected';

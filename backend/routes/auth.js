@@ -110,6 +110,14 @@ router.post('/login', authLimiter, async (req, res) => {
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
+        phone: user.phone,
+        address: {
+          country: user.address_country,
+          city: user.address_city,
+          zip: user.address_zip,
+          address1: user.address1,
+          floor: user.address_floor
+        },
         role: user.role || 'user'
       }
     });
@@ -124,7 +132,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await db.query(
-      'SELECT id, first_name, last_name, email FROM users WHERE id = ?',
+      'SELECT id, first_name, last_name, email, phone, address_country, address_city, address_zip, address1, address_floor FROM users WHERE id = ?',
       [userId]
     );
 
@@ -139,7 +147,15 @@ router.get('/me', authenticateToken, async (req, res) => {
         id: u.id,
         firstName: u.first_name,
         lastName: u.last_name,
-        email: u.email
+        email: u.email,
+        phone: u.phone,
+        address: {
+          country: u.address_country,
+          city: u.address_city,
+          zip: u.address_zip,
+          address1: u.address1,
+          floor: u.address_floor
+        }
       }
     });
   } catch (error) {
@@ -151,7 +167,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 router.put('/me', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, phone, address } = req.body;
 
     if (!firstName || !lastName || !email) {
       return res.status(400).json({ success: false, message: 'Όλα τα πεδία είναι υποχρεωτικά' });
@@ -162,6 +178,21 @@ router.put('/me', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Μη έγκυρο email' });
     }
 
+    const trimmedPhone = phone ? String(phone).trim() : null;
+    const phoneRegex = /^(\+30|0030)?[269]\d{9}$/;
+    if (trimmedPhone && !phoneRegex.test(trimmedPhone)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο τηλέφωνο (π.χ. 6912345678 ή +306912345678)' });
+    }
+
+    const addr = address || {};
+    const trimmedAddress = {
+      country: addr.country ? String(addr.country).trim() : 'ΕΛΛΑΔΑ',
+      city: addr.city ? String(addr.city).trim() : null,
+      zip: addr.zip ? String(addr.zip).trim() : null,
+      address1: addr.address1 ? String(addr.address1).trim() : null,
+      floor: addr.floor ? String(addr.floor).trim() : null
+    };
+
     const [existing] = await db.query(
       'SELECT id FROM users WHERE email = ? AND id != ?',
       [email.toLowerCase().trim(), userId]
@@ -171,8 +202,14 @@ router.put('/me', authenticateToken, async (req, res) => {
     }
 
     await db.query(
-      'UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?',
-      [firstName.trim(), lastName.trim(), email.toLowerCase().trim(), userId]
+      `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?,
+       address_country = ?, address_city = ?, address_zip = ?, address1 = ?, address_floor = ?
+       WHERE id = ?`,
+      [
+        firstName.trim(), lastName.trim(), email.toLowerCase().trim(), trimmedPhone,
+        trimmedAddress.country, trimmedAddress.city, trimmedAddress.zip, trimmedAddress.address1, trimmedAddress.floor,
+        userId
+      ]
     );
 
     const [rows] = await db.query('SELECT role FROM users WHERE id = ?', [userId]);
@@ -185,6 +222,8 @@ router.put('/me', authenticateToken, async (req, res) => {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.toLowerCase().trim(),
+        phone: trimmedPhone,
+        address: trimmedAddress,
         role: rows[0]?.role
       }
     });

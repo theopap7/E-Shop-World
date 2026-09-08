@@ -22,7 +22,10 @@ export class ProfileComponent {
   // Edit profile state
   editMode = false;
   isUpdating = false;
-  editForm = { firstName: '', lastName: '', email: '' };
+  editForm = {
+    firstName: '', lastName: '', email: '', phone: '',
+    address: { country: 'ΕΛΛΑΔΑ', city: '', zip: '', address1: '', floor: '' }
+  };
 
   currentPassword = '';
   newPassword = '';
@@ -48,7 +51,15 @@ export class ProfileComponent {
     this.editForm = {
       firstName: this.user.firstName,
       lastName: this.user.lastName,
-      email: this.user.email
+      email: this.user.email,
+      phone: this.user.phone || '',
+      address: {
+        country: this.user.address?.country || 'ΕΛΛΑΔΑ',
+        city: this.user.address?.city || '',
+        zip: this.user.address?.zip || '',
+        address1: this.user.address?.address1 || '',
+        floor: this.user.address?.floor || ''
+      }
     };
     this.editMode = true;
   }
@@ -58,14 +69,20 @@ export class ProfileComponent {
   }
 
   updateProfile(): void {
-    const { firstName, lastName, email } = this.editForm;
+    const { firstName, lastName, email, phone, address } = this.editForm;
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       this.toastService.warning('Συμπλήρωσε όλα τα πεδία');
       return;
     }
 
+    const phoneRegex = /^(\+30|0030)?[269]\d{9}$/;
+    if (phone.trim() && !phoneRegex.test(phone.trim())) {
+      this.toastService.warning('Μη έγκυρο τηλέφωνο (π.χ. 6912345678 ή +306912345678)');
+      return;
+    }
+
     this.isUpdating = true;
-    this.http.put<{ success: boolean; user: AuthUser }>(`${environment.apiUrl}/me`, { firstName, lastName, email }).subscribe({
+    this.http.put<{ success: boolean; user: AuthUser }>(`${environment.apiUrl}/me`, { firstName, lastName, email, phone, address }).subscribe({
       next: (res) => {
         if (res.success) {
           this.auth.updateUser(res.user);

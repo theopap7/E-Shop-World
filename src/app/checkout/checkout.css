@@ -188,6 +188,24 @@ label {
   cursor: pointer;
 }
 
+.btn-link {
+  background: none;
+  border: 1px solid #6366f1;
+  border-radius: 20px;
+  padding: 5px 12px;
+  color: #6366f1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-link:hover {
+  background: #6366f1;
+  color: #fff;
+}
+
 /* ===== Errors ===== */
 .err {
   color: #c62828;

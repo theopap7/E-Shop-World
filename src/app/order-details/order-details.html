@@ -138,6 +138,10 @@
             <span>Email</span>
             <strong>{{ order.email }}</strong>
           </div>
+          <div class="row" *ngIf="order.customer_phone">
+            <span>Τηλέφωνο</span>
+            <strong>{{ order.customer_phone }}</strong>
+          </div>
         </div>
 
         <!-- Στοιχεία Παραλήπτη -->

@@ -24,7 +24,12 @@
 
     <div class="grid">
       <form [formGroup]="form" (ngSubmit)="submit()" class="card">
-        <h3>Στοιχεία παραλήπτη</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>Στοιχεία παραλήπτη</h3>
+          <button type="button" class="btn-link" (click)="toggleForOther()">
+            {{ orderingForOther ? 'Τα στοιχεία μου' : 'Παραγγελία για άλλον' }}
+          </button>
+        </div>
 
         <label>
           Ονοματεπώνυμο
