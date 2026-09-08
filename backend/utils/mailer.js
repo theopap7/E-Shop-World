@@ -69,7 +69,7 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
     console.log('📧 Preview email at:', previewUrl);
   }
 
-  return info;
+  return { info, previewUrl: previewUrl || null };
 }
 
 async function sendOrderConfirmationEmail(toEmail, order) {

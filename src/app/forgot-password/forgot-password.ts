@@ -16,6 +16,7 @@ export class ForgotPasswordComponent {
   isSubmitting = false;
   submitted = false;
   errorMessage = '';
+  devPreviewUrl: string | null = null;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.form = this.fb.group({
@@ -29,8 +30,9 @@ export class ForgotPasswordComponent {
     this.errorMessage = '';
 
     this.authService.forgotPassword(this.form.value.email).subscribe({
-      next: () => {
+      next: (res) => {
         this.submitted = true;
+        this.devPreviewUrl = res.devPreviewUrl || null;
         this.isSubmitting = false;
       },
       error: (err) => {

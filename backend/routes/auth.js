@@ -298,9 +298,14 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
-    await sendPasswordResetEmail(normalizedEmail, resetLink);
+    const { previewUrl } = await sendPasswordResetEmail(normalizedEmail, resetLink);
 
-    res.json({ success: true, message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.' });
+    res.json({
+      success: true,
+      message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.',
+      // Only set in dev (Ethereal fake SMTP) — never present with a real EMAIL_HOST configured
+      devPreviewUrl: previewUrl || undefined
+    });
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα κατά την επαναφορά κωδικού' });

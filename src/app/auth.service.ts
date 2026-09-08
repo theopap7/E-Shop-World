@@ -95,8 +95,8 @@ export class AuthService {
     this.userSubject.next(user);
   }
 
-  forgotPassword(email: string): Observable<{ success: boolean; message: string }> {
-    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/forgot-password`, { email });
+  forgotPassword(email: string): Observable<{ success: boolean; message: string; devPreviewUrl?: string }> {
+    return this.http.post<{ success: boolean; message: string; devPreviewUrl?: string }>(`${this.apiUrl}/forgot-password`, { email });
   }
 
   resetPassword(token: string, newPassword: string): Observable<{ success: boolean; message: string }> {
