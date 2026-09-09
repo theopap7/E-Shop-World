@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface AuthAddress {
@@ -65,6 +65,14 @@ export class AuthService {
     return this.http.get<{ success: boolean; exists: boolean }>(`${this.apiUrl}/check-email`, {
       params: { email }
     });
+  }
+
+  /** Re-checks the current user against the server (not the cached localStorage copy). */
+  fetchCurrentUser(): Observable<AuthUser> {
+    return this.http.get<{ success: boolean; user: AuthUser }>(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
+      map((res) => res.user),
+      tap((user) => this.updateUser(user))
+    );
   }
 
   getUser(): AuthUser | null {

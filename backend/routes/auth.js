@@ -132,7 +132,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await db.query(
-      'SELECT id, first_name, last_name, email, phone, address_country, address_city, address_zip, address1, address_floor FROM users WHERE id = ?',
+      'SELECT id, first_name, last_name, email, phone, address_country, address_city, address_zip, address1, address_floor, role FROM users WHERE id = ?',
       [userId]
     );
 
@@ -155,7 +155,8 @@ router.get('/me', authenticateToken, async (req, res) => {
           zip: u.address_zip,
           address1: u.address1,
           floor: u.address_floor
-        }
+        },
+        role: u.role || 'user'
       }
     });
   } catch (error) {
