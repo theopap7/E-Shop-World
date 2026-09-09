@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { OrderService, MyReturnRow } from '../services/order.service';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { returnStatusLabel } from '../services/return-status.util';
 
 interface OrderReturnGroup {
   orderId: number;
@@ -68,9 +69,6 @@ export class MyReturnsComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    if (status === 'pending') return 'Σε Αναμονή';
-    if (status === 'approved') return 'Εγκρίθηκε';
-    if (status === 'rejected') return 'Απορρίφθηκε';
-    return status;
+    return returnStatusLabel(status);
   }
 }

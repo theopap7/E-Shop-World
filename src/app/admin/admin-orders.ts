@@ -27,12 +27,11 @@ export class AdminOrdersComponent implements OnInit {
   readonly pageSize = 20;
 
   readonly filters = [
-    { key: 'all',        label: 'Όλες' },
-    { key: 'pending',    label: 'Σε αναμονή' },
-    { key: 'processing', label: 'Σε επεξεργασία' },
-    { key: 'shipped',    label: 'Απεστάλη' },
-    { key: 'delivered',  label: 'Παραδόθηκε' },
-    { key: 'cancelled',  label: 'Ακυρώθηκε' },
+    { key: 'all', label: 'Όλες' },
+    ...(['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const).map(key => ({
+      key,
+      label: statusLabel(key),
+    })),
   ];
 
   get searchFilteredOrders(): AdminOrder[] {

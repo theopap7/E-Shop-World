@@ -175,13 +175,3 @@ export class OrderService {
     return this.http.get(`${this.baseUrl}/orders/${orderId}/pdf`, { responseType: 'blob' });
   }
 }
-
-
-
-
-
-
-
-
-
-

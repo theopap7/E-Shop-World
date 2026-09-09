@@ -8,6 +8,7 @@ import { AdminService } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { CartService } from '../services/cart.service';
 import { statusLabel } from '../services/order-status.util';
+import { returnStatusLabel as returnStatusLabelUtil } from '../services/return-status.util';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 type OrderDto = {
@@ -258,10 +259,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   returnStatusLabel(status: string): string {
-    if (status === 'pending') return 'Σε Αναμονή';
-    if (status === 'approved') return 'Εγκρίθηκε';
-    if (status === 'rejected') return 'Απορρίφθηκε';
-    return status;
+    return returnStatusLabelUtil(status);
   }
 
   reorderAll(): void {

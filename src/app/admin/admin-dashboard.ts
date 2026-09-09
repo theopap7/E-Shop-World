@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminStats, ChartData } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
+import { statusLabel } from '../services/order-status.util';
 import {
   Chart,
   LineController, BarController, DoughnutController,
@@ -19,14 +20,6 @@ Chart.register(
   PointElement, CategoryScale, LinearScale,
   Tooltip, Legend, Filler
 );
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Αναμονή',
-  processing: 'Επεξεργασία',
-  shipped: 'Απεστάλη',
-  delivered: 'Παραδόθηκε',
-  cancelled: 'Ακυρώθηκε'
-};
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -191,7 +184,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.statusChart = new Chart(this.statusCanvas.nativeElement, {
       type: 'doughnut',
       data: {
-        labels: raw.map(r => STATUS_LABELS[r.status] ?? r.status),
+        labels: raw.map(r => statusLabel(r.status)),
         datasets: [{
           data: raw.map(r => r.count),
           backgroundColor: raw.map(r => colors[r.status] ?? '#6b7280'),

@@ -25,11 +25,7 @@ export interface ProductDto {
 }
 
 export interface ProductFilters {
-  search?: string;
   category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  sort?: string;
 }
 
 export interface Category {
@@ -49,20 +45,8 @@ export class ProductService {
   getProducts(filters?: ProductFilters): Observable<{ success: boolean; products: ProductDto[] }> {
     let params = new HttpParams();
 
-    if (filters?.search) {
-      params = params.set('search', filters.search);
-    }
     if (filters?.category && filters.category !== 'all') {
       params = params.set('category', filters.category);
-    }
-    if (filters?.minPrice !== undefined) {
-      params = params.set('minPrice', filters.minPrice.toString());
-    }
-    if (filters?.maxPrice !== undefined) {
-      params = params.set('maxPrice', filters.maxPrice.toString());
-    }
-    if (filters?.sort) {
-      params = params.set('sort', filters.sort);
     }
 
     return this.http.get<{ success: boolean; products: ProductDto[] }>(

@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { statusLabel } from '../services/order-status.util';
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
@@ -45,14 +46,7 @@ export class OrderTimelineComponent {
   }
   
   private getLabel(status: OrderStatus): string {
-    const labels: Record<OrderStatus, string> = {
-      'pending': 'Σε Αναμονή',
-      'processing': 'Σε Επεξεργασία',
-      'shipped': 'Αποστολή',
-      'delivered': 'Παραδόθηκε',
-      'cancelled': 'Ακυρώθηκε'
-    };
-    return labels[status];
+    return statusLabel(status);
   }
   
   private getIcon(status: OrderStatus, isActiveOrCompleted: boolean): string {

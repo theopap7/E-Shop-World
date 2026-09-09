@@ -8,6 +8,7 @@ import { ToastService } from '../services/toast.service';
 import { AdminService } from '../services/admin.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { environment } from '../../environments/environment';
+import { returnStatusLabel } from '../services/return-status.util';
 
 interface ReturnItem {
   product_id: number;
@@ -94,10 +95,7 @@ export class AdminReturnsComponent implements OnInit {
   }
 
   statusLabel(s: string): string {
-    if (s === 'pending') return 'Σε Αναμονή';
-    if (s === 'approved') return 'Εγκρίθηκε';
-    if (s === 'rejected') return 'Απορρίφθηκε';
-    return s;
+    return returnStatusLabel(s);
   }
 
   get pendingCount(): number {
