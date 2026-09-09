@@ -245,7 +245,7 @@
         <div class="gallery-grid" *ngIf="galleryImages.length > 0">
           <div class="gallery-item" *ngFor="let img of galleryImages">
             <img [src]="img.image_url | imageUrl" alt="Gallery" (error)="onImgError($event)" />
-            <button type="button" class="gallery-delete-btn" (click)="deleteGalleryImage(img.id)" title="Διαγραφή">✕</button>
+            <button type="button" class="gallery-delete-btn" (click)="deleteGalleryImage(img.id)" title="Διαγραφή" aria-label="Διαγραφή εικόνας">✕</button>
           </div>
         </div>
 

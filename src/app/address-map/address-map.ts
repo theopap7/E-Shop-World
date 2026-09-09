@@ -4,7 +4,6 @@ import {
   OnChanges,
   OnDestroy,
   AfterViewInit,
-  SimpleChanges,
   ElementRef,
   ViewChild,
 } from '@angular/core';
@@ -65,7 +64,7 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       .subscribe((result) => this.applyResult(result));
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     if (!this.viewReady) return;
     const query = this.buildQuery();
     if (!query) {

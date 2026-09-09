@@ -29,7 +29,7 @@
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
         />
-        <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''">✕</button>
+        <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''" aria-label="Καθαρισμός αναζήτησης">✕</button>
       </div>
 
       <div class="count-info">{{ filteredUsers.length }} χρήστες</div>

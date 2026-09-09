@@ -293,10 +293,14 @@ hr {
 
 .discount-input-group .form-input {
   flex: 1;
+  margin-top: 0;
   text-transform: uppercase;
 }
 
 .discount-input-group .btn {
+  width: auto;
+  margin: 0;
+  padding: 8px 16px;
   white-space: nowrap;
 }
 

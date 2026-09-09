@@ -10,7 +10,7 @@
     <h3>🛒 Καλάθι ({{ cartService.getCount() }})</h3>
     <div class="header-actions">
       <button *ngIf="items.length > 0" class="clear-btn" type="button" (click)="clearCart()">Αφαίρεση όλων</button>
-      <button class="close-btn" type="button" (click)="close()">✕</button>
+      <button class="close-btn" type="button" (click)="close()" aria-label="Κλείσιμο">✕</button>
     </div>
   </div>
 

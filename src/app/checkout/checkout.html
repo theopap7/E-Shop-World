@@ -246,36 +246,35 @@
           <div class="discount-input-group">
             <input
               type="text"
+              class="form-input"
               placeholder="Π.χ. SAVE10"
               [(ngModel)]="discountCode"
               [disabled]="!!appliedDiscount"
               (keyup.enter)="applyDiscount()"
-              style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase;"
             />
             <button
               type="button"
               (click)="applyDiscount()"
               [disabled]="applyingDiscount || !!appliedDiscount"
-              class="btn"
-              style="width: auto; margin: 0; padding: 8px 16px;">
+              class="btn">
               {{ applyingDiscount ? 'Έλεγχος...' : 'Εφαρμογή' }}
             </button>
           </div>
 
-          <div *ngIf="discountError" style="color: #c62828; font-size: 0.8rem; margin-top: 8px;">
+          <div *ngIf="discountError" class="discount-error">
             {{ discountError }}
           </div>
 
-          <div *ngIf="appliedDiscount" class="row" style="color: #10b981; margin-top: 12px;">
+          <div *ngIf="appliedDiscount" class="row discount-row">
             <span>
               Έκπτωση ({{ appliedDiscount.code }})
-              <button type="button" (click)="removeDiscount()" style="background: none; border: none; color: #ef4444; cursor: pointer; margin-left: 8px;">✕</button>
+              <button type="button" (click)="removeDiscount()" class="remove-discount-btn" aria-label="Αφαίρεση κωδικού έκπτωσης">✕</button>
             </span>
-            <span>-{{ discountAmount | number:'1.2-2' }}€</span>
+            <span class="discount-amount">-{{ discountAmount | number:'1.2-2' }}€</span>
           </div>
         </div>
 
-        <hr style="margin: 18px 0;">
+        <hr>
         <div class="row total"><span>Σύνολο</span><span>{{ total | number:'1.2-2' }}€</span></div>
 
       </div>
