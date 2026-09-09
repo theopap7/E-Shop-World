@@ -5,6 +5,9 @@
   <small class="map-status map-status-warn" *ngIf="status === 'not-found'">
     Δεν βρέθηκε ακριβής τοποθεσία για αυτή τη διεύθυνση.
   </small>
+  <small class="map-status map-status-warn" *ngIf="status === 'found' && !zipConfirmed">
+    Η τοποθεσία στον χάρτη βασίζεται στη διεύθυνση — ο ΤΚ δεν επιβεβαιώθηκε.
+  </small>
   <small class="map-status map-status-error" *ngIf="status === 'error'">
     Σφάλμα κατά την αναζήτηση χάρτη.
   </small>
