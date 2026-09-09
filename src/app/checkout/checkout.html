@@ -194,6 +194,7 @@
           <small class="err" *ngIf="form.get('paymentDetails.cardExp')?.touched && form.get('paymentDetails.cardExp')?.invalid">
             <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
             <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['pattern']">Μορφή: MM/YY (π.χ. 12/27)</span>
+            <span *ngIf="form.get('paymentDetails.cardExp')?.errors?.['cardExpired']">Η κάρτα έχει λήξει</span>
           </small>
 
           <label>

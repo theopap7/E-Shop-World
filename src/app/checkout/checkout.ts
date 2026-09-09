@@ -3,10 +3,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
+  ValidatorFn,
   FormsModule
 } from '@angular/forms';
 
@@ -16,6 +19,23 @@ import { DiscountService, DiscountValidationResponse } from '../services/discoun
 import { ToastService } from '../services/toast.service';
 import { AddressMapComponent } from '../address-map/address-map';
 import { AuthService } from '../services/auth.service';
+
+/** Rejects a MM/YY expiry that has already passed (format is checked separately). */
+function cardNotExpiredValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const match = /^(0[1-9]|1[0-2])\/(\d{2})$/.exec(control.value ?? '');
+    if (!match) return null;
+
+    const expMonth = Number(match[1]);
+    const expYear = 2000 + Number(match[2]);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    const isExpired = expYear < currentYear || (expYear === currentYear && expMonth < currentMonth);
+    return isExpired ? { cardExpired: true } : null;
+  };
+}
 
 @Component({
   selector: 'app-checkout',
@@ -211,6 +231,7 @@ export class CheckoutComponent implements OnInit {
       cardExp.setValidators([
         Validators.required,
         Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/),
+        cardNotExpiredValidator(),
       ]);
 
       cardCvv.setValidators([
@@ -357,15 +378,10 @@ export class CheckoutComponent implements OnInit {
         ? String(details.iban || '').trim()
         : undefined,
 
-      card: v.paymentMethod === 'card_mock'
-        ? {
-            number: String(details.cardNumber || '').trim(),
-            holder: String(details.cardHolder || '').trim(),
-            exp: String(details.cardExp || '').trim(),
-            cvv: String(details.cardCvv || '').trim(),
-          }
-        : undefined,
-      
+      // Card fields are only validated client-side for the mock-payment UX —
+      // there is no real payment processor behind this, so the PAN/CVV never
+      // needs to leave the browser and is intentionally not sent to the API.
+
       discountCode: this.appliedDiscount?.code || undefined,
       discountAmount: this.discountAmount || 0,
 

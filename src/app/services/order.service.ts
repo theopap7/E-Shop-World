@@ -22,13 +22,6 @@ export interface ShippingDto {
 export type ShippingMethod = 'courier_standard' | 'courier_express' | 'pickup';
 export type PaymentMethod = 'cod' | 'card_mock' | 'bank_transfer';
 
-export interface CardDto {
-  number: string;
-  holder: string;
-  exp: string;
-  cvv: string;
-}
-
 export interface CreateOrderDto {
   items: CreateOrderItemDto[];
   recipientName: string;
@@ -37,7 +30,6 @@ export interface CreateOrderDto {
   shippingMethod: ShippingMethod;
   paymentMethod: PaymentMethod;
   paymentIban?: string;
-  card?: CardDto;
   discountCode?: string;
   discountAmount?: number;
   isGift?: boolean;
