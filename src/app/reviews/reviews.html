@@ -65,8 +65,10 @@
 
   <div *ngIf="isLoading" class="loading">Φόρτωση κριτικών...</div>
 
-  <div *ngIf="!isLoading && reviews.length === 0" class="no-reviews">
-    Δεν υπάρχουν κριτικές ακόμα. Γίνε ο πρώτος!
+  <div *ngIf="!isLoading && reviews.length === 0" class="empty-state">
+    <div class="empty-icon">⭐</div>
+    <h3>Δεν υπάρχουν κριτικές ακόμα</h3>
+    <p>Γίνε ο πρώτος που θα αξιολογήσει αυτό το προϊόν.</p>
   </div>
 
   <div class="reviews-list">

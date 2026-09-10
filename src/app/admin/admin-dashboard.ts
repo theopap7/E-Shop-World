@@ -133,31 +133,23 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.revenueChart?.destroy();
     this.revenueChart = new Chart(this.revenueCanvas.nativeElement, {
-      type: 'line',
+      type: 'bar',
       data: {
         labels,
         datasets: [
           {
             label: 'Έσοδα (€)',
             data: revenueData,
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37,99,235,0.08)',
-            fill: true,
-            tension: 0.4,
-            yAxisID: 'yRevenue',
-            pointRadius: 3,
-            pointHoverRadius: 5
+            backgroundColor: '#2563eb',
+            borderRadius: 4,
+            yAxisID: 'yRevenue'
           },
           {
             label: 'Παραγγελίες',
             data: ordersData,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16,185,129,0.08)',
-            fill: true,
-            tension: 0.4,
-            yAxisID: 'yOrders',
-            pointRadius: 3,
-            pointHoverRadius: 5
+            backgroundColor: '#10b981',
+            borderRadius: 4,
+            yAxisID: 'yOrders'
           }
         ]
       },
