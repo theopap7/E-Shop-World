@@ -48,6 +48,10 @@ export class ReviewsComponent implements OnInit {
     return this.reviews.some(r => r.user_id === this.currentUserId);
   }
 
+  get reviewsLabel(): string {
+    return this.total === 1 ? 'κριτική' : 'κριτικές';
+  }
+
   private destroyRef = inject(DestroyRef);
 
   constructor(
