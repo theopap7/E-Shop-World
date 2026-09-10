@@ -17,6 +17,7 @@ import { ToastService } from '../services/toast.service';
 export class HeaderComponent implements OnInit {
   cartCount = 0;
   isLoggedIn = false;
+  isAdmin = false;
   wishlistCount = 0;
 
   private destroyRef = inject(DestroyRef);
@@ -37,6 +38,7 @@ export class HeaderComponent implements OnInit {
 
     this.authService.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
       this.isLoggedIn = !!user;
+      this.isAdmin = this.authService.isAdmin();
     });
 
     this.wishlistService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {

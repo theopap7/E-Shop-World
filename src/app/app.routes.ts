@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login';
 import { Dashboard } from './dashboard/dashboard';
 import { CartComponent } from './cart/cart';
 import { authGuard } from './guards/auth.guard';
+import { guestGuard } from './guards/guest.guard';
 import { adminGuard } from './guards/admin.guard';
 import { ProfileComponent } from './profile/profile';
 import { MyOrdersComponent } from './my-orders/my-orders';
@@ -25,13 +26,15 @@ import { ResetPasswordComponent } from './reset-password/reset-password';
 
 export const routes: Routes = [
 
-  { 
-    path: 'register', 
-    component: RegisterComponent 
+  {
+    path: 'register',
+    component: RegisterComponent,
+    canActivate: [guestGuard]
   },
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [guestGuard]
   },
   {
     path: 'forgot-password',

@@ -24,6 +24,11 @@
         <span class="chip-text">Προφίλ</span>
       </a>
 
+      <a *ngIf="isAdmin" routerLink="/admin" class="action-chip">
+        <span class="chip-icon">🛠️</span>
+        <span class="chip-text">Διαχείριση</span>
+      </a>
+
       <button class="action-chip danger" type="button" (click)="logout()">
         <span class="chip-icon">↩</span>
         <span class="chip-text">Αποσύνδεση</span>
