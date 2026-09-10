@@ -23,6 +23,8 @@ import { AdminReturnsComponent } from './admin/admin-returns';
 import { AdminUsersComponent } from './admin/admin-users';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { ResetPasswordComponent } from './reset-password/reset-password';
+import { AboutComponent } from './about/about';
+import { TermsComponent } from './terms/terms';
 
 export const routes: Routes = [
 
@@ -190,9 +192,21 @@ export const routes: Routes = [
     data: { breadcrumb: 'Χρήστες' }
   },
 
-  { 
-    path: '404', 
-    component: NotFoundComponent 
+  {
+    path: 'about',
+    component: AboutComponent,
+    data: { breadcrumb: 'Σχετικά' }
+  },
+
+  {
+    path: 'terms',
+    component: TermsComponent,
+    data: { breadcrumb: 'Όροι Χρήσης' }
+  },
+
+  {
+    path: '404',
+    component: NotFoundComponent
   },
 
   { 

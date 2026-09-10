@@ -211,7 +211,7 @@
 
         <label class="terms">
           <input type="checkbox" formControlName="acceptTerms" />
-          Αποδέχομαι τους όρους χρήσης
+          Αποδέχομαι τους <a routerLink="/terms" target="_blank" (click)="$event.stopPropagation()">όρους χρήσης</a>
         </label>
         <small class="err" *ngIf="form.get('acceptTerms')?.touched && form.get('acceptTerms')?.invalid">
           Πρέπει να αποδεχτείς τους όρους
