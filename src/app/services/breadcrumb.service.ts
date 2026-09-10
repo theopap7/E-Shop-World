@@ -211,6 +211,17 @@ export class BreadcrumbService {
       return breadcrumbs;
     }
 
+    if (segments.length === 1) {
+      // any other single-segment top-level route (about, terms, ...) —
+      // sourced straight from its route so a new one never needs a branch here
+      const path = `/${segments[0]}`;
+      const label = this.routeLabel(path);
+      if (label) {
+        breadcrumbs.push({ label, url: path, active: true });
+        return breadcrumbs;
+      }
+    }
+
     // Fallback: mark home as active
     breadcrumbs[0].active = true;
     return breadcrumbs;
