@@ -11,12 +11,14 @@
 
     <div *ngIf="isLoading" class="card">Φόρτωση...</div>
 
-    <div *ngIf="!isLoading && error" class="card empty-state">
+    <div *ngIf="!isLoading && error" class="card">
       <p>{{ error }}</p>
     </div>
 
-    <div *ngIf="!isLoading && !error && groups.length === 0" class="card empty-state">
-      <p>Δεν έχεις υποβάλει κανένα αίτημα επιστροφής.</p>
+    <div *ngIf="!isLoading && !error && groups.length === 0" class="empty-state">
+      <div class="empty-icon">↩️</div>
+      <h3>Δεν έχεις υποβάλει αίτημα επιστροφής</h3>
+      <p>Αν κάτι δεν πήγε καλά σε μια παραγγελία, μπορείς να ζητήσεις επιστροφή από εκεί.</p>
       <a routerLink="/profile/orders" class="btn btn-outline">Δες τις παραγγελίες σου</a>
     </div>
 
