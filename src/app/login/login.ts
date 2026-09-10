@@ -54,6 +54,7 @@ export class LoginComponent {
         }
       });
     } else if (!this.isSubmitting) {
+      this.loginForm.markAllAsTouched();
       this.toastService.warning('Παρακαλώ συμπλήρωσε όλα τα πεδία σωστά');
     }
   }

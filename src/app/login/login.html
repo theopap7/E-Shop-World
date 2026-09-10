@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="!loginForm.valid || isSubmitting">
+    <button type="submit" [disabled]="isSubmitting">
       {{ isSubmitting ? 'Σύνδεση...' : 'Σύνδεση' }}
     </button>
   </form>

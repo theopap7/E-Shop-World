@@ -76,6 +76,7 @@ export class RegisterComponent {
         }
       });
     } else {
+      this.registerForm.markAllAsTouched();
       if (this.registerForm.errors?.['mismatch']) {
         this.toastService.warning('Οι κωδικοί δεν ταιριάζουν');
       } else {
