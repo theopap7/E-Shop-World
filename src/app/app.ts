@@ -13,15 +13,24 @@ import { FooterComponent } from './footer/footer';
   template: `
     <app-cart-sidebar></app-cart-sidebar>
     <app-toast-container></app-toast-container>
-    <div class="layout-wrapper">
-      <app-header></app-header>
-      <app-breadcrumb></app-breadcrumb>
-      <router-outlet></router-outlet>
+    <div class="app-shell">
+      <div class="layout-wrapper">
+        <app-header></app-header>
+        <app-breadcrumb></app-breadcrumb>
+        <router-outlet></router-outlet>
+      </div>
+      <app-footer></app-footer>
     </div>
-    <app-footer></app-footer>
   `,
    styles: [`
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
     .layout-wrapper {
+      flex: 1;
       max-width: 1200px;
       margin: 0 auto;
       padding: 12px 20px 0;
