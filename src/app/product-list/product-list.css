@@ -261,15 +261,30 @@
 }
 
 /* Empty state with reset */
-.empty {
+.empty-state {
+  margin-top: 14px;
   text-align: center;
-  padding: var(--space-8);
-  color: var(--color-text-muted);
+  padding: 80px 20px;
+  background: #f9fafb;
+  border-radius: 12px;
 }
 
-.empty p {
-  margin-bottom: var(--space-4);
-  font-size: var(--text-lg);
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 0 0 12px;
+  color: #1f2937;
+  font-size: 22px;
+}
+
+.empty-state p {
+  margin: 0 0 20px;
+  color: #6b7280;
+  font-size: 15px;
 }
 
 /* Responsive */

@@ -119,9 +119,11 @@
     </button>
   </div>
 
-  <div *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0" class="empty">
-    <p>😕 Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα.</p>
-    <button class="btn-outline" type="button" (click)="resetFilters()">
+  <div *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0" class="empty-state">
+    <div class="empty-icon">😕</div>
+    <h3>Δεν βρέθηκαν προϊόντα</h3>
+    <p>Δοκίμασε διαφορετικά φίλτρα ή καθάρισέ τα.</p>
+    <button class="reset-btn" type="button" (click)="resetFilters()">
       Καθαρισμός φίλτρων
     </button>
   </div>

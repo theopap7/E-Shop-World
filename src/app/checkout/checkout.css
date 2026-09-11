@@ -63,12 +63,14 @@
 .alert {
   padding: 12px 14px;
   border-radius: 6px;
+  border: 1px solid transparent;
   margin-bottom: 16px;
 }
 
 .alert-error {
-  background: #fdecea;
-  color: #b71c1c;
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
 }
 
 .alert-success {

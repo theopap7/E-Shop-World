@@ -73,7 +73,7 @@
 }
 
 .err {
-  color: #e74c3c;
+  color: var(--color-danger);
   font-size: 12px;
 }
 
