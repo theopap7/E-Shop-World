@@ -1,0 +1,101 @@
+<section class="page">
+    <div class="container">
+
+      <div class="header-actions">
+        <a [routerLink]="['/admin']" class="back-button">
+          <span>← Πίσω στον πίνακα διαχειριστή</span>
+        </a>
+      </div>
+
+      <div class="page-header">
+        <h2>🏷️ Κατηγορίες</h2>
+        <button class="btn btn-primary" type="button" (click)="openCreateModal()">
+          + Νέα Κατηγορία
+        </button>
+      </div>
+
+    <div *ngIf="isLoading" class="card">
+      Φόρτωση...
+    </div>
+
+    <div *ngIf="!isLoading" class="card table-wrap">
+
+      <div *ngIf="categories.length === 0" class="empty-state">
+        Δεν υπάρχουν κατηγορίες
+      </div>
+
+      <table *ngIf="categories.length > 0" class="table">
+        <thead>
+          <tr>
+            <th>Όνομα</th>
+            <th>Προϊόντα</th>
+            <th>Ενέργειες</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories">
+
+            <td><strong>{{ category.name }}</strong></td>
+
+            <td>{{ category.product_count }}</td>
+
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="btn-icon"
+                  (click)="openEditModal(category)"
+                  title="Επεξεργασία">
+                  ✏️
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-icon"
+                  (click)="deleteCategory(category.id, category.name)"
+                  title="Διαγραφή">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Επεξεργασία Κατηγορίας' : 'Νέα Κατηγορία' }}</h3>
+      <button type="button" class="close-btn" (click)="closeModal()" aria-label="Κλείσιμο">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <label class="form-label">
+        Όνομα *
+        <input
+          type="text"
+          class="form-input"
+          placeholder="π.χ. Αθλητικά"
+          [(ngModel)]="form.name"
+        />
+      </label>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="closeModal()">
+        Ακύρωση
+      </button>
+      <button type="button" class="btn btn-primary" (click)="saveCategory()" [disabled]="isSaving">
+        {{ isSaving ? 'Αποθήκευση...' : (isEditMode ? 'Αποθήκευση' : 'Δημιουργία') }}
+      </button>
+    </div>
+
+  </div>
+</div>

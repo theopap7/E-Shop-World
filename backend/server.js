@@ -38,6 +38,7 @@ app.use('/api', require('./routes/admin/stats'));
 app.use('/api', require('./routes/admin/reviews'));
 app.use('/api', require('./routes/admin/discounts'));
 app.use('/api', require('./routes/admin/returns'));
+app.use('/api', require('./routes/admin/categories'));
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });

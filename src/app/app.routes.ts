@@ -21,6 +21,7 @@ import { NotFoundComponent } from './not-found/not-found';
 import { AdminDiscountsComponent } from './admin-discounts/admin-discounts';
 import { AdminReturnsComponent } from './admin/admin-returns';
 import { AdminUsersComponent } from './admin/admin-users';
+import { AdminCategoriesComponent } from './admin/admin-categories';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { ResetPasswordComponent } from './reset-password/reset-password';
 import { AboutComponent } from './about/about';
@@ -190,6 +191,13 @@ export const routes: Routes = [
     component: AdminUsersComponent,
     canActivate: [adminGuard],
     data: { breadcrumb: 'Χρήστες' }
+  },
+
+  {
+    path: 'admin/categories',
+    component: AdminCategoriesComponent,
+    canActivate: [adminGuard],
+    data: { breadcrumb: 'Κατηγορίες' }
   },
 
   {

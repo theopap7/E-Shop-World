@@ -68,6 +68,17 @@ export interface AdminUser {
   last_order_at: string | null;
 }
 
+export interface AdminCategory {
+  id: number;
+  name: string;
+  created_at: string;
+  product_count: number;
+}
+
+export interface CreateCategoryDto {
+  name: string;
+}
+
 export interface AdminReviewDto {
   id: number;
   rating: number;
@@ -150,6 +161,22 @@ export class AdminService {
       { params: { range } }
     );
   }
+
+getCategories(): Observable<{ success: boolean; categories: AdminCategory[] }> {
+  return this.http.get<{ success: boolean; categories: AdminCategory[] }>(`${this.baseUrl}/categories`);
+}
+
+createCategory(category: CreateCategoryDto): Observable<ApiResponse> {
+  return this.http.post<ApiResponse>(`${this.baseUrl}/categories`, category);
+}
+
+updateCategory(id: number, category: CreateCategoryDto): Observable<ApiResponse> {
+  return this.http.put<ApiResponse>(`${this.baseUrl}/categories/${id}`, category);
+}
+
+deleteCategory(id: number): Observable<ApiResponse> {
+  return this.http.delete<ApiResponse>(`${this.baseUrl}/categories/${id}`);
+}
 
 getAllReviews(): Observable<{ success: boolean; reviews: AdminReviewDto[] }> {
   return this.http.get<{ success: boolean; reviews: AdminReviewDto[] }>(
