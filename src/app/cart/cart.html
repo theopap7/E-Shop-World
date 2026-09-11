@@ -12,12 +12,11 @@
         <p class="subtitle">Έλεγξε ποσότητες και ολοκλήρωσε την παραγγελία σου</p>
       </div>
 
-      <div class="top-actions">
+      <div class="top-actions" *ngIf="items.length > 0">
         <button
           class="btn btn-danger-outline"
           type="button"
           (click)="clear()"
-          [disabled]="items.length === 0"
         >
           Αφαίρεση όλων
         </button>
@@ -26,8 +25,10 @@
 
     <p *ngIf="orderError" class="alert alert-error">{{ orderError }}</p>
 
-    <div *ngIf="items.length === 0" class="empty-card">
-      <p class="empty-title">Το καλάθι είναι άδειο.</p>
+    <div *ngIf="items.length === 0" class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h3>Το καλάθι σου είναι άδειο</h3>
+      <p>Πρόσθεσε προϊόντα που σου αρέσουν για να τα δεις εδώ!</p>
       <a class="btn btn-primary" routerLink="/dashboard">Πήγαινε στα προϊόντα</a>
     </div>
 

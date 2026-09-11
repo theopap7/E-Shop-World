@@ -144,18 +144,30 @@
   color: #991b1b;
 }
 
-.empty-card {
+.empty-state {
   margin-top: 14px;
-  background: #fff;
-  border: 1px dashed #e5e7eb;
-  border-radius: 14px;
-  padding: 22px;
   text-align: center;
+  padding: 80px 20px;
+  background: #f9fafb;
+  border-radius: 12px;
 }
 
-.empty-title {
-  margin: 0 0 12px;
-  color: #374151;
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 22px;
+}
+
+.empty-state p {
+  margin: 0 0 20px;
+  color: #6b7280;
+  font-size: 15px;
 }
 
 .cart-card {

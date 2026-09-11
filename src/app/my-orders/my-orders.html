@@ -46,9 +46,10 @@
       </button>
     </div>
 
-    <div *ngIf="!isLoading && !error && orders.length === 0" class="card">
-      Δεν έχεις κάνει ακόμα παραγγελίες.
-      <div class="spacer"></div>
+    <div *ngIf="!isLoading && !error && orders.length === 0" class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h3>Δεν έχεις κάνει ακόμα παραγγελίες</h3>
+      <p>Οι παραγγελίες σου θα εμφανίζονται εδώ μόλις κάνεις την πρώτη σου αγορά.</p>
       <a class="btn btn-primary" routerLink="/dashboard">Πήγαινε στα προϊόντα</a>
     </div>
 
