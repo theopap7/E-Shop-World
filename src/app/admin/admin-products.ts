@@ -70,6 +70,7 @@ export class AdminProductsComponent implements OnInit {
           this.products = this.products.filter((p) => p.id !== id);
           const maxPage = Math.max(1, Math.ceil(this.products.length / this.pageSize));
           if (this.currentPage > maxPage) this.currentPage = maxPage;
+          this.adminService.invalidateStatsCache();
           this.toastService.success(res.message || 'Το προϊόν διαγράφηκε!');
         } else {
           this.toastService.error(res.message || 'Αποτυχία διαγραφής');

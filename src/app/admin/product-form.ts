@@ -9,6 +9,7 @@ import { ToastService } from '../services/toast.service';
 import { environment } from '../../environments/environment';
 import { Category, ProductImage } from '../services/product.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { CLOTHING_SIZES as CLOTHING_SIZE_OPTIONS, SHOE_SIZES as SHOE_SIZE_OPTIONS, sortSizes } from '../services/size-order.util';
 
 @Component({
   selector: 'app-product-form',
@@ -42,8 +43,8 @@ export class ProductFormComponent implements OnInit {
   uploadingGallery = false;
 
   // sizes
-  readonly CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  readonly SHOE_SIZES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+  readonly CLOTHING_SIZES = CLOTHING_SIZE_OPTIONS;
+  readonly SHOE_SIZES = SHOE_SIZE_OPTIONS;
   selectedSizes: string[] = [];
 
   get sizeMode(): 'clothing' | 'shoes' | 'none' {
@@ -168,10 +169,12 @@ export class ProductFormComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
+    const sortedSizes = sortSizes(this.selectedSizes);
+
     const productData = {
       ...this.form.value,
       category_id: this.form.value.category_id || null,
-      sizes: this.selectedSizes.length > 0 ? this.selectedSizes : null,
+      sizes: sortedSizes.length > 0 ? sortedSizes : null,
     };
 
     const request = this.isEditMode
@@ -181,6 +184,7 @@ export class ProductFormComponent implements OnInit {
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
+          this.adminService.invalidateStatsCache();
           this.toastService.success(this.isEditMode ? 'Προϊόν ενημερώθηκε!' : 'Προϊόν δημιουργήθηκε!');
           this.router.navigate(['/admin/products']);
         }

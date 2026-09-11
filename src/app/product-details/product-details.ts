@@ -11,6 +11,7 @@ import { BreadcrumbService } from '../services/breadcrumb.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RecentlyViewedService, RecentlyViewedProduct } from '../services/recently-viewed.service';
+import { sortSizes } from '../services/size-order.util';
 
 @Component({
   selector: 'app-product-detail',
@@ -38,7 +39,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   get sizes(): string[] {
-    return this.product?.sizes ?? [];
+    return sortSizes(this.product?.sizes ?? []);
   }
 
   get canAddToCart(): boolean {
