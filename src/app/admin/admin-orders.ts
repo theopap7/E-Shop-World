@@ -88,10 +88,7 @@ export class AdminOrdersComponent implements OnInit {
     this.adminService.getOrders().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
-          this.orders = res.orders.sort((a: AdminOrder, b: AdminOrder) =>
-            a.status === 'pending' && b.status !== 'pending' ? -1 :
-            a.status !== 'pending' && b.status === 'pending' ? 1 : 0
-          );
+          this.orders = this.sortOrders(res.orders);
         }
         this.isLoading = false;
       },
@@ -100,6 +97,25 @@ export class AdminOrdersComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  // Re-fetches without toggling isLoading, so a single status change doesn't
+  // flash the whole table into its loading skeleton.
+  private refreshOrdersQuietly(): void {
+    this.adminService.getOrders().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.orders = this.sortOrders(res.orders);
+        }
+      }
+    });
+  }
+
+  private sortOrders(orders: AdminOrder[]): AdminOrder[] {
+    return orders.sort((a: AdminOrder, b: AdminOrder) =>
+      a.status === 'pending' && b.status !== 'pending' ? -1 :
+      a.status !== 'pending' && b.status === 'pending' ? 1 : 0
+    );
   }
 
   updateStatus(orderId: number, newStatus: string): void {
@@ -119,8 +135,10 @@ export class AdminOrdersComponent implements OnInit {
     this.adminService.updateOrderStatus(orderId, newStatus).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
-          const order = this.orders.find((o) => o.id === orderId);
-          if (order) order.status = newStatus;
+          // Reload instead of patching order.status locally — the server may also
+          // change payment_status as a side effect (e.g. COD auto-marks paid on
+          // delivery), and a local patch would leave that stale until next refresh.
+          this.refreshOrdersQuietly();
           this.adminService.invalidateStatsCache();
           this.toastService.success('Κατάσταση παραγγελίας ενημερώθηκε!');
         }

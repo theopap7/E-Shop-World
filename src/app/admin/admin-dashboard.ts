@@ -214,12 +214,18 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
+  // Builds keys from local date components (not toISOString, which converts to
+  // UTC and can shift the date by a day for timezones ahead of UTC) so they
+  // line up with the server's local-calendar-day grouping.
   private getLastNDays(n: number): string[] {
     const days: string[] = [];
     for (let i = n - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      days.push(d.toISOString().slice(0, 10));
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const date = String(d.getDate()).padStart(2, '0');
+      days.push(`${year}-${month}-${date}`);
     }
     return days;
   }

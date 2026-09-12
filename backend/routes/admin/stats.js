@@ -27,7 +27,7 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
       db.query(`SELECT COUNT(*) as total FROM orders WHERE payment_status = 'pending' AND payment_method = 'bank_transfer' AND status != 'cancelled'`),
       db.query(`SELECT COUNT(*) as total FROM return_requests WHERE status = 'pending'`),
       db.query(`
-        SELECT DATE(o.created_at) AS day, COUNT(*) AS orders,
+        SELECT DATE_FORMAT(o.created_at, '%Y-%m-%d') AS day, COUNT(*) AS orders,
           ROUND(SUM(CASE WHEN o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded')
             THEN o.total_amount - COALESCE(ref.refunded, 0) ELSE 0 END), 2) AS revenue
         FROM orders o
@@ -37,7 +37,7 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
           GROUP BY order_id
         ) ref ON ref.order_id = o.id
         WHERE o.created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
-        GROUP BY DATE(o.created_at) ORDER BY day ASC
+        GROUP BY day ORDER BY day ASC
       `),
       db.query(`SELECT status, COUNT(*) AS count FROM orders GROUP BY status`),
       db.query(`
@@ -83,7 +83,7 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
     const [[dailyOrders], [statusBreakdown], [topProducts]] = await Promise.all([
       db.query(`
         SELECT
-          DATE(o.created_at) AS day,
+          DATE_FORMAT(o.created_at, '%Y-%m-%d') AS day,
           COUNT(*) AS orders,
           ROUND(SUM(CASE WHEN o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded')
             THEN o.total_amount - COALESCE(ref.refunded, 0) ELSE 0 END), 2) AS revenue
@@ -94,7 +94,7 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
           GROUP BY order_id
         ) ref ON ref.order_id = o.id
         ${dateFilter}
-        GROUP BY DATE(o.created_at)
+        GROUP BY day
         ORDER BY day ASC
       `, dateParams),
       db.query(`
