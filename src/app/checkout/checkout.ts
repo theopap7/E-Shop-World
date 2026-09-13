@@ -61,6 +61,7 @@ export class CheckoutComponent implements OnInit {
   success: string | null = null;
   discountExpiredPrompt = false;
   orderingForOther = false;
+  resendingVerification = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -169,6 +170,27 @@ export class CheckoutComponent implements OnInit {
     } else {
       this.applyMyDetails();
     }
+  }
+
+  get isEmailVerified(): boolean {
+    return this.authService.getUser()?.emailVerified !== false;
+  }
+
+  resendVerification(): void {
+    const user = this.authService.getUser();
+    if (!user || this.resendingVerification) return;
+
+    this.resendingVerification = true;
+    this.authService.resendVerification(user.email).subscribe({
+      next: () => {
+        this.resendingVerification = false;
+        this.toastService.success('Στάλθηκε νέο email επιβεβαίωσης!');
+      },
+      error: (err) => {
+        this.resendingVerification = false;
+        this.toastService.error(err.error?.message || 'Σφάλμα αποστολής email');
+      }
+    });
   }
 
   get total(): number {
@@ -330,6 +352,11 @@ export class CheckoutComponent implements OnInit {
 
     if (this.items.length === 0) {
       this.error = 'Το καλάθι είναι άδειο.';
+      return;
+    }
+
+    if (!this.isEmailVerified) {
+      this.error = 'Επιβεβαίωσε το email σου πριν ολοκληρώσεις την παραγγελία.';
       return;
     }
 

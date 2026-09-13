@@ -24,6 +24,7 @@ import { AdminUsersComponent } from './admin/admin-users';
 import { AdminCategoriesComponent } from './admin/admin-categories';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { ResetPasswordComponent } from './reset-password/reset-password';
+import { VerifyEmailComponent } from './verify-email/verify-email';
 import { AboutComponent } from './about/about';
 import { TermsComponent } from './terms/terms';
 
@@ -46,6 +47,10 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent
   },
 
   {

@@ -83,6 +83,12 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
     conn = await db.getConnection();
     await conn.beginTransaction();
 
+    const [verifiedRows] = await conn.query('SELECT email_verified FROM users WHERE id = ?', [userId]);
+    if (!verifiedRows.length || !verifiedRows[0].email_verified) {
+      await conn.rollback();
+      return res.status(403).json({ success: false, message: 'Επιβεβαίωσε το email σου πριν ολοκληρώσεις παραγγελία' });
+    }
+
     const validatedItems = [];
     for (const item of items) {
       const { productId, quantity } = item;

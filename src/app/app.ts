@@ -5,15 +5,17 @@ import { ToastContainerComponent } from './toast/toast';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb';
 import { HeaderComponent } from './header/header';
 import { FooterComponent } from './footer/footer';
+import { EmailVerifyBannerComponent } from './email-verify-banner/email-verify-banner';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ RouterModule, CartSidebarComponent, ToastContainerComponent, BreadcrumbComponent, HeaderComponent, FooterComponent ],
+  imports: [ RouterModule, CartSidebarComponent, ToastContainerComponent, BreadcrumbComponent, HeaderComponent, FooterComponent, EmailVerifyBannerComponent ],
   template: `
     <app-cart-sidebar></app-cart-sidebar>
     <app-toast-container></app-toast-container>
     <div class="app-shell">
+      <app-email-verify-banner></app-email-verify-banner>
       <div class="layout-wrapper">
         <app-header></app-header>
         <app-breadcrumb></app-breadcrumb>

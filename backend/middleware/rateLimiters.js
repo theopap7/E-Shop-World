@@ -42,4 +42,12 @@ const discountLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-module.exports = { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter, discountLimiter };
+const resendVerificationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: { success: false, message: 'Πολλά αιτήματα επαναποστολής. Δοκιμάστε ξανά σε 15 λεπτά.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+module.exports = { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter, discountLimiter, resendVerificationLimiter };

@@ -64,7 +64,7 @@ export class RegisterComponent {
         next: () => {
           this.toastService.success('Η εγγραφή ολοκληρώθηκε επιτυχώς! 🎉');
           setTimeout(() => {
-            this.toastService.info('Μπορείς να συνδεθείς τώρα');
+            this.toastService.info('Έλεγξε το email σου για να το επιβεβαιώσεις');
           }, 500);
           this.isSubmitting = false;
           this.router.navigate(['/login']);

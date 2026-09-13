@@ -1,0 +1,55 @@
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+h2 {
+  font-size: 26px;
+  margin-bottom: 10px;
+  color: #6366f1;
+}
+
+.subtitle {
+  color: #555;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.success-box {
+  padding: 20px 0;
+}
+
+.success-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.success-box h3 {
+  color: #6366f1;
+  margin-bottom: 12px;
+}
+
+.success-box p {
+  color: #555;
+  font-size: 14px;
+}
+
+.back-link {
+  margin-top: 20px;
+}
+
+.back-link a {
+  color: #6366f1;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}

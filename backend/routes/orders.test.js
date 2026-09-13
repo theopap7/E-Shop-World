@@ -18,9 +18,10 @@ function authCookie(payload = { id: 1, role: 'user' }) {
   return `token=${token}`;
 }
 
-function makeConn({ productRows }) {
+function makeConn({ productRows, emailVerified = true }) {
   return {
     query: jest.fn()
+      .mockResolvedValueOnce([[{ email_verified: emailVerified ? 1 : 0 }]]) // SELECT email_verified
       .mockResolvedValueOnce([productRows]) // SELECT product ... FOR UPDATE
       .mockResolvedValueOnce([{ insertId: 123 }]) // INSERT INTO orders
       .mockResolvedValueOnce([{}]) // INSERT INTO order_items
@@ -73,9 +74,26 @@ describe('POST /api/orders', () => {
     expect(res.body.subtotal).toBe(realDbPrice);
     expect(res.body.totalAmount).toBe(realDbPrice);
 
-    const orderItemInsertCall = conn.query.mock.calls[2];
+    const orderItemInsertCall = conn.query.mock.calls[3];
     expect(orderItemInsertCall[1]).toContain(realDbPrice);
     expect(orderItemInsertCall[1]).not.toContain(0.01);
+  });
+
+  it('rejects order creation for an unverified email', async () => {
+    const conn = makeConn({
+      productRows: [{ id: 5, price: 49.99, stock: 10, name: 'Test Product' }],
+      emailVerified: false
+    });
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Cookie', authCookie())
+      .send(basePayload);
+
+    expect(res.status).toBe(403);
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
   });
 
   it('rejects the order when requested quantity exceeds available stock', async () => {
@@ -124,7 +142,7 @@ describe('POST /api/orders', () => {
 
     expect(res.status).toBe(201);
 
-    const orderInsertCall = conn.query.mock.calls[1];
+    const orderInsertCall = conn.query.mock.calls[2];
     expect(orderInsertCall[1]).toContain(true);
     expect(orderInsertCall[1]).toContain('Happy birthday!');
   });
@@ -142,7 +160,7 @@ describe('POST /api/orders', () => {
 
     expect(res.status).toBe(201);
 
-    const orderInsertCall = conn.query.mock.calls[1];
+    const orderInsertCall = conn.query.mock.calls[2];
     expect(orderInsertCall[1]).toContain(false);
     expect(orderInsertCall[1]).not.toContain('Should be ignored');
   });

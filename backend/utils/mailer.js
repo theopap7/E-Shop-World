@@ -72,6 +72,43 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
   return { info, previewUrl: previewUrl || null };
 }
 
+async function sendVerificationEmail(toEmail, verifyLink) {
+  const transport = await getTransporter();
+
+  const info = await transport.sendMail({
+    from: process.env.EMAIL_FROM || '"E-Shop" <noreply@eshop.gr>',
+    to: toEmail,
+    subject: 'Επιβεβαίωση email',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
+        <h2 style="color: #2563eb;">Καλωσήρθες στο E-Shop!</h2>
+        <p>Κάνε κλικ στο παρακάτω κουμπί για να επιβεβαιώσεις το email σου:</p>
+        <a href="${verifyLink}" style="
+          display: inline-block;
+          padding: 12px 24px;
+          background-color: #2563eb;
+          color: white;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: bold;
+          margin: 16px 0;
+        ">Επιβεβαίωση Email</a>
+        <p style="color: #888; font-size: 13px;">
+          Ο σύνδεσμος λήγει σε <strong>24 ώρες</strong>.<br>
+          Αν δεν δημιούργησες εσύ αυτόν τον λογαριασμό, αγνόησε αυτό το email.
+        </p>
+      </div>
+    `,
+  });
+
+  const previewUrl = nodemailer.getTestMessageUrl(info);
+  if (previewUrl) {
+    console.log('📧 Verification email preview:', previewUrl);
+  }
+
+  return { info, previewUrl: previewUrl || null };
+}
+
 async function sendOrderConfirmationEmail(toEmail, order) {
   const transport = await getTransporter();
 
@@ -214,4 +251,4 @@ async function sendOrderStatusEmail(toEmail, order) {
   return info;
 }
 
-module.exports = { sendPasswordResetEmail, sendOrderConfirmationEmail, sendOrderStatusEmail };
+module.exports = { sendPasswordResetEmail, sendVerificationEmail, sendOrderConfirmationEmail, sendOrderStatusEmail };

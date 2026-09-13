@@ -1,0 +1,8 @@
+<div class="verify-banner" *ngIf="showBanner">
+  <span class="icon">✉️</span>
+  <span class="text">Το email σου δεν έχει επιβεβαιωθεί.</span>
+  <button *ngIf="!sent" type="button" [disabled]="isSending" (click)="resend()">
+    {{ isSending ? 'Αποστολή...' : 'Επαναποστολή email επιβεβαίωσης' }}
+  </button>
+  <span class="sent-text" *ngIf="sent">Στάλθηκε! Έλεγξε τα εισερχόμενά σου.</span>
+</div>

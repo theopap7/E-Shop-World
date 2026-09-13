@@ -1,0 +1,53 @@
+.verify-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background: #fffbeb;
+  border-bottom: 1px solid #fcd34d;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1;
+}
+
+button {
+  padding: 6px 14px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  background: #d97706;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.sent-text {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .verify-banner {
+    padding: 10px 16px;
+  }
+}

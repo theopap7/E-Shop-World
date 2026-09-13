@@ -13,6 +13,16 @@
     <div *ngIf="error" class="alert alert-error">{{ error }}</div>
     <div *ngIf="success" class="alert alert-success">{{ success }}</div>
 
+    <div *ngIf="!isEmailVerified" class="alert alert-warning">
+      <p><strong>Το email σου δεν έχει επιβεβαιωθεί.</strong></p>
+      <p>Πρέπει να επιβεβαιώσεις το email σου πριν ολοκληρώσεις την παραγγελία.</p>
+      <div class="prompt-actions">
+        <button type="button" class="prompt-btn prompt-btn-primary" [disabled]="resendingVerification" (click)="resendVerification()">
+          {{ resendingVerification ? 'Αποστολή...' : 'Επαναποστολή email επιβεβαίωσης' }}
+        </button>
+      </div>
+    </div>
+
     <div *ngIf="discountExpiredPrompt" class="alert alert-warning discount-expired-prompt">
       <p><strong>Ο κωδικός έκπτωσης δεν είναι πλέον διαθέσιμος.</strong></p>
       <p>Θέλεις να συνεχίσεις χωρίς έκπτωση;</p>
@@ -217,7 +227,7 @@
           Πρέπει να αποδεχτείς τους όρους
         </small>
 
-        <button type="submit" [disabled]="isSubmitting || form.invalid || items.length === 0" class="btn">
+        <button type="submit" [disabled]="isSubmitting || form.invalid || items.length === 0 || !isEmailVerified" class="btn">
           {{ isSubmitting ? 'Γίνεται καταχώρηση...' : 'Ολοκλήρωση παραγγελίας' }}
         </button>
       </form>

@@ -14,6 +14,7 @@ CREATE TABLE users (
   address1 VARCHAR(255),
   address_floor VARCHAR(50),
   role ENUM('user', 'admin') DEFAULT 'user',
+  email_verified BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -145,6 +146,18 @@ CREATE TABLE password_reset_tokens (
 );
 
 CREATE INDEX idx_reset_token ON password_reset_tokens(token);
+
+CREATE TABLE email_verification_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token VARCHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_email_verification_token ON email_verification_tokens(token);
 
 -- Sample categories
 INSERT INTO categories (name) VALUES ('Ηλεκτρονικά'), ('Ρούχα'), ('Βιβλία'), ('Αθλητικά'), ('Παπούτσια');

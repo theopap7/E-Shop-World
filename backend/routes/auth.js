@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
-const { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter } = require('../middleware/rateLimiters');
-const { sendPasswordResetEmail } = require('../utils/mailer');
+const { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter, resendVerificationLimiter } = require('../middleware/rateLimiters');
+const { sendPasswordResetEmail, sendVerificationEmail } = require('../utils/mailer');
 
 router.post('/register', authLimiter, async (req, res) => {
   try {
@@ -35,18 +35,117 @@ router.post('/register', authLimiter, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await db.query(
-      'INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
+      'INSERT INTO users (first_name, last_name, email, password, email_verified) VALUES (?, ?, ?, ?, FALSE)',
       [firstName.trim(), lastName.trim(), normalizedEmail, hashedPassword]
     );
+
+    const userId = result.insertId;
+
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    const verifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await db.query(
+      'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+      [userId, verifyToken, verifyExpiresAt]
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
 
     res.status(201).json({
       success: true,
       message: 'Η εγγραφή ολοκληρώθηκε επιτυχώς',
-      userId: result.insertId
+      userId
     });
+
+    // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
+    (async () => {
+      try {
+        await sendVerificationEmail(normalizedEmail, verifyLink);
+      } catch (emailErr) {
+        console.error('Verification email failed (non-critical):', emailErr.message);
+      }
+    })();
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα κατά την εγγραφή' });
+  }
+});
+
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Λείπει το token επιβεβαίωσης' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT * FROM email_verification_tokens WHERE token = ? AND used = FALSE AND expires_at > NOW()',
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ success: false, message: 'Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει' });
+    }
+
+    const verifyRecord = rows[0];
+
+    await db.query('UPDATE users SET email_verified = TRUE WHERE id = ?', [verifyRecord.user_id]);
+    await db.query('UPDATE email_verification_tokens SET used = TRUE WHERE id = ?', [verifyRecord.id]);
+
+    res.json({ success: true, message: 'Το email επιβεβαιώθηκε επιτυχώς!' });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(500).json({ success: false, message: 'Σφάλμα κατά την επιβεβαίωση email' });
+  }
+});
+
+router.post('/resend-verification', resendVerificationLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Το email είναι υποχρεωτικό' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const [users] = await db.query('SELECT id, email_verified FROM users WHERE email = ?', [normalizedEmail]);
+
+    // Always respond success to prevent email enumeration
+    if (users.length === 0 || users[0].email_verified) {
+      return res.json({ success: true, message: 'Αν ο λογαριασμός υπάρχει και δεν έχει επιβεβαιωθεί, θα λάβεις νέο σύνδεσμο.' });
+    }
+
+    const userId = users[0].id;
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await db.query('UPDATE email_verification_tokens SET used = TRUE WHERE user_id = ? AND used = FALSE', [userId]);
+
+    await db.query(
+      'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+      [userId, token, expiresAt]
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const verifyLink = `${frontendUrl}/verify-email?token=${token}`;
+
+    res.json({
+      success: true,
+      message: 'Αν ο λογαριασμός υπάρχει και δεν έχει επιβεβαιωθεί, θα λάβεις νέο σύνδεσμο.'
+    });
+
+    // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
+    (async () => {
+      try {
+        await sendVerificationEmail(normalizedEmail, verifyLink);
+      } catch (emailErr) {
+        console.error('Resend verification email failed (non-critical):', emailErr.message);
+      }
+    })();
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({ success: false, message: 'Σφάλμα κατά την επαναποστολή' });
   }
 });
 
@@ -118,7 +217,8 @@ router.post('/login', authLimiter, async (req, res) => {
           address1: user.address1,
           floor: user.address_floor
         },
-        role: user.role || 'user'
+        role: user.role || 'user',
+        emailVerified: !!user.email_verified
       }
     });
   } catch (error) {
@@ -132,7 +232,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await db.query(
-      'SELECT id, first_name, last_name, email, phone, address_country, address_city, address_zip, address1, address_floor, role FROM users WHERE id = ?',
+      'SELECT id, first_name, last_name, email, phone, address_country, address_city, address_zip, address1, address_floor, role, email_verified FROM users WHERE id = ?',
       [userId]
     );
 
@@ -156,7 +256,8 @@ router.get('/me', authenticateToken, async (req, res) => {
           address1: u.address1,
           floor: u.address_floor
         },
-        role: u.role || 'user'
+        role: u.role || 'user',
+        emailVerified: !!u.email_verified
       }
     });
   } catch (error) {
@@ -213,7 +314,7 @@ router.put('/me', authenticateToken, async (req, res) => {
       ]
     );
 
-    const [rows] = await db.query('SELECT role FROM users WHERE id = ?', [userId]);
+    const [rows] = await db.query('SELECT role, email_verified FROM users WHERE id = ?', [userId]);
 
     return res.json({
       success: true,
@@ -225,7 +326,8 @@ router.put('/me', authenticateToken, async (req, res) => {
         email: email.toLowerCase().trim(),
         phone: trimmedPhone,
         address: trimmedAddress,
-        role: rows[0]?.role
+        role: rows[0]?.role,
+        emailVerified: !!rows[0]?.email_verified
       }
     });
   } catch (error) {
@@ -299,14 +401,19 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
-    const { previewUrl } = await sendPasswordResetEmail(normalizedEmail, resetLink);
-
     res.json({
       success: true,
-      message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.',
-      // Only set in dev (Ethereal fake SMTP) — never present with a real EMAIL_HOST configured
-      devPreviewUrl: previewUrl || undefined
+      message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.'
     });
+
+    // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
+    (async () => {
+      try {
+        await sendPasswordResetEmail(normalizedEmail, resetLink);
+      } catch (emailErr) {
+        console.error('Password reset email failed (non-critical):', emailErr.message);
+      }
+    })();
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα κατά την επαναφορά κωδικού' });
