@@ -14,6 +14,7 @@ export interface Product {
   category_name?: string;
   created_at?: string;
   sizes?: string[] | null;
+  sizeStock?: Record<string, number> | null;
 }
 
 export interface CreateProductDto {
@@ -24,6 +25,7 @@ export interface CreateProductDto {
   category_id: number | null;
   image_url: string;
   sizes?: string[] | null;
+  sizeStock?: Record<string, number>;
 }
 
 export interface AdminOrder {

@@ -91,23 +91,25 @@ export class CartService implements OnDestroy {
   }
 
   addToCart(product: ProductDto, qty = 1, size?: string): void {
+    const availableStock = size ? (product.sizeStock?.[size] ?? 0) : product.stock;
+
     const items = [...this.itemsSubject.value];
     const existing = items.find(i => i.productId === product.id && (i.size ?? '') === (size ?? ''));
 
     if (existing) {
-      const canAdd = product.stock - existing.quantity;
+      const canAdd = availableStock - existing.quantity;
       if (canAdd <= 0) {
         this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα για "${product.name}"`);
         return;
       }
-      existing.quantity = Math.min(existing.quantity + qty, product.stock);
+      existing.quantity = Math.min(existing.quantity + qty, availableStock);
     } else {
       items.push({
         productId: product.id,
         name: product.name,
         price: product.price,
-        quantity: Math.min(qty, product.stock),
-        stock: product.stock,
+        quantity: Math.min(qty, availableStock),
+        stock: availableStock,
         image_url: product.image_url,
         size,
       });

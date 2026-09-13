@@ -79,7 +79,7 @@
 
         <div class="stock-status">
           <span *ngIf="product.stock > 0" class="in-stock">
-            ✅ Διαθέσιμο ({{ product.stock }} τεμάχια)
+            ✅ {{ product.stock === 1 ? 'Τελευταίο κομμάτι' : 'Διαθέσιμο' }}
           </span>
 
           <span *ngIf="product.stock === 0" class="out-of-stock">
@@ -102,14 +102,18 @@
               type="button"
               class="size-btn"
               [class.selected]="selectedSize === s"
-              (click)="selectedSize = s">
+              [class.unavailable]="!isSizeAvailable(s)"
+              [disabled]="!isSizeAvailable(s)"
+              [title]="isSizeAvailable(s) ? '' : 'Μη διαθέσιμο μέγεθος'"
+              (click)="selectSize(s)">
               {{ s }}
+              <span class="size-btn-count">{{ sizeStockLabel(s) }}</span>
             </button>
           </div>
         </div>
 
         <div class="product-actions">
-          <div class="qty-selector" *ngIf="product.stock > 0">
+          <div class="qty-selector" *ngIf="availableStock > 0">
             <label class="qty-label">Ποσότητα</label>
             <select class="qty-select" [(ngModel)]="selectedQty">
               <option *ngFor="let n of qtyOptions" [value]="n">{{ n }}</option>

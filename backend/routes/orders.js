@@ -87,9 +87,10 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
     for (const item of items) {
       const { productId, quantity } = item;
       const q = Number(quantity);
+      const size = item.size || null;
 
       const [productRows] = await conn.query(
-        'SELECT id, price, stock, name FROM products WHERE id = ? FOR UPDATE',
+        'SELECT id, price, stock, name, sizes FROM products WHERE id = ? FOR UPDATE',
         [Number(productId)]
       );
 
@@ -99,8 +100,28 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
       }
 
       const product = productRows[0];
+      const requiresSize = Array.isArray(product.sizes) && product.sizes.length > 0;
 
-      if (product.stock < q) {
+      if (requiresSize && !size) {
+        await conn.rollback();
+        return res.status(400).json({ success: false, message: `Επίλεξε μέγεθος για "${product.name}"` });
+      }
+
+      if (size) {
+        const [sizeRows] = await conn.query(
+          'SELECT stock FROM product_size_stock WHERE product_id = ? AND size = ? FOR UPDATE',
+          [Number(productId), size]
+        );
+        const sizeStock = sizeRows[0]?.stock ?? 0;
+
+        if (sizeStock < q) {
+          await conn.rollback();
+          return res.status(400).json({
+            success: false,
+            message: `Ανεπαρκές απόθεμα για "${product.name}" (μέγεθος ${size}, διαθέσιμο: ${sizeStock})`
+          });
+        }
+      } else if (product.stock < q) {
         await conn.rollback();
         return res.status(400).json({
           success: false,
@@ -108,7 +129,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
         });
       }
 
-      validatedItems.push({ productId: Number(productId), quantity: q, unitPrice: Number(product.price), size: item.size || null });
+      validatedItems.push({ productId: Number(productId), quantity: q, unitPrice: Number(product.price), size });
       subtotal += q * Number(product.price);
     }
     subtotal = Number(subtotal.toFixed(2));
@@ -203,6 +224,12 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
         'UPDATE products SET stock = stock - ? WHERE id = ?',
         [item.quantity, item.productId]
       );
+      if (item.size) {
+        await conn.query(
+          'UPDATE product_size_stock SET stock = stock - ? WHERE product_id = ? AND size = ?',
+          [item.quantity, item.productId, item.size]
+        );
+      }
     }
 
     if (finalDiscountCode && discountCodeId) {
@@ -376,10 +403,11 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
          oi.unit_price,
          oi.size,
          (oi.quantity * oi.unit_price) AS line_total,
-         p.stock,
+         COALESCE(pss.stock, p.stock) AS stock,
          p.image_url
        FROM order_items oi
        JOIN products p ON p.id = oi.product_id
+       LEFT JOIN product_size_stock pss ON pss.product_id = oi.product_id AND pss.size = oi.size
        WHERE oi.order_id = ?
        ORDER BY oi.id ASC`,
       [orderId]
@@ -616,7 +644,7 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
     );
 
     const [items] = await conn.query(
-      'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+      'SELECT product_id, quantity, size FROM order_items WHERE order_id = ?',
       [orderId]
     );
     for (const item of items) {
@@ -624,6 +652,12 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
         'UPDATE products SET stock = stock + ? WHERE id = ?',
         [item.quantity, item.product_id]
       );
+      if (item.size) {
+        await conn.query(
+          'UPDATE product_size_stock SET stock = stock + ? WHERE product_id = ? AND size = ?',
+          [item.quantity, item.product_id, item.size]
+        );
+      }
     }
 
     if (order.discount_code) {

@@ -90,11 +90,17 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
       );
 
       const [returnItems] = await conn.query(
-        'SELECT product_id, quantity FROM return_request_items WHERE return_request_id = ?',
+        'SELECT product_id, quantity, size FROM return_request_items WHERE return_request_id = ?',
         [returnId]
       );
       for (const item of returnItems) {
         await conn.query('UPDATE products SET stock = stock + ? WHERE id = ?', [item.quantity, item.product_id]);
+        if (item.size) {
+          await conn.query(
+            'UPDATE product_size_stock SET stock = stock + ? WHERE product_id = ? AND size = ?',
+            [item.quantity, item.product_id, item.size]
+          );
+        }
       }
     }
 

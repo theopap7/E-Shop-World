@@ -164,6 +164,14 @@ CREATE TABLE product_images (
 
 CREATE INDEX idx_product_images_product ON product_images(product_id);
 
+CREATE TABLE product_size_stock (
+  product_id INT NOT NULL,
+  size VARCHAR(20) NOT NULL,
+  stock INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (product_id, size),
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
 CREATE TABLE wishlists (
   user_id INT NOT NULL,
   product_id INT NOT NULL,

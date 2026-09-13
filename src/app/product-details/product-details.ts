@@ -33,19 +33,48 @@ export class ProductDetailComponent implements OnInit {
   selectedQty = 1;
   selectedSize: string | null = null;
 
+  get availableStock(): number {
+    if (!this.product) return 0;
+    if (this.sizes.length > 0) {
+      return this.selectedSize ? (this.product.sizeStock?.[this.selectedSize] ?? 0) : 0;
+    }
+    return this.product.stock;
+  }
+
   get qtyOptions(): number[] {
-    if (!this.product || this.product.stock <= 0) return [];
-    return Array.from({ length: Math.min(this.product.stock, 100) }, (_, i) => i + 1);
+    if (this.availableStock <= 0) return [];
+    return Array.from({ length: Math.min(this.availableStock, 100) }, (_, i) => i + 1);
   }
 
   get sizes(): string[] {
     return sortSizes(this.product?.sizes ?? []);
   }
 
+  isSizeAvailable(size: string): boolean {
+    return (this.product?.sizeStock?.[size] ?? 0) > 0;
+  }
+
+  sizeStockOf(size: string): number {
+    return this.product?.sizeStock?.[size] ?? 0;
+  }
+
+  sizeStockLabel(size: string): string {
+    const qty = this.sizeStockOf(size);
+    if (qty === 0) return 'Εξαντλήθηκε';
+    if (qty === 1) return 'Τελευταίο κομμάτι';
+    return '';
+  }
+
+  selectSize(size: string): void {
+    if (!this.isSizeAvailable(size)) return;
+    this.selectedSize = size;
+    this.selectedQty = 1;
+  }
+
   get canAddToCart(): boolean {
-    if (!this.product || this.product.stock === 0) return false;
+    if (!this.product) return false;
     if (this.sizes.length > 0 && !this.selectedSize) return false;
-    return true;
+    return this.availableStock > 0;
   }
 
   private destroyRef = inject(DestroyRef);

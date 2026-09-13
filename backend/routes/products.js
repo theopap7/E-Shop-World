@@ -108,12 +108,22 @@ router.get('/products/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
+    const product = rows[0];
+
+    if (Array.isArray(product.sizes) && product.sizes.length > 0) {
+      const [sizeRows] = await db.query(
+        'SELECT size, stock FROM product_size_stock WHERE product_id = ?',
+        [productId]
+      );
+      product.sizeStock = Object.fromEntries(sizeRows.map(r => [r.size, r.stock]));
+    }
+
     const [galleryImages] = await db.query(
       'SELECT id, image_url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC',
       [productId]
     );
 
-    res.json({ success: true, product: rows[0], galleryImages });
+    res.json({ success: true, product, galleryImages });
   } catch (error) {
     console.error('Get product error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

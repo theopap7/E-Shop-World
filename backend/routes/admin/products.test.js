@@ -12,6 +12,18 @@ const { authCookie } = require('../../test-utils/authCookie');
 
 const admin = () => authCookie({ id: 1, role: 'admin' });
 
+function makeConn(queryResults) {
+  const query = jest.fn();
+  for (const result of queryResults) query.mockResolvedValueOnce(result);
+  return {
+    query,
+    beginTransaction: jest.fn().mockResolvedValue(undefined),
+    commit: jest.fn().mockResolvedValue(undefined),
+    rollback: jest.fn().mockResolvedValue(undefined),
+    release: jest.fn()
+  };
+}
+
 describe('GET /api/admin/products', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -86,9 +98,10 @@ describe('POST /api/admin/products', () => {
   });
 
   it('creates a valid product', async () => {
-    db.query
-      .mockResolvedValueOnce([[{ id: 1 }]]) // category lookup
-      .mockResolvedValueOnce([{ insertId: 42 }]); // insert
+    db.query.mockResolvedValueOnce([[{ id: 1 }]]); // category lookup
+    db.getConnection.mockResolvedValue(makeConn([
+      [{ insertId: 42 }] // INSERT INTO products
+    ]));
 
     const res = await request(app)
       .post('/api/admin/products')
@@ -104,7 +117,9 @@ describe('PUT /api/admin/products/:id', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('returns 404 when the product does not exist', async () => {
-    db.query.mockResolvedValueOnce([{ affectedRows: 0 }]);
+    db.getConnection.mockResolvedValue(makeConn([
+      [{ affectedRows: 0 }] // UPDATE products
+    ]));
     const res = await request(app)
       .put('/api/admin/products/999')
       .set('Cookie', admin())
@@ -113,7 +128,10 @@ describe('PUT /api/admin/products/:id', () => {
   });
 
   it('updates a valid product', async () => {
-    db.query.mockResolvedValueOnce([{ affectedRows: 1 }]);
+    db.getConnection.mockResolvedValue(makeConn([
+      [{ affectedRows: 1 }], // UPDATE products
+      [{}] // DELETE FROM product_size_stock
+    ]));
     const res = await request(app)
       .put('/api/admin/products/1')
       .set('Cookie', admin())

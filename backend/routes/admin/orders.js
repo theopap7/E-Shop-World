@@ -150,11 +150,17 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
 
     if (status === 'cancelled') {
       const [orderItems] = await conn.query(
-        'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+        'SELECT product_id, quantity, size FROM order_items WHERE order_id = ?',
         [orderId]
       );
       for (const item of orderItems) {
         await conn.query('UPDATE products SET stock = stock + ? WHERE id = ?', [item.quantity, item.product_id]);
+        if (item.size) {
+          await conn.query(
+            'UPDATE product_size_stock SET stock = stock + ? WHERE product_id = ? AND size = ?',
+            [item.quantity, item.product_id, item.size]
+          );
+        }
       }
 
       const [orderData] = await conn.query('SELECT discount_code FROM orders WHERE id = ?', [orderId]);

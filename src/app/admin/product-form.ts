@@ -46,6 +46,7 @@ export class ProductFormComponent implements OnInit {
   readonly CLOTHING_SIZES = CLOTHING_SIZE_OPTIONS;
   readonly SHOE_SIZES = SHOE_SIZE_OPTIONS;
   selectedSizes: string[] = [];
+  sizeStock: Record<string, number> = {};
 
   get sizeMode(): 'clothing' | 'shoes' | 'none' {
     const catId = this.form.get('category_id')?.value;
@@ -65,16 +66,32 @@ export class ProductFormComponent implements OnInit {
     return this.selectedSizes.includes(s);
   }
 
+  get sortedSelectedSizes(): string[] {
+    return sortSizes(this.selectedSizes);
+  }
+
   toggleSize(s: string): void {
     if (this.isSizeSelected(s)) {
       this.selectedSizes = this.selectedSizes.filter(x => x !== s);
     } else {
       this.selectedSizes = [...this.selectedSizes, s];
+      this.sizeStock[s] ??= 0;
     }
   }
 
   clearSizes(): void {
     this.selectedSizes = [];
+    this.sizeStock = {};
+    this.form.get('stock')?.setValue(0);
+  }
+
+  getSizeStock(s: string): number {
+    return this.sizeStock[s] ?? 0;
+  }
+
+  setSizeStock(s: string, value: string): void {
+    const n = Number(value);
+    this.sizeStock[s] = Number.isFinite(n) && n >= 0 ? n : 0;
   }
 
   private destroyRef = inject(DestroyRef);
@@ -111,6 +128,8 @@ export class ProductFormComponent implements OnInit {
         this.isEditMode = false;
         this.productId = null;
         this.form.reset({ name: '', description: '', price: 0, stock: 0, category_id: null, image_url: '' });
+        this.selectedSizes = [];
+        this.sizeStock = {};
       }
     });
   }
@@ -148,6 +167,7 @@ export class ProductFormComponent implements OnInit {
           this.uploadError = '';
           this.uploading = false;
           this.selectedSizes = Array.isArray(p.sizes) ? [...p.sizes] : [];
+          this.sizeStock = { ...(p.sizeStock || {}) };
           this.loadGalleryImages(id);
         }
 
@@ -175,6 +195,9 @@ export class ProductFormComponent implements OnInit {
       ...this.form.value,
       category_id: this.form.value.category_id || null,
       sizes: sortedSizes.length > 0 ? sortedSizes : null,
+      sizeStock: sortedSizes.length > 0
+        ? Object.fromEntries(sortedSizes.map(s => [s, this.getSizeStock(s)]))
+        : undefined,
     };
 
     const request = this.isEditMode

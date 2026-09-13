@@ -165,8 +165,12 @@
 }
 
 .size-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   min-width: 44px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border: 2px solid #d1d5db;
   border-radius: 8px;
   background: white;
@@ -175,6 +179,17 @@
   color: #374151;
   cursor: pointer;
   transition: all 0.15s ease;
+}
+
+.size-btn-count {
+  min-height: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.size-btn.selected .size-btn-count {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .size-btn:hover {
@@ -186,6 +201,18 @@
   border-color: #3b82f6;
   background: #3b82f6;
   color: white;
+}
+
+.size-btn.unavailable {
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.size-btn.unavailable:hover {
+  border-color: #e5e7eb;
+  color: #9ca3af;
 }
 
 .product-actions {

@@ -22,6 +22,7 @@ export interface ProductDto {
   average_rating: number | null;
   review_count: number;
   sizes?: string[] | null;
+  sizeStock?: Record<string, number> | null;
 }
 
 export interface ProductFilters {

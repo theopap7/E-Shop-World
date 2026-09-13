@@ -68,7 +68,7 @@
 
         </div>
 
-        <div class="form-group">
+        <div class="form-group" *ngIf="sizeMode === 'none'">
 
           <label>Απόθεμα *</label>
 
@@ -144,8 +144,18 @@
           </div>
         </ng-container>
 
-        <div class="sizes-selected" *ngIf="selectedSizes.length > 0">
-          <span>Επιλεγμένα: <strong>{{ selectedSizes.join(', ') }}</strong></span>
+        <div class="sizes-stock" *ngIf="selectedSizes.length > 0">
+          <label>Απόθεμα ανά μέγεθος *</label>
+          <div class="sizes-stock-row" *ngFor="let s of sortedSelectedSizes">
+            <span class="sizes-stock-label">{{ s }}</span>
+            <input
+              type="number"
+              min="0"
+              class="sizes-stock-input"
+              [value]="getSizeStock(s)"
+              (input)="setSizeStock(s, $any($event.target).value)"
+            />
+          </div>
           <button type="button" class="clear-sizes-btn" (click)="clearSizes()">Καθαρισμός</button>
         </div>
         <div class="sizes-selected muted-text" *ngIf="selectedSizes.length === 0">

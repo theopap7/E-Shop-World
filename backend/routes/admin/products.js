@@ -41,27 +41,58 @@ router.get('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
       return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
-    res.json({ success: true, product: rows[0] });
+    const product = rows[0];
+
+    if (Array.isArray(product.sizes) && product.sizes.length > 0) {
+      const [sizeRows] = await db.query(
+        'SELECT size, stock FROM product_size_stock WHERE product_id = ?',
+        [productId]
+      );
+      product.sizeStock = Object.fromEntries(sizeRows.map(r => [r.size, r.stock]));
+    }
+
+    res.json({ success: true, product });
   } catch (error) {
     console.error('Admin get product error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
+// When sizes are given, per-size quantities (sizeStock) replace the flat
+// stock number as the source of truth — the total is derived from them.
+function resolveStock({ sizes, stock, sizeStock }) {
+  if (!Array.isArray(sizes) || sizes.length === 0) {
+    const stockNum = Number(stock);
+    if (stock == null || !Number.isFinite(stockNum) || stockNum < 0) return null;
+    return { stockNum, perSize: null };
+  }
+
+  const perSize = {};
+  let total = 0;
+  for (const size of sizes) {
+    const qty = Number(sizeStock?.[size] ?? 0);
+    if (!Number.isFinite(qty) || qty < 0) return null;
+    perSize[size] = qty;
+    total += qty;
+  }
+  return { stockNum: total, perSize };
+}
+
 router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
   try {
-    const { name, description, price, stock, category_id, image_url, sizes } = req.body;
+    const { name, description, price, stock, category_id, image_url, sizes, sizeStock } = req.body;
 
-    if (!name || !price || stock == null) {
-      return res.status(400).json({ success: false, message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' });
+    if (!name || !price) {
+      return res.status(400).json({ success: false, message: 'Το όνομα και η τιμή είναι υποχρεωτικά' });
     }
 
     const priceNum = Number(price);
-    const stockNum = Number(stock);
     if (!Number.isFinite(priceNum) || priceNum <= 0) {
       return res.status(400).json({ success: false, message: 'Η τιμή πρέπει να είναι θετικός αριθμός' });
     }
-    if (!Number.isFinite(stockNum) || stockNum < 0) {
+
+    const resolved = resolveStock({ sizes, stock, sizeStock });
+    if (!resolved) {
       return res.status(400).json({ success: false, message: 'Το απόθεμα πρέπει να είναι μη αρνητικός αριθμός' });
     }
 
@@ -74,13 +105,34 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
 
     const sizesJson = Array.isArray(sizes) && sizes.length > 0 ? JSON.stringify(sizes) : null;
 
-    const [result] = await db.query(
-      `INSERT INTO products (name, description, price, stock, category_id, image_url, sizes)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [name, description || null, priceNum, stockNum, category_id || null, image_url || null, sizesJson]
-    );
+    let conn;
+    try {
+      conn = await db.getConnection();
+      await conn.beginTransaction();
 
-    res.status(201).json({ success: true, message: 'Το προϊόν δημιουργήθηκε επιτυχώς', productId: result.insertId });
+      const [result] = await conn.query(
+        `INSERT INTO products (name, description, price, stock, category_id, image_url, sizes)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [name, description || null, priceNum, resolved.stockNum, category_id || null, image_url || null, sizesJson]
+      );
+
+      if (resolved.perSize) {
+        for (const [size, qty] of Object.entries(resolved.perSize)) {
+          await conn.query(
+            'INSERT INTO product_size_stock (product_id, size, stock) VALUES (?, ?, ?)',
+            [result.insertId, size, qty]
+          );
+        }
+      }
+
+      await conn.commit();
+      res.status(201).json({ success: true, message: 'Το προϊόν δημιουργήθηκε επιτυχώς', productId: result.insertId });
+    } catch (error) {
+      if (conn) await conn.rollback();
+      throw error;
+    } finally {
+      if (conn) conn.release();
+    }
   } catch (error) {
     console.error('Admin create product error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -90,18 +142,19 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
 router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const productId = Number(req.params.id);
-    const { name, description, price, stock, category_id, image_url, sizes } = req.body;
+    const { name, description, price, stock, category_id, image_url, sizes, sizeStock } = req.body;
 
-    if (!name || !price || stock == null) {
-      return res.status(400).json({ success: false, message: 'Το όνομα, η τιμή και το απόθεμα είναι υποχρεωτικά' });
+    if (!name || !price) {
+      return res.status(400).json({ success: false, message: 'Το όνομα και η τιμή είναι υποχρεωτικά' });
     }
 
     const priceNum = Number(price);
-    const stockNum = Number(stock);
     if (!Number.isFinite(priceNum) || priceNum <= 0) {
       return res.status(400).json({ success: false, message: 'Η τιμή πρέπει να είναι θετικός αριθμός' });
     }
-    if (!Number.isFinite(stockNum) || stockNum < 0) {
+
+    const resolved = resolveStock({ sizes, stock, sizeStock });
+    if (!resolved) {
       return res.status(400).json({ success: false, message: 'Το απόθεμα πρέπει να είναι μη αρνητικός αριθμός' });
     }
 
@@ -114,18 +167,41 @@ router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
 
     const sizesJson = Array.isArray(sizes) && sizes.length > 0 ? JSON.stringify(sizes) : null;
 
-    const [result] = await db.query(
-      `UPDATE products
-       SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ?, sizes = ?
-       WHERE id = ?`,
-      [name, description || null, priceNum, stockNum, category_id || null, image_url || null, sizesJson, productId]
-    );
+    let conn;
+    try {
+      conn = await db.getConnection();
+      await conn.beginTransaction();
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
+      const [result] = await conn.query(
+        `UPDATE products
+         SET name = ?, description = ?, price = ?, stock = ?, category_id = ?, image_url = ?, sizes = ?
+         WHERE id = ?`,
+        [name, description || null, priceNum, resolved.stockNum, category_id || null, image_url || null, sizesJson, productId]
+      );
+
+      if (result.affectedRows === 0) {
+        await conn.rollback();
+        return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
+      }
+
+      await conn.query('DELETE FROM product_size_stock WHERE product_id = ?', [productId]);
+      if (resolved.perSize) {
+        for (const [size, qty] of Object.entries(resolved.perSize)) {
+          await conn.query(
+            'INSERT INTO product_size_stock (product_id, size, stock) VALUES (?, ?, ?)',
+            [productId, size, qty]
+          );
+        }
+      }
+
+      await conn.commit();
+      res.json({ success: true, message: 'Το προϊόν ενημερώθηκε επιτυχώς' });
+    } catch (error) {
+      if (conn) await conn.rollback();
+      throw error;
+    } finally {
+      if (conn) conn.release();
     }
-
-    res.json({ success: true, message: 'Το προϊόν ενημερώθηκε επιτυχώς' });
   } catch (error) {
     console.error('Admin update product error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
