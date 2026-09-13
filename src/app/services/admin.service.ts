@@ -164,45 +164,45 @@ export class AdminService {
     );
   }
 
-getCategories(): Observable<{ success: boolean; categories: AdminCategory[] }> {
-  return this.http.get<{ success: boolean; categories: AdminCategory[] }>(`${this.baseUrl}/categories`);
-}
+  getCategories(): Observable<{ success: boolean; categories: AdminCategory[] }> {
+    return this.http.get<{ success: boolean; categories: AdminCategory[] }>(`${this.baseUrl}/categories`);
+  }
 
-createCategory(category: CreateCategoryDto): Observable<ApiResponse> {
-  return this.http.post<ApiResponse>(`${this.baseUrl}/categories`, category);
-}
+  createCategory(category: CreateCategoryDto): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/categories`, category);
+  }
 
-updateCategory(id: number, category: CreateCategoryDto): Observable<ApiResponse> {
-  return this.http.put<ApiResponse>(`${this.baseUrl}/categories/${id}`, category);
-}
+  updateCategory(id: number, category: CreateCategoryDto): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.baseUrl}/categories/${id}`, category);
+  }
 
-deleteCategory(id: number): Observable<ApiResponse> {
-  return this.http.delete<ApiResponse>(`${this.baseUrl}/categories/${id}`);
-}
+  deleteCategory(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.baseUrl}/categories/${id}`);
+  }
 
-getAllReviews(): Observable<{ success: boolean; reviews: AdminReviewDto[] }> {
-  return this.http.get<{ success: boolean; reviews: AdminReviewDto[] }>(
-    `${this.baseUrl}/reviews`
-  );
-}
+  getAllReviews(): Observable<{ success: boolean; reviews: AdminReviewDto[] }> {
+    return this.http.get<{ success: boolean; reviews: AdminReviewDto[] }>(
+      `${this.baseUrl}/reviews`
+    );
+  }
 
-deleteReview(reviewId: number): Observable<{ success: boolean; message?: string }> {
-  return this.http.delete<{ success: boolean; message?: string }>(
-    `${environment.apiUrl}/reviews/${reviewId}`
-  );
-}
+  deleteReview(reviewId: number): Observable<{ success: boolean; message?: string }> {
+    return this.http.delete<{ success: boolean; message?: string }>(
+      `${environment.apiUrl}/reviews/${reviewId}`
+    );
+  }
 
-downloadOrderPDF(orderId: number) {
-  return this.http.get(
-    `${environment.apiUrl}/orders/${orderId}/pdf`,
-    { responseType: 'blob' }
-  );
-}
+  downloadOrderPDF(orderId: number) {
+    return this.http.get(
+      `${environment.apiUrl}/orders/${orderId}/pdf`,
+      { responseType: 'blob' }
+    );
+  }
 
-downloadOrderCSV(orderId: number) {
-  return this.http.get(
-    `${this.baseUrl}/orders/${orderId}/csv`,
-    { responseType: 'blob' }
-  );
-}
+  downloadOrderCSV(orderId: number) {
+    return this.http.get(
+      `${this.baseUrl}/orders/${orderId}/csv`,
+      { responseType: 'blob' }
+    );
+  }
 }

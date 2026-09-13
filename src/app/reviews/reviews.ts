@@ -202,7 +202,6 @@ export class ReviewsComponent implements OnInit {
     this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Η κριτική διαγράφηκε');
-        this.reviews = this.reviews.filter(r => r.id !== reviewId);
         this.loadReviews();
       },
       error: (err) => {

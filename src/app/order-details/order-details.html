@@ -343,41 +343,7 @@
           </ng-container>
 
           <ng-container *ngIf="returnRequests.length > 0">
-            <div class="return-status-card" *ngFor="let rr of returnRequests" style="margin-top:10px">
-              <div class="return-status-row">
-                <span class="return-status-label">Κατάσταση</span>
-                <span class="pill"
-                  [ngClass]="{
-                    'pill--pending': rr.status === 'pending',
-                    'pill--delivered': rr.status === 'approved',
-                    'pill--cancelled': rr.status === 'rejected'
-                  }">
-                  {{ returnStatusLabel(rr.status) }}
-                </span>
-              </div>
-              <div class="return-status-row return-status-items-row" *ngIf="rr.items && rr.items.length > 0">
-                <span class="return-status-label">Προϊόντα</span>
-                <div class="return-status-items">
-                  <div class="return-status-item" *ngFor="let it of rr.items">
-                    <img
-                      [src]="it.image_url | imageUrl"
-                      [alt]="it.product_name"
-                      class="return-status-item-thumb"
-                      (error)="$any($event.target).src='no-image.svg'"
-                    />
-                    <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container></span>
-                  </div>
-                </div>
-              </div>
-              <div class="return-status-row">
-                <span class="return-status-label">Λόγος</span>
-                <span>{{ rr.reason }}</span>
-              </div>
-              <div class="return-status-row" *ngIf="rr.admin_note">
-                <span class="return-status-label">Σχόλιο</span>
-                <span>{{ rr.admin_note }}</span>
-              </div>
-            </div>
+            <ng-container *ngTemplateOutlet="returnStatusList; context: { $implicit: returnRequests }"></ng-container>
           </ng-container>
 
         </div>
@@ -391,44 +357,50 @@
               </div>
             </div>
           </div>
-          <div class="return-status-card" *ngFor="let rr of returnRequests" style="margin-top:10px">
-            <div class="return-status-row">
-              <span class="return-status-label">Κατάσταση</span>
-              <span class="pill"
-                [class.pill--pending]="rr.status === 'pending'"
-                [class.pill--delivered]="rr.status === 'approved'"
-                [class.pill--cancelled]="rr.status === 'rejected'">
-                {{ returnStatusLabel(rr.status) }}
-              </span>
-            </div>
-            <div class="return-status-row return-status-items-row" *ngIf="rr.items && rr.items.length > 0">
-              <span class="return-status-label">Προϊόντα</span>
-              <div class="return-status-items">
-                <div class="return-status-item" *ngFor="let it of rr.items">
-                  <img
-                    [src]="it.image_url | imageUrl"
-                    [alt]="it.product_name"
-                    class="return-status-item-thumb"
-                    (error)="$any($event.target).src='no-image.svg'"
-                  />
-                  <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container></span>
-                </div>
-              </div>
-            </div>
-            <div class="return-status-row">
-              <span class="return-status-label">Λόγος</span>
-              <span>{{ rr.reason }}</span>
-            </div>
-            <div class="return-status-row" *ngIf="rr.admin_note">
-              <span class="return-status-label">Σχόλιο</span>
-              <span>{{ rr.admin_note }}</span>
-            </div>
-          </div>
+          <ng-container *ngTemplateOutlet="returnStatusList; context: { $implicit: returnRequests }"></ng-container>
         </div>
 
       </div>
 
     </ng-container>
+
+    <ng-template #returnStatusList let-list>
+      <div class="return-status-card" *ngFor="let rr of list" style="margin-top:10px">
+        <div class="return-status-row">
+          <span class="return-status-label">Κατάσταση</span>
+          <span class="pill"
+            [ngClass]="{
+              'pill--pending': rr.status === 'pending',
+              'pill--delivered': rr.status === 'approved',
+              'pill--cancelled': rr.status === 'rejected'
+            }">
+            {{ returnStatusLabel(rr.status) }}
+          </span>
+        </div>
+        <div class="return-status-row return-status-items-row" *ngIf="rr.items && rr.items.length > 0">
+          <span class="return-status-label">Προϊόντα</span>
+          <div class="return-status-items">
+            <div class="return-status-item" *ngFor="let it of rr.items">
+              <img
+                [src]="it.image_url | imageUrl"
+                [alt]="it.product_name"
+                class="return-status-item-thumb"
+                (error)="$any($event.target).src='no-image.svg'"
+              />
+              <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container></span>
+            </div>
+          </div>
+        </div>
+        <div class="return-status-row">
+          <span class="return-status-label">Λόγος</span>
+          <span>{{ rr.reason }}</span>
+        </div>
+        <div class="return-status-row" *ngIf="rr.admin_note">
+          <span class="return-status-label">Σχόλιο</span>
+          <span>{{ rr.admin_note }}</span>
+        </div>
+      </div>
+    </ng-template>
 
   </div>
 </section>

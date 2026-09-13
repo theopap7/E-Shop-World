@@ -68,7 +68,5 @@ export class MyReturnsComponent implements OnInit {
     return groups;
   }
 
-  statusLabel(status: string): string {
-    return returnStatusLabel(status);
-  }
+  statusLabel = returnStatusLabel;
 }

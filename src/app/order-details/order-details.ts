@@ -256,9 +256,7 @@ export class OrderDetailsComponent implements OnInit {
     });
   }
 
-  returnStatusLabel(status: string): string {
-    return returnStatusLabelUtil(status);
-  }
+  returnStatusLabel = returnStatusLabelUtil;
 
   reorderAll(): void {
     if (this.isReordering || this.items.length === 0) return;
@@ -275,16 +273,18 @@ export class OrderDetailsComponent implements OnInit {
     this.isReordering = false;
   }
 
+  private triggerDownload(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
   downloadCSV(orderId: number) {
     this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `order-${orderId}.csv`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
+      next: blob => this.triggerDownload(blob, `order-${orderId}.csv`),
       error: () => this.toastService.error('Αποτυχία λήψης CSV')
     });
   }
@@ -308,14 +308,7 @@ export class OrderDetailsComponent implements OnInit {
 
   downloadPDF(orderId: number) {
     this.orderService.downloadOrderPDF(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `order-${orderId}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
+      next: blob => this.triggerDownload(blob, `order-${orderId}.pdf`),
       error: () => this.toastService.error('Αποτυχία λήψης PDF')
     });
   }

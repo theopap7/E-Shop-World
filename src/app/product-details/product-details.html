@@ -144,41 +144,31 @@
 
     <div class="related-products" *ngIf="!isLoading && relatedProducts.length > 0">
       <h2 class="related-title">Σχετικά Προϊόντα</h2>
-      <div class="related-grid">
-        <a
-          class="related-card"
-          *ngFor="let rp of relatedProducts"
-          [routerLink]="['/products', rp.id]">
-          <img
-            [src]="rp.image_url | imageUrl"
-            [alt]="rp.name"
-            class="related-image"
-            (error)="$any($event.target).src='no-image.svg'"
-          />
-          <div class="related-name">{{ rp.name }}</div>
-          <div class="related-price">{{ rp.price | number:'1.2-2' }}€</div>
-        </a>
-      </div>
+      <ng-container *ngTemplateOutlet="relatedGrid; context: { $implicit: relatedProducts }"></ng-container>
     </div>
 
     <div class="related-products" *ngIf="!isLoading && recentlyViewed.length > 0">
       <h2 class="related-title">Είδες Πρόσφατα</h2>
+      <ng-container *ngTemplateOutlet="relatedGrid; context: { $implicit: recentlyViewed }"></ng-container>
+    </div>
+
+    <ng-template #relatedGrid let-list>
       <div class="related-grid">
         <a
           class="related-card"
-          *ngFor="let rv of recentlyViewed"
-          [routerLink]="['/products', rv.id]">
+          *ngFor="let p of list"
+          [routerLink]="['/products', p.id]">
           <img
-            [src]="rv.image_url | imageUrl"
-            [alt]="rv.name"
+            [src]="p.image_url | imageUrl"
+            [alt]="p.name"
             class="related-image"
             (error)="$any($event.target).src='no-image.svg'"
           />
-          <div class="related-name">{{ rv.name }}</div>
-          <div class="related-price">{{ rv.price | number:'1.2-2' }}€</div>
+          <div class="related-name">{{ p.name }}</div>
+          <div class="related-price">{{ p.price | number:'1.2-2' }}€</div>
         </a>
       </div>
-    </div>
+    </ng-template>
 
     <app-reviews
       *ngIf="!isLoading && product"

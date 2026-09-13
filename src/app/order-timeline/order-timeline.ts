@@ -32,18 +32,15 @@ export class OrderTimelineComponent {
     }
 
     return statuses.map((status, index) => ({
-      label: this.getLabel(status),
+      label: statusLabel(status),
       status: status,
       icon: this.getIcon(status, index <= currentIndex),
       completed: index < currentIndex,
       active: index === currentIndex
     }));
   }
-  
-  private getLabel(status: OrderStatus): string {
-    return statusLabel(status);
-  }
-  
+
+
   private getIcon(status: OrderStatus, isActiveOrCompleted: boolean): string {
     if (!isActiveOrCompleted) return '○';
     
