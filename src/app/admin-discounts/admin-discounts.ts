@@ -183,7 +183,7 @@ export class AdminDiscountsComponent implements OnInit {
       value: code.value,
       minOrderAmount: code.min_order_amount,
       maxUses: code.max_uses,
-      expiresAt: code.expires_at,
+      expiresAt: this.formatDateForInput(code.expires_at) || null,
       active: !code.active
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
