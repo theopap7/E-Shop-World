@@ -30,8 +30,6 @@ export class ProfileComponent {
   currentPassword = '';
   newPassword = '';
   confirmPassword = '';
-  passwordError: string | null = null;
-  passwordSuccess: string | null = null;
   changingPassword = false;
   showCurrentPassword = false;
   showNewPassword = false;
@@ -106,9 +104,6 @@ export class ProfileComponent {
   }
 
   changePassword() {
-    this.passwordSuccess = null;
-    this.passwordError = null;
-
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
       this.toastService.warning('Συμπλήρωσε όλα τα πεδία');
       return;

@@ -275,9 +275,6 @@ export class OrderDetailsComponent implements OnInit {
     this.isReordering = false;
   }
 
-  get itemsTotal(): number {
-    return this.items.reduce((sum, i) => sum + (Number(i.line_total) || 0), 0);
-  }
   downloadCSV(orderId: number) {
     this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: blob => {

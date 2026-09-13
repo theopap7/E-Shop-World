@@ -135,8 +135,4 @@ export class MyReviewsComponent implements OnInit {
   setEditRating(rating: number): void {
     this.editRating = rating;
   }
-
-  getEditStarsPreview(star: number): string {
-    return star <= this.editRating ? 'filled' : '';
-  }
 }

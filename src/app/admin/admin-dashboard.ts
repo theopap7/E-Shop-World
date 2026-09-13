@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, DestroyRef, inject, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, DestroyRef, inject, ElementRef, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -28,7 +28,7 @@ Chart.register(
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
-export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   stats: AdminStats | null = null;
   isLoading = true;
   error: string | null = null;
@@ -56,8 +56,6 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnInit(): void {
     this.loadDashboard();
   }
-
-  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
     this.revenueChart?.destroy();

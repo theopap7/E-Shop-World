@@ -30,7 +30,6 @@ export class ReviewsComponent implements OnInit {
   newComment = '';
   isSubmitting = false;
   submitError = '';
-  submitSuccess = '';
 
   // Edit state
   editingReviewId: number | null = null;
@@ -112,7 +111,6 @@ export class ReviewsComponent implements OnInit {
 
     this.isSubmitting = true;
     this.submitError = '';
-    this.submitSuccess = '';
 
     this.reviewService.submitReview(
       this.productId,
