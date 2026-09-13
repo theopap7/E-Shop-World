@@ -1,8 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
 const { upload, verifyImageSignature } = require('../../middleware/upload');
+
+const uploadDir = path.join(__dirname, '..', '..', 'uploads');
+
+// only local /uploads/ files get deleted; seeded/external URLs are skipped
+function deleteUploadedFile(imageUrl) {
+  if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
+  fs.unlink(path.join(uploadDir, path.basename(imageUrl)), () => {});
+}
 
 router.get('/admin/products', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -126,7 +136,7 @@ router.delete('/admin/products/:id', authenticateToken, isAdmin, async (req, res
   try {
     const productId = Number(req.params.id);
 
-    const [products] = await db.query('SELECT id, name FROM products WHERE id = ?', [productId]);
+    const [products] = await db.query('SELECT id, name, image_url FROM products WHERE id = ?', [productId]);
     if (products.length === 0) {
       return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
@@ -145,11 +155,19 @@ router.delete('/admin/products/:id', authenticateToken, isAdmin, async (req, res
       });
     }
 
+    const [galleryImages] = await db.query(
+      'SELECT image_url FROM product_images WHERE product_id = ?',
+      [productId]
+    );
+
     const [result] = await db.query('DELETE FROM products WHERE id = ?', [productId]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
+
+    deleteUploadedFile(products[0].image_url);
+    galleryImages.forEach(img => deleteUploadedFile(img.image_url));
 
     return res.json({ success: true, message: `Το προϊόν "${productName}" διαγράφηκε επιτυχώς!` });
   } catch (error) {
@@ -213,6 +231,11 @@ router.delete('/admin/products/:id/images/:imageId', authenticateToken, isAdmin,
     const productId = Number(req.params.id);
     const imageId = Number(req.params.imageId);
 
+    const [images] = await db.query(
+      'SELECT image_url FROM product_images WHERE id = ? AND product_id = ?',
+      [imageId, productId]
+    );
+
     const [result] = await db.query(
       'DELETE FROM product_images WHERE id = ? AND product_id = ?',
       [imageId, productId]
@@ -221,6 +244,8 @@ router.delete('/admin/products/:id/images/:imageId', authenticateToken, isAdmin,
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: 'Η εικόνα δεν βρέθηκε' });
     }
+
+    deleteUploadedFile(images[0]?.image_url);
 
     res.json({ success: true, message: 'Η εικόνα διαγράφηκε' });
   } catch (error) {

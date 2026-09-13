@@ -144,6 +144,7 @@ describe('DELETE /api/admin/products/:id', () => {
     db.query
       .mockResolvedValueOnce([[{ id: 1, name: 'Test' }]])
       .mockResolvedValueOnce([[{ count: 0 }]])
+      .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{ affectedRows: 1 }]);
 
     const res = await request(app).delete('/api/admin/products/1').set('Cookie', admin());

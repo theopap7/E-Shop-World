@@ -313,7 +313,7 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
   }
 });
 
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', forgotPasswordLimiter, async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
