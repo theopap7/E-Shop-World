@@ -21,9 +21,6 @@ export class DiscountService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Validate discount code
-   */
   validateDiscount(code: string, orderTotal: number): Observable<DiscountValidationResponse> {
     return this.http.post<DiscountValidationResponse>(
       `${this.apiUrl}/validate-discount`,

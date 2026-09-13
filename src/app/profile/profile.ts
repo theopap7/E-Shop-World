@@ -109,19 +109,16 @@ export class ProfileComponent {
     this.passwordSuccess = null;
     this.passwordError = null;
 
-    // Έλεγχος συμπλήρωσης
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
       this.toastService.warning('Συμπλήρωσε όλα τα πεδία');
       return;
     }
 
-    // Έλεγχος επιβεβαίωσης
     if (this.newPassword !== this.confirmPassword) {
       this.toastService.error('Οι κωδικοί δεν ταιριάζουν');
       return;
     }
 
-    // Έλεγχος μήκους
     if (this.newPassword.length < 8) {
       this.toastService.warning('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες');
       return;

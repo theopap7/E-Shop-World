@@ -123,9 +123,8 @@ export class ProductListComponent implements OnInit {
   }
 
   get filteredProducts(): ProductDto[] {
-    let result = [...this.allProducts]; // Copy!
+    let result = [...this.allProducts];
 
-    // 1. Search filter
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase().trim();
       result = result.filter(p =>
@@ -135,14 +134,12 @@ export class ProductListComponent implements OnInit {
       );
     }
 
-    // 2. Category filter
     if (this.selectedCategory !== 'all') {
       result = result.filter(p =>
         p.category_name === this.selectedCategory
       );
     }
 
-    // 3. Price filter
     if (this.priceMin != null) {
       result = result.filter(p => p.price >= this.priceMin!);
     }
@@ -150,7 +147,6 @@ export class ProductListComponent implements OnInit {
       result = result.filter(p => p.price <= this.priceMax!);
     }
 
-    // 4. Sort
     switch (this.sortBy) {
       case 'price_asc':
         result.sort((a, b) => a.price - b.price);
@@ -161,7 +157,7 @@ export class ProductListComponent implements OnInit {
       case 'name_asc':
         result.sort((a, b) => a.name.localeCompare(b.name));
         break;
-      default: // newest
+      default:
         result.sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );

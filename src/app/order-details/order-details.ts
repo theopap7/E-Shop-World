@@ -122,8 +122,6 @@ export class OrderDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
-    // ελέγχει αν είμαστε στο admin panel
     this.isAdminPage = this.router.url.startsWith('/admin');
 
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {

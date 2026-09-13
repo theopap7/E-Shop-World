@@ -24,18 +24,13 @@ export class OrderTimelineComponent {
   @Input() currentStatus: OrderStatus = 'pending';
   
   get steps(): TimelineStep[] {
-    // Define the order flow
     const statuses: OrderStatus[] = ['pending', 'processing', 'shipped', 'delivered'];
-    
-    // Find current step index
     const currentIndex = statuses.indexOf(this.currentStatus);
-    
-    // If cancelled, show special state
+
     if (this.currentStatus === 'cancelled') {
       return this.getCancelledSteps();
     }
-    
-    // Build timeline steps
+
     return statuses.map((status, index) => ({
       label: this.getLabel(status),
       status: status,

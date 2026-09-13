@@ -36,14 +36,12 @@ export class ReviewService {
 
   constructor(private http: HttpClient) {}
 
-  // Πάρε reviews για ένα product
   getReviews(productId: number): Observable<ReviewsResponse> {
     return this.http.get<ReviewsResponse>(
       `${this.baseUrl}/reviews/${productId}`
     );
   }
 
-  // Πάρε τις κριτικές του logged-in χρήστη
   getMyReviews(): Observable<MyReviewsResponse> {
     return this.http.get<MyReviewsResponse>(
       `${this.baseUrl}/reviews/my`
