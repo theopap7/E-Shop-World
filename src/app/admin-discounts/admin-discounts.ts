@@ -235,7 +235,9 @@ export class AdminDiscountsComponent implements OnInit {
 
   isExpired(expiresAt: string | null): boolean {
     if (!expiresAt) return false;
-    return new Date(expiresAt) < new Date();
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return expiresAt.slice(0, 10) < todayStr;
   }
 
   isExhausted(code: DiscountCode): boolean {

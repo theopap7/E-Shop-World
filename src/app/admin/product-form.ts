@@ -357,6 +357,7 @@ export class ProductFormComponent implements OnInit {
 
   deleteGalleryImage(imageId: number): void {
     if (!this.productId) return;
+    if (!confirm('Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτή την εικόνα;')) return;
 
     this.http.delete<{ success: boolean }>(
       `${environment.apiUrl}/admin/products/${this.productId}/images/${imageId}`

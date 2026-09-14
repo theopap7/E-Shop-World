@@ -16,10 +16,6 @@ import { environment } from '../../environments/environment';
 })
 export class ProfileComponent {
   user: AuthUser | null;
-
-  loading = false;
-
-  // Edit profile state
   editMode = false;
   isUpdating = false;
   editForm = {

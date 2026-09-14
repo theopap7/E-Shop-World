@@ -56,13 +56,13 @@
         </button>
       </div>
 
-      <div *ngIf="orders.length === 0" class="empty">
+      <div *ngIf="filteredOrders.length === 0" class="empty">
         <div class="empty-icon">🧾</div>
         <h3>Δεν βρέθηκαν παραγγελίες</h3>
-        <p>Όταν γίνουν αγορές, θα εμφανιστούν εδώ.</p>
+        <p>{{ orders.length === 0 ? 'Όταν γίνουν αγορές, θα εμφανιστούν εδώ.' : 'Δοκίμασε διαφορετικά κριτήρια αναζήτησης.' }}</p>
       </div>
 
-      <div *ngIf="orders.length > 0" class="table-wrap">
+      <div *ngIf="filteredOrders.length > 0" class="table-wrap">
         <table class="table">
 
           <thead>

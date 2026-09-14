@@ -10,11 +10,7 @@
       <h2>👤 Το Προφίλ μου</h2>
     </div>
 
-    <div *ngIf="loading" class="loading">
-      Φόρτωση...
-    </div>
-
-    <div *ngIf="!loading && user" class="profile-layout">
+    <div *ngIf="user" class="profile-layout">
 
       <div class="profile-card">
 
