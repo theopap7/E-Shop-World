@@ -22,7 +22,7 @@
     </div>
 
     <div *ngIf="!isLoading && returns.length > 0" class="returns-list">
-      <div class="return-card" *ngFor="let r of returns">
+      <div class="return-card" *ngFor="let r of pagedReturns">
 
         <div class="return-header">
           <div class="return-meta">
@@ -103,6 +103,13 @@
         </div>
 
       </div>
+
+      <app-pagination
+        [total]="returns.length"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        (pageChange)="currentPage = $event"
+      ></app-pagination>
     </div>
 
   </div>

@@ -9,6 +9,7 @@ import { AdminService } from '../services/admin.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { environment } from '../../environments/environment';
 import { returnStatusLabel } from '../services/return-status.util';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 interface ReturnItem {
   product_id: number;
@@ -38,7 +39,7 @@ interface ReturnRequest {
 @Component({
   selector: 'app-admin-returns',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ImageUrlPipe],
+  imports: [CommonModule, RouterModule, FormsModule, ImageUrlPipe, PaginationComponent],
   templateUrl: './admin-returns.html',
   styleUrl: './admin-returns.css'
 })
@@ -47,6 +48,13 @@ export class AdminReturnsComponent implements OnInit {
   isLoading = false;
   processingId: number | null = null;
   adminNotes: Record<number, string> = {};
+  currentPage = 1;
+  readonly pageSize = 15;
+
+  get pagedReturns(): ReturnRequest[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.returns.slice(start, start + this.pageSize);
+  }
 
   private readonly apiUrl = `${environment.apiUrl}/admin/returns`;
 
@@ -63,6 +71,7 @@ export class AdminReturnsComponent implements OnInit {
     this.http.get<{ success: boolean; returns: ReturnRequest[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.returns = res.returns || [];
+        this.currentPage = 1;
         this.isLoading = false;
       },
       error: () => {
