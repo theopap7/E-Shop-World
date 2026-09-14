@@ -273,6 +273,21 @@
   margin-bottom: 2px;
 }
 
+.write-review-link {
+  display: inline-block;
+  font-family: 'Public Sans', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  color: var(--accent);
+  text-decoration: none;
+  margin-top: 6px;
+  white-space: nowrap;
+}
+
+.write-review-link:hover {
+  text-decoration: underline;
+}
+
 /* ===============================
    STATUS / PAYMENT PILLS
 ================================= */

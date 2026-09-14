@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Review, ReviewService } from '../services/review.service';
+import { EligibleProduct, Review, ReviewService } from '../services/review.service';
 import { ToastService } from '../services/toast.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
@@ -17,6 +17,7 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 })
 export class MyReviewsComponent implements OnInit {
   reviews: Review[] = [];
+  eligibleProducts: EligibleProduct[] = [];
   isLoading = false;
   error = '';
 
@@ -36,6 +37,18 @@ export class MyReviewsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMyReviews();
+    this.loadEligibleProducts();
+  }
+
+  loadEligibleProducts(): void {
+    this.reviewService.getEligibleProducts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        this.eligibleProducts = res.products;
+      },
+      error: () => {
+        this.eligibleProducts = [];
+      }
+    });
   }
 
   loadMyReviews(): void {
@@ -64,6 +77,7 @@ export class MyReviewsComponent implements OnInit {
         this.deletingId = null;
         this.toastService.success('Η κριτική διαγράφηκε');
         this.reviews = this.reviews.filter(r => r.id !== reviewId);
+        this.loadEligibleProducts();
 
         if (this.editingReviewId === reviewId) {
           this.cancelEdit();

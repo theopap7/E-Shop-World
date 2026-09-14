@@ -16,7 +16,31 @@
       {{ error }}
     </div>
 
-    <div *ngIf="!isLoading && !error && reviews.length === 0" class="empty-state">
+    <div *ngIf="!isLoading && eligibleProducts.length > 0" class="eligible-section">
+      <h3 class="eligible-title">Μπορείς να αξιολογήσεις</h3>
+
+      <div class="eligible-list">
+        <a
+          *ngFor="let p of eligibleProducts"
+          class="eligible-card"
+          [routerLink]="['/products', p.product_id]"
+          fragment="reviews"
+        >
+          <div class="eligible-top">
+            <img
+              *ngIf="p.product_image"
+              [src]="p.product_image | imageUrl"
+              [alt]="p.product_name"
+              class="eligible-image"
+            />
+            <span class="eligible-name">{{ p.product_name }}</span>
+          </div>
+          <span class="eligible-cta">✍️ Γράψε κριτική</span>
+        </a>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !error && reviews.length === 0 && eligibleProducts.length === 0" class="empty-state">
       <div class="empty-icon">⭐</div>
       <h3>Δεν έχεις γράψει ακόμα κριτικές</h3>
       <p>Οι κριτικές σου για προϊόντα που έχεις αγοράσει θα εμφανίζονται εδώ.</p>

@@ -107,6 +107,14 @@
                   Ποσότητα: {{ it.quantity }}
                   × {{ it.unit_price | number:'1.2-2' }} €
                 </div>
+                <a
+                  *ngIf="!isAdminPage && order.status === 'delivered'"
+                  [routerLink]="['/products', it.product_id]"
+                  fragment="reviews"
+                  class="write-review-link"
+                >
+                  ✍️ Γράψε κριτική
+                </a>
               </div>
 
               <div class="line">

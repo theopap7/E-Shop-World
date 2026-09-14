@@ -26,6 +26,28 @@ router.get('/reviews/my', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/reviews/eligible', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [products] = await db.query(`
+      SELECT DISTINCT oi.product_id, p.name AS product_name, p.image_url AS product_image
+      FROM order_items oi
+      JOIN orders o ON o.id = oi.order_id
+      JOIN products p ON p.id = oi.product_id
+      WHERE o.user_id = ? AND o.status = 'delivered'
+        AND NOT EXISTS (
+          SELECT 1 FROM reviews r WHERE r.product_id = oi.product_id AND r.user_id = ?
+        )
+    `, [userId, userId]);
+
+    res.json({ success: true, products });
+  } catch (error) {
+    console.error('Get eligible-for-review products error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 router.get('/reviews/:productId', async (req, res) => {
   try {
     const productId = Number(req.params.productId);

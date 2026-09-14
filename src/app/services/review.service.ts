@@ -28,6 +28,17 @@ export interface MyReviewsResponse {
   reviews: Review[];
 }
 
+export interface EligibleProduct {
+  product_id: number;
+  product_name: string;
+  product_image: string | null;
+}
+
+export interface EligibleProductsResponse {
+  success: boolean;
+  products: EligibleProduct[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,6 +56,12 @@ export class ReviewService {
   getMyReviews(): Observable<MyReviewsResponse> {
     return this.http.get<MyReviewsResponse>(
       `${this.baseUrl}/reviews/my`
+    );
+  }
+
+  getEligibleProducts(): Observable<EligibleProductsResponse> {
+    return this.http.get<EligibleProductsResponse>(
+      `${this.baseUrl}/reviews/eligible`
     );
   }
 

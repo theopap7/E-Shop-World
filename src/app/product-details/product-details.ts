@@ -138,6 +138,12 @@ export class ProductDetailComponent implements OnInit {
         }
 
         this.isLoading = false;
+
+        if (this.route.snapshot.fragment === 'reviews') {
+          setTimeout(() => {
+            document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
       },
       error: (err: { status: number }) => {
         this.error = err?.status === 404
