@@ -92,7 +92,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
     const aggregatedMap = new Map();
     for (const item of items) {
       const productId = Number(item.productId);
-      const size = item.size || null;
+      const size = item.size ? String(item.size).toUpperCase() : null;
       const key = `${productId}::${size ?? ''}`;
       const existing = aggregatedMap.get(key);
       if (existing) {
