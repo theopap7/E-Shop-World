@@ -76,6 +76,7 @@ describe('PUT /api/me', () => {
 
   it('accepts a valid phone and optional address, persisting both', async () => {
     db.query
+      .mockResolvedValueOnce([[{ email: 'test@test.com' }]]) // current email lookup
       .mockResolvedValueOnce([[]]) // email-taken check
       .mockResolvedValueOnce([{}]) // UPDATE users
       .mockResolvedValueOnce([[{ role: 'user' }]]); // SELECT role
@@ -99,13 +100,14 @@ describe('PUT /api/me', () => {
       floor: '2'
     });
 
-    const updateCall = db.query.mock.calls[1];
+    const updateCall = db.query.mock.calls[2];
     expect(updateCall[1]).toContain('6912345678');
     expect(updateCall[1]).toContain('Athens');
   });
 
   it('allows clearing the phone by sending an empty value', async () => {
     db.query
+      .mockResolvedValueOnce([[{ email: 'test@test.com' }]])
       .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{}])
       .mockResolvedValueOnce([[{ role: 'user' }]]);
@@ -117,6 +119,30 @@ describe('PUT /api/me', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.user.phone).toBeNull();
+  });
+
+  it('resets email_verified and sends a new verification email when the email changes', async () => {
+    db.query
+      .mockResolvedValueOnce([[{ email: 'old@test.com' }]]) // current email lookup
+      .mockResolvedValueOnce([[]]) // email-taken check
+      .mockResolvedValueOnce([{}]) // UPDATE users
+      .mockResolvedValueOnce([{}]) // invalidate old tokens
+      .mockResolvedValueOnce([{}]) // insert new token
+      .mockResolvedValueOnce([[{ role: 'user', email_verified: 0 }]]); // SELECT role
+
+    const res = await request(app)
+      .put('/api/me')
+      .set('Cookie', authCookie())
+      .send({ ...basePayload, email: 'new@test.com' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.user.emailVerified).toBe(false);
+
+    const updateCall = db.query.mock.calls[2];
+    expect(updateCall[0]).toContain('email_verified = FALSE');
+
+    const insertTokenCall = db.query.mock.calls[4];
+    expect(insertTokenCall[0]).toContain('INSERT INTO email_verification_tokens');
   });
 });
 

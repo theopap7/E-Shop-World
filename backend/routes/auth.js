@@ -295,9 +295,14 @@ router.put('/me', authenticateToken, async (req, res) => {
       floor: addr.floor ? String(addr.floor).trim() : null
     };
 
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const [currentRows] = await db.query('SELECT email FROM users WHERE id = ?', [userId]);
+    const emailChanged = currentRows[0]?.email !== normalizedEmail;
+
     const [existing] = await db.query(
       'SELECT id FROM users WHERE email = ? AND id != ?',
-      [email.toLowerCase().trim(), userId]
+      [normalizedEmail, userId]
     );
     if (existing.length > 0) {
       return res.status(400).json({ success: false, message: 'Το email χρησιμοποιείται ήδη από άλλο λογαριασμό' });
@@ -305,14 +310,37 @@ router.put('/me', authenticateToken, async (req, res) => {
 
     await db.query(
       `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?,
-       address_country = ?, address_city = ?, address_zip = ?, address1 = ?, address_floor = ?
+       address_country = ?, address_city = ?, address_zip = ?, address1 = ?, address_floor = ?${emailChanged ? ', email_verified = FALSE' : ''}
        WHERE id = ?`,
       [
-        firstName.trim(), lastName.trim(), email.toLowerCase().trim(), trimmedPhone,
+        firstName.trim(), lastName.trim(), normalizedEmail, trimmedPhone,
         trimmedAddress.country, trimmedAddress.city, trimmedAddress.zip, trimmedAddress.address1, trimmedAddress.floor,
         userId
       ]
     );
+
+    if (emailChanged) {
+      const verifyToken = crypto.randomBytes(32).toString('hex');
+      const verifyExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      await db.query('UPDATE email_verification_tokens SET used = TRUE WHERE user_id = ? AND used = FALSE', [userId]);
+      await db.query(
+        'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+        [userId, verifyToken, verifyExpiresAt]
+      );
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+      const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
+
+      // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
+      (async () => {
+        try {
+          await sendVerificationEmail(normalizedEmail, verifyLink);
+        } catch (emailErr) {
+          console.error('Verification email failed (non-critical):', emailErr.message);
+        }
+      })();
+    }
 
     const [rows] = await db.query('SELECT role, email_verified FROM users WHERE id = ?', [userId]);
 
@@ -323,7 +351,7 @@ router.put('/me', authenticateToken, async (req, res) => {
         id: userId,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         phone: trimmedPhone,
         address: trimmedAddress,
         role: rows[0]?.role,

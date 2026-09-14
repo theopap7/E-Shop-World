@@ -208,10 +208,14 @@ router.patch('/admin/orders/:id/confirm-payment', authenticateToken, isAdmin, as
   try {
     const orderId = Number(req.params.id);
 
-    const [rows] = await db.query('SELECT payment_status FROM orders WHERE id = ?', [orderId]);
+    const [rows] = await db.query('SELECT payment_status, payment_method FROM orders WHERE id = ?', [orderId]);
 
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
+    }
+
+    if (rows[0].payment_method !== 'bank_transfer') {
+      return res.status(400).json({ success: false, message: 'Η χειροκίνητη επιβεβαίωση πληρωμής ισχύει μόνο για τραπεζική κατάθεση' });
     }
 
     if (rows[0].payment_status !== 'pending') {

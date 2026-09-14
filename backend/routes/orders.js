@@ -89,11 +89,24 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
       return res.status(403).json({ success: false, message: 'Επιβεβαίωσε το email σου πριν ολοκληρώσεις παραγγελία' });
     }
 
-    const validatedItems = [];
+    const aggregatedMap = new Map();
     for (const item of items) {
-      const { productId, quantity } = item;
-      const q = Number(quantity);
+      const productId = Number(item.productId);
       const size = item.size || null;
+      const key = `${productId}::${size ?? ''}`;
+      const existing = aggregatedMap.get(key);
+      if (existing) {
+        existing.quantity += Number(item.quantity);
+      } else {
+        aggregatedMap.set(key, { productId, size, quantity: Number(item.quantity) });
+      }
+    }
+    const aggregatedItems = Array.from(aggregatedMap.values());
+
+    const validatedItems = [];
+    for (const item of aggregatedItems) {
+      const { productId, quantity, size } = item;
+      const q = Number(quantity);
 
       const [productRows] = await conn.query(
         'SELECT id, price, stock, name, sizes FROM products WHERE id = ? FOR UPDATE',

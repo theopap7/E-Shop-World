@@ -141,14 +141,20 @@ describe('PATCH /api/admin/orders/:id/confirm-payment', () => {
   });
 
   it('rejects confirming a payment that is not pending', async () => {
-    db.query.mockResolvedValueOnce([[{ payment_status: 'paid' }]]);
+    db.query.mockResolvedValueOnce([[{ payment_status: 'paid', payment_method: 'bank_transfer' }]]);
     const res = await request(app).patch('/api/admin/orders/1/confirm-payment').set('Cookie', admin());
     expect(res.status).toBe(400);
   });
 
-  it('confirms a pending payment', async () => {
+  it('rejects confirming payment for a non-bank_transfer order', async () => {
+    db.query.mockResolvedValueOnce([[{ payment_status: 'pending', payment_method: 'cod' }]]);
+    const res = await request(app).patch('/api/admin/orders/1/confirm-payment').set('Cookie', admin());
+    expect(res.status).toBe(400);
+  });
+
+  it('confirms a pending bank_transfer payment', async () => {
     db.query
-      .mockResolvedValueOnce([[{ payment_status: 'pending' }]])
+      .mockResolvedValueOnce([[{ payment_status: 'pending', payment_method: 'bank_transfer' }]])
       .mockResolvedValueOnce([{}]);
 
     const res = await request(app).patch('/api/admin/orders/1/confirm-payment').set('Cookie', admin());
