@@ -65,7 +65,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
 
   for (const item of items) {
     const { productId, quantity } = item;
-    if (!productId || !Number.isFinite(Number(quantity)) || Number(quantity) <= 0) {
+    if (!productId || !Number.isInteger(Number(quantity)) || Number(quantity) <= 0) {
       return res.status(400).json({ success: false, message: 'Μη έγκυρο order item' });
     }
   }

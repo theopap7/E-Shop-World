@@ -126,6 +126,10 @@ export class AdminDiscountsComponent implements OnInit {
       this.toastService.warning('Η αξία πρέπει να είναι μεγαλύτερη από 0');
       return;
     }
+    if (this.form.maxUses != null && this.form.maxUses < 1) {
+      this.toastService.warning('Οι μέγιστες χρήσεις πρέπει να είναι τουλάχιστον 1 (άφησε κενό για απεριόριστες)');
+      return;
+    }
     if (this.isSaving) return;
     this.isSaving = true;
 
@@ -134,7 +138,7 @@ export class AdminDiscountsComponent implements OnInit {
       type: this.form.type,
       value: this.form.value,
       minOrderAmount: this.form.minOrderAmount || 0,
-      maxUses: this.form.maxUses || null,
+      maxUses: this.form.maxUses ?? null,
       expiresAt: this.form.expiresAt || null,
       active: this.form.active
     };
