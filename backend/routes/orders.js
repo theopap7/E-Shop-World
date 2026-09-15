@@ -541,7 +541,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     for (const item of items) {
       const productId = Number(item.productId);
       const qty = Number(item.quantity);
-      const size = item.size ? String(item.size) : null;
+      const size = item.size ? String(item.size).toUpperCase() : null;
       if (!Number.isInteger(productId) || !Number.isInteger(qty) || qty < 1) {
         await conn.rollback();
         return res.status(400).json({ success: false, message: 'Μη έγκυρη γραμμή επιστροφής' });
