@@ -6,6 +6,7 @@ const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
 const { discountLimiter } = require('../middleware/rateLimiters');
 const { sendOrderConfirmationEmail } = require('../utils/mailer');
+const { restoreStock } = require('../utils/stock');
 
 // Only rate-limit checkout attempts that carry a discount code, so a discount-code
 // brute-force can't bypass the /validate-discount limiter by going through /orders instead.
@@ -666,18 +667,7 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
       'SELECT product_id, quantity, size FROM order_items WHERE order_id = ?',
       [orderId]
     );
-    for (const item of items) {
-      await conn.query(
-        'UPDATE products SET stock = stock + ? WHERE id = ?',
-        [item.quantity, item.product_id]
-      );
-      if (item.size) {
-        await conn.query(
-          'UPDATE product_size_stock SET stock = stock + ? WHERE product_id = ? AND size = ?',
-          [item.quantity, item.product_id, item.size]
-        );
-      }
-    }
+    await restoreStock(conn, items);
 
     if (order.discount_code) {
       await conn.query(

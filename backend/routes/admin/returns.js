@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
+const { restoreStock } = require('../../utils/stock');
 
 router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -93,15 +94,7 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
         'SELECT product_id, quantity, size FROM return_request_items WHERE return_request_id = ?',
         [returnId]
       );
-      for (const item of returnItems) {
-        await conn.query('UPDATE products SET stock = stock + ? WHERE id = ?', [item.quantity, item.product_id]);
-        if (item.size) {
-          await conn.query(
-            'UPDATE product_size_stock SET stock = stock + ? WHERE product_id = ? AND size = ?',
-            [item.quantity, item.product_id, item.size]
-          );
-        }
-      }
+      await restoreStock(conn, returnItems);
     }
 
     await conn.commit();

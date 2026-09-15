@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
 const { sendOrderStatusEmail } = require('../../utils/mailer');
+const { restoreStock } = require('../../utils/stock');
+const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
 
 router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -133,7 +135,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
     // bank_transfer order can otherwise reach "delivered" while payment is
     // still unconfirmed — block that so a later return can't mark it
     // "refunded" for money that was never actually received.
-    if (status === 'delivered' && paymentMethod === 'bank_transfer' && currentPaymentStatus !== 'paid') {
+    if (status === 'delivered' && requiresManualPaymentConfirmation(paymentMethod) && currentPaymentStatus !== 'paid') {
       await conn.rollback();
       return res.status(400).json({ success: false, message: 'Επιβεβαιώστε πρώτα την πληρωμή πριν σημειώσετε την παραγγελία ως παραδομένη' });
     }
@@ -153,15 +155,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
         'SELECT product_id, quantity, size FROM order_items WHERE order_id = ?',
         [orderId]
       );
-      for (const item of orderItems) {
-        await conn.query('UPDATE products SET stock = stock + ? WHERE id = ?', [item.quantity, item.product_id]);
-        if (item.size) {
-          await conn.query(
-            'UPDATE product_size_stock SET stock = stock + ? WHERE product_id = ? AND size = ?',
-            [item.quantity, item.product_id, item.size]
-          );
-        }
-      }
+      await restoreStock(conn, orderItems);
 
       const [orderData] = await conn.query('SELECT discount_code FROM orders WHERE id = ?', [orderId]);
       if (orderData[0]?.discount_code) {
@@ -214,7 +208,7 @@ router.patch('/admin/orders/:id/confirm-payment', authenticateToken, isAdmin, as
       return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
-    if (rows[0].payment_method !== 'bank_transfer') {
+    if (!requiresManualPaymentConfirmation(rows[0].payment_method)) {
       return res.status(400).json({ success: false, message: 'Η χειροκίνητη επιβεβαίωση πληρωμής ισχύει μόνο για τραπεζική κατάθεση' });
     }
 
