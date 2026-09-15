@@ -440,7 +440,8 @@ export class CheckoutComponent implements OnInit {
         const isDiscountError =
           message.includes('εξαντληθεί') ||
           message.includes('λήξει') ||
-          message.includes('κωδικός έκπτωσης');
+          message.includes('κωδικός έκπτωσης') ||
+          message.includes('Ελάχιστο ποσό παραγγελίας');
 
         if (isDiscountError && this.appliedDiscount) {
           this.discountExpiredPrompt = true;
