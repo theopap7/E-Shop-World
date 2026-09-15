@@ -60,6 +60,7 @@ export class ProductFormComponent implements OnInit {
 
   onCategoryChange(): void {
     this.selectedSizes = [];
+    this.sizeStock = {};
   }
 
   isSizeSelected(s: string): boolean {
@@ -186,16 +187,25 @@ export class ProductFormComponent implements OnInit {
       return;
     }
 
+    if (this.sizeMode !== 'none' && this.selectedSizes.length === 0) {
+      this.error = 'Επίλεξε τουλάχιστον ένα μέγεθος για αυτή την κατηγορία.';
+      return;
+    }
+
     this.isLoading = true;
     this.error = null;
 
     const sortedSizes = sortSizes(this.selectedSizes);
+    const hasSizes = sortedSizes.length > 0;
 
     const productData = {
       ...this.form.value,
       category_id: this.form.value.category_id || null,
-      sizes: sortedSizes.length > 0 ? sortedSizes : null,
-      sizeStock: sortedSizes.length > 0
+      stock: hasSizes
+        ? sortedSizes.reduce((sum, s) => sum + this.getSizeStock(s), 0)
+        : this.form.value.stock,
+      sizes: hasSizes ? sortedSizes : null,
+      sizeStock: hasSizes
         ? Object.fromEntries(sortedSizes.map(s => [s, this.getSizeStock(s)]))
         : undefined,
     };

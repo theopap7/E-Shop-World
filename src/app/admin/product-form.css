@@ -14,6 +14,19 @@
   border:1px solid #e8e8e8;
 }
 
+.alert{
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  margin-bottom:16px;
+  font-weight:700;
+}
+.alert-error{
+  border-color:#fecaca;
+  background:#fef2f2;
+  color:#991b1b;
+}
+
 
 /* ========================= */
 /* HEADER */
