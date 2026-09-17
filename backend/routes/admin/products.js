@@ -1,18 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
-const { upload, verifyImageSignature } = require('../../middleware/upload');
-
-const uploadDir = path.join(__dirname, '..', '..', 'uploads');
-
-// only local /uploads/ files get deleted; seeded/external URLs are skipped
-function deleteUploadedFile(imageUrl) {
-  if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
-  fs.unlink(path.join(uploadDir, path.basename(imageUrl)), () => {});
-}
+const { upload, verifyImageSignature, saveImage, deleteImage } = require('../../middleware/upload');
 
 router.get('/admin/products', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -242,8 +232,8 @@ router.delete('/admin/products/:id', authenticateToken, isAdmin, async (req, res
       return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
     }
 
-    deleteUploadedFile(products[0].image_url);
-    galleryImages.forEach(img => deleteUploadedFile(img.image_url));
+    deleteImage(products[0].image_url);
+    galleryImages.forEach(img => deleteImage(img.image_url));
 
     return res.json({ success: true, message: `Το προϊόν "${productName}" διαγράφηκε επιτυχώς!` });
   } catch (error) {
@@ -282,7 +272,7 @@ router.post('/admin/products/:id/images', authenticateToken, isAdmin, upload.sin
       return res.status(400).json({ success: false, message: 'Δεν επιλέχθηκε αρχείο' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = await saveImage(req.file);
 
     const [countRows] = await db.query(
       'SELECT COUNT(*) as count FROM product_images WHERE product_id = ?',
@@ -321,7 +311,7 @@ router.delete('/admin/products/:id/images/:imageId', authenticateToken, isAdmin,
       return res.status(404).json({ success: false, message: 'Η εικόνα δεν βρέθηκε' });
     }
 
-    deleteUploadedFile(images[0]?.image_url);
+    deleteImage(images[0]?.image_url);
 
     res.json({ success: true, message: 'Η εικόνα διαγράφηκε' });
   } catch (error) {
@@ -330,13 +320,13 @@ router.delete('/admin/products/:id/images/:imageId', authenticateToken, isAdmin,
   }
 });
 
-router.post('/upload-image', authenticateToken, isAdmin, upload.single('image'), verifyImageSignature, (req, res) => {
+router.post('/upload-image', authenticateToken, isAdmin, upload.single('image'), verifyImageSignature, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Δεν επιλέχθηκε αρχείο' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = await saveImage(req.file);
     res.json({ success: true, imageUrl, message: 'Η εικόνα ανέβηκε επιτυχώς' });
   } catch (error) {
     console.error('Upload error:', error);

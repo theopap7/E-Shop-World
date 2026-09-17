@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:3000/api',
-  baseUrl: 'http://localhost:3000'
+  apiUrl: 'https://e-shop-world.onrender.com/api',
+  baseUrl: 'https://e-shop-world.onrender.com'
 };
