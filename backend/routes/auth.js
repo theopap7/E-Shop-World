@@ -52,16 +52,16 @@ router.post('/register', authLimiter, async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
 
-    try {
-      await sendVerificationEmail(normalizedEmail, verifyLink);
-    } catch (emailErr) {
-      console.error('Verification email failed (non-critical):', emailErr.message);
-    }
-
     res.status(201).json({
       success: true,
       message: 'Η εγγραφή ολοκληρώθηκε επιτυχώς',
       userId
+    });
+
+    // Backgrounded: mailer has its own connect/send timeouts, so this always
+    // settles (and logs) within a few seconds instead of hanging forever.
+    sendVerificationEmail(normalizedEmail, verifyLink).catch((emailErr) => {
+      console.error('Verification email failed (non-critical):', emailErr.message);
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -127,15 +127,13 @@ router.post('/resend-verification', resendVerificationLimiter, async (req, res) 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const verifyLink = `${frontendUrl}/verify-email?token=${token}`;
 
-    try {
-      await sendVerificationEmail(normalizedEmail, verifyLink);
-    } catch (emailErr) {
-      console.error('Resend verification email failed (non-critical):', emailErr.message);
-    }
-
     res.json({
       success: true,
       message: 'Αν ο λογαριασμός υπάρχει και δεν έχει επιβεβαιωθεί, θα λάβεις νέο σύνδεσμο.'
+    });
+
+    sendVerificationEmail(normalizedEmail, verifyLink).catch((emailErr) => {
+      console.error('Resend verification email failed (non-critical):', emailErr.message);
     });
   } catch (error) {
     console.error('Resend verification error:', error);
@@ -326,11 +324,9 @@ router.put('/me', authenticateToken, async (req, res) => {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
       const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
 
-      try {
-        await sendVerificationEmail(normalizedEmail, verifyLink);
-      } catch (emailErr) {
+      sendVerificationEmail(normalizedEmail, verifyLink).catch((emailErr) => {
         console.error('Verification email failed (non-critical):', emailErr.message);
-      }
+      });
     }
 
     const [rows] = await db.query('SELECT role, email_verified FROM users WHERE id = ?', [userId]);
