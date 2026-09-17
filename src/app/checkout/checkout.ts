@@ -37,6 +37,26 @@ function cardNotExpiredValidator(): ValidatorFn {
   };
 }
 
+/** Validates the IBAN check digits via the standard MOD-97 algorithm (ISO 7064),
+ * not just the country-code/length shape — rejects well-formed but fake IBANs. */
+function ibanChecksumValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = String(control.value ?? '').replace(/\s+/g, '').toUpperCase();
+    if (!value) return null;
+    if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/.test(value)) return { pattern: true };
+
+    const rearranged = value.slice(4) + value.slice(0, 4);
+    const numeric = rearranged.replace(/[A-Z]/g, (ch) => String(ch.charCodeAt(0) - 55));
+
+    let remainder = 0;
+    for (let i = 0; i < numeric.length; i += 7) {
+      remainder = Number(String(remainder) + numeric.substring(i, i + 7)) % 97;
+    }
+
+    return remainder === 1 ? null : { ibanChecksum: true };
+  };
+}
+
 @Component({
   selector: 'app-checkout',
   standalone: true,
@@ -235,7 +255,7 @@ export class CheckoutComponent implements OnInit {
     if (method === 'bank_transfer') {
       iban.setValidators([
         Validators.required,
-        Validators.pattern(/^[A-Z]{2}[0-9A-Z]{13,30}$/),
+        ibanChecksumValidator(),
       ]);
     }
 
