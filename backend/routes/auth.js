@@ -52,20 +52,17 @@ router.post('/register', authLimiter, async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
 
+    try {
+      await sendVerificationEmail(normalizedEmail, verifyLink);
+    } catch (emailErr) {
+      console.error('Verification email failed (non-critical):', emailErr.message);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Η εγγραφή ολοκληρώθηκε επιτυχώς',
       userId
     });
-
-    // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
-    (async () => {
-      try {
-        await sendVerificationEmail(normalizedEmail, verifyLink);
-      } catch (emailErr) {
-        console.error('Verification email failed (non-critical):', emailErr.message);
-      }
-    })();
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα κατά την εγγραφή' });
@@ -130,19 +127,16 @@ router.post('/resend-verification', resendVerificationLimiter, async (req, res) 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const verifyLink = `${frontendUrl}/verify-email?token=${token}`;
 
+    try {
+      await sendVerificationEmail(normalizedEmail, verifyLink);
+    } catch (emailErr) {
+      console.error('Resend verification email failed (non-critical):', emailErr.message);
+    }
+
     res.json({
       success: true,
       message: 'Αν ο λογαριασμός υπάρχει και δεν έχει επιβεβαιωθεί, θα λάβεις νέο σύνδεσμο.'
     });
-
-    // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
-    (async () => {
-      try {
-        await sendVerificationEmail(normalizedEmail, verifyLink);
-      } catch (emailErr) {
-        console.error('Resend verification email failed (non-critical):', emailErr.message);
-      }
-    })();
   } catch (error) {
     console.error('Resend verification error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα κατά την επαναποστολή' });
@@ -332,14 +326,11 @@ router.put('/me', authenticateToken, async (req, res) => {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
       const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
 
-      // Fire-and-forget: response already sent, doesn't block on the SMTP round-trip.
-      (async () => {
-        try {
-          await sendVerificationEmail(normalizedEmail, verifyLink);
-        } catch (emailErr) {
-          console.error('Verification email failed (non-critical):', emailErr.message);
-        }
-      })();
+      try {
+        await sendVerificationEmail(normalizedEmail, verifyLink);
+      } catch (emailErr) {
+        console.error('Verification email failed (non-critical):', emailErr.message);
+      }
     }
 
     const [rows] = await db.query('SELECT role, email_verified FROM users WHERE id = ?', [userId]);
