@@ -118,16 +118,24 @@ export class AdminOrdersComponent implements OnInit {
     );
   }
 
+  // Forces the <select>'s bound value to re-render as the real status — the
+  // native element already jumped to the user's clicked option before we knew
+  // whether the change would be accepted, so a rejected/cancelled change needs
+  // this to snap the dropdown back instead of leaving it on the stale pick.
+  private resyncSelect(orderId: number): void {
+    const order = this.orders.find(o => o.id === orderId);
+    if (order) {
+      const prev = order.status;
+      order.status = '';
+      setTimeout(() => order.status = prev, 0);
+    }
+  }
+
   updateStatus(orderId: number, newStatus: string): void {
     if (this.updatingId === orderId) return;
 
     if (newStatus === 'cancelled' && !confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`)) {
-      const order = this.orders.find(o => o.id === orderId);
-      if (order) {
-        const prev = order.status;
-        order.status = '';
-        setTimeout(() => order.status = prev, 0);
-      }
+      this.resyncSelect(orderId);
       return;
     }
 
@@ -146,6 +154,7 @@ export class AdminOrdersComponent implements OnInit {
       },
       error: (err) => {
         this.toastService.error(err?.error?.message || 'Αποτυχία ενημέρωσης κατάστασης');
+        this.resyncSelect(orderId);
         this.updatingId = null;
       },
     });

@@ -166,7 +166,7 @@
   [disabled]="order.status === 'delivered' || order.status === 'cancelled' || updatingId === order.id"
 >
 
-  <option value="pending">
+  <option value="pending" [disabled]="order.status !== 'pending'">
     Σε αναμονή
   </option>
 
