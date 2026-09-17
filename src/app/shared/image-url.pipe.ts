@@ -6,6 +6,9 @@ export class ImageUrlPipe implements PipeTransform {
   transform(url: string | null | undefined): string {
     if (!url) return 'no-image.svg';
     if (url.startsWith('data:')) return url;
+    if (url.includes('res.cloudinary.com')) {
+      return url.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
     if (url.startsWith('https://')) return url;
     if (url.startsWith('http://')) {
       try {
