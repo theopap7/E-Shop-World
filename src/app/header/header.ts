@@ -36,9 +36,9 @@ export class HeaderComponent implements OnInit {
     });
     this.cartCount = this.cartService.getCount();
 
-    this.authService.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
-      this.isLoggedIn = !!user;
-      this.isAdmin = this.authService.isAdmin();
+    this.authService.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.isLoggedIn = this.authService.isLoggedIn();
+      this.isAdmin = this.isLoggedIn && this.authService.isAdmin();
     });
 
     this.wishlistService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
