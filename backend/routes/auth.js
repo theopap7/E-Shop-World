@@ -196,7 +196,7 @@ router.post('/login', authLimiter, async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -483,7 +483,7 @@ router.post('/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax'
+    sameSite: isProduction ? 'none' : 'lax'
   });
   res.json({ success: true, message: 'Αποσύνδεση επιτυχής' });
 });
