@@ -1,7 +1,14 @@
 const nodemailer = require('nodemailer');
 
+const useSendGrid = !!process.env.SENDGRID_API_KEY;
+if (useSendGrid) {
+  require('@sendgrid/mail').setApiKey(process.env.SENDGRID_API_KEY);
+}
+
 let transporter = null;
 
+// SMTP is only used as a dev fallback now — most hosts (Render included)
+// block outbound SMTP on their free tier, so production always uses SendGrid's HTTP API.
 async function getTransporter() {
   if (transporter) return transporter;
 
@@ -36,11 +43,34 @@ async function getTransporter() {
   return transporter;
 }
 
-async function sendPasswordResetEmail(toEmail, resetLink) {
-  const transport = await getTransporter();
+// Sends over SendGrid's HTTP API when configured, otherwise falls back to SMTP
+// (real or Ethereal). Returns { info, previewUrl } like the old SMTP-only code did.
+async function send({ to, subject, html }) {
+  if (useSendGrid) {
+    const sgMail = require('@sendgrid/mail');
+    const info = await sgMail.send({
+      to,
+      from: { email: process.env.SENDGRID_FROM_EMAIL, name: 'E-Shop' },
+      subject,
+      html,
+    });
+    return { info, previewUrl: null };
+  }
 
+  const transport = await getTransporter();
   const info = await transport.sendMail({
     from: process.env.EMAIL_FROM || '"E-Shop" <noreply@eshop.gr>',
+    to,
+    subject,
+    html,
+  });
+  const previewUrl = nodemailer.getTestMessageUrl(info);
+  if (previewUrl) console.log('📧 Preview email at:', previewUrl);
+  return { info, previewUrl: previewUrl || null };
+}
+
+async function sendPasswordResetEmail(toEmail, resetLink) {
+  return send({
     to: toEmail,
     subject: 'Επαναφορά κωδικού πρόσβασης',
     html: `
@@ -65,21 +95,10 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
       </div>
     `,
   });
-
-  // In dev (Ethereal), log preview URL to terminal
-  const previewUrl = nodemailer.getTestMessageUrl(info);
-  if (previewUrl) {
-    console.log('📧 Preview email at:', previewUrl);
-  }
-
-  return { info, previewUrl: previewUrl || null };
 }
 
 async function sendVerificationEmail(toEmail, verifyLink) {
-  const transport = await getTransporter();
-
-  const info = await transport.sendMail({
-    from: process.env.EMAIL_FROM || '"E-Shop" <noreply@eshop.gr>',
+  return send({
     to: toEmail,
     subject: 'Επιβεβαίωση email',
     html: `
@@ -103,18 +122,9 @@ async function sendVerificationEmail(toEmail, verifyLink) {
       </div>
     `,
   });
-
-  const previewUrl = nodemailer.getTestMessageUrl(info);
-  if (previewUrl) {
-    console.log('📧 Verification email preview:', previewUrl);
-  }
-
-  return { info, previewUrl: previewUrl || null };
 }
 
 async function sendOrderConfirmationEmail(toEmail, order) {
-  const transport = await getTransporter();
-
   const shippingMethodLabel = {
     courier_standard: 'Τυπική αποστολή (3-5 εργάσιμες)',
     courier_express: 'Γρήγορη αποστολή (1-2 εργάσιμες)',
@@ -140,8 +150,7 @@ async function sendOrderConfirmationEmail(toEmail, order) {
     ? `<p style="margin:4px 0;">${order.address}</p>`
     : `<p style="margin:4px 0;">Παραλαβή από κατάστημα</p>`;
 
-  const info = await transport.sendMail({
-    from: process.env.EMAIL_FROM || '"E-Shop" <noreply@eshop.gr>',
+  return send({
     to: toEmail,
     subject: `Επιβεβαίωση Παραγγελίας #${order.id}`,
     html: `
@@ -190,15 +199,9 @@ async function sendOrderConfirmationEmail(toEmail, order) {
       </div>
     `,
   });
-
-  const previewUrl = nodemailer.getTestMessageUrl(info);
-  if (previewUrl) console.log(`📧 Order #${order.id} confirmation email:`, previewUrl);
-  return info;
 }
 
 async function sendOrderStatusEmail(toEmail, order) {
-  const transport = await getTransporter();
-
   const subjects = {
     processing: `Παραγγελία #${order.id} — Σε επεξεργασία`,
     shipped:    `Παραγγελία #${order.id} — Απεστάλη! 🚚`,
@@ -232,8 +235,7 @@ async function sendOrderStatusEmail(toEmail, order) {
   const body = bodies[order.status];
   if (!body) return;
 
-  const info = await transport.sendMail({
-    from: process.env.EMAIL_FROM || '"E-Shop" <noreply@eshop.gr>',
+  return send({
     to: toEmail,
     subject: subjects[order.status],
     html: `
@@ -248,10 +250,6 @@ async function sendOrderStatusEmail(toEmail, order) {
       </div>
     `,
   });
-
-  const previewUrl = nodemailer.getTestMessageUrl(info);
-  if (previewUrl) console.log(`📧 Order #${order.id} status (${order.status}) email:`, previewUrl);
-  return info;
 }
 
 module.exports = { sendPasswordResetEmail, sendVerificationEmail, sendOrderConfirmationEmail, sendOrderStatusEmail };
