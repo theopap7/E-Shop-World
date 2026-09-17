@@ -147,7 +147,7 @@ describe('PUT /api/me', () => {
 });
 
 describe('POST /api/register', () => {
-  const basePayload = { firstName: 'Test', lastName: 'User', email: 'new@test.com', password: 'password123' };
+  const basePayload = { firstName: 'Test', lastName: 'User', email: 'new@test.com', password: 'Password123' };
 
   beforeEach(() => {
     jest.clearAllMocks();

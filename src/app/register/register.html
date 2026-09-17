@@ -49,6 +49,9 @@
       <small class="err" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('minlength')">
         Τουλάχιστον 8 χαρακτήρες
       </small>
+      <small class="err" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('pattern')">
+        Χρειάζεται τουλάχιστον ένα κεφαλαίο, ένα πεζό και έναν αριθμό
+      </small>
     </div>
 
     <div>

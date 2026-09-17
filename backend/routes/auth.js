@@ -8,6 +8,9 @@ const { authenticateToken } = require('../middleware/auth');
 const { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter, resendVerificationLimiter } = require('../middleware/rateLimiters');
 const { sendPasswordResetEmail, sendVerificationEmail } = require('../utils/mailer');
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const PASSWORD_MESSAGE = 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, ένα κεφαλαίο, ένα πεζό και έναν αριθμό';
+
 router.post('/register', authLimiter, async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
@@ -21,8 +24,8 @@ router.post('/register', authLimiter, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Μη έγκυρο email' });
     }
 
-    if (!password || password.length < 8) {
-      return res.status(400).json({ success: false, message: 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες' });
+    if (!password || !PASSWORD_REGEX.test(password)) {
+      return res.status(400).json({ success: false, message: PASSWORD_MESSAGE });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -356,8 +359,8 @@ router.post('/change-password', authenticateToken, passwordLimiter, async (req, 
     const userId = req.user.id;
     const { currentPassword, newPassword } = req.body;
 
-    if (!currentPassword || !newPassword || newPassword.length < 8) {
-      return res.status(400).json({ success: false, message: 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες' });
+    if (!currentPassword || !newPassword || !PASSWORD_REGEX.test(newPassword)) {
+      return res.status(400).json({ success: false, message: PASSWORD_MESSAGE });
     }
 
     const [rows] = await db.query('SELECT password FROM users WHERE id = ?', [userId]);
@@ -439,8 +442,8 @@ router.post('/reset-password', forgotPasswordLimiter, async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    if (!token || !newPassword || newPassword.length < 8) {
-      return res.status(400).json({ success: false, message: 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες' });
+    if (!token || !newPassword || !PASSWORD_REGEX.test(newPassword)) {
+      return res.status(400).json({ success: false, message: PASSWORD_MESSAGE });
     }
 
     const [rows] = await db.query(

@@ -110,8 +110,8 @@ export class ProfileComponent {
       return;
     }
 
-    if (this.newPassword.length < 8) {
-      this.toastService.warning('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες');
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(this.newPassword)) {
+      this.toastService.warning('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, ένα κεφαλαίο, ένα πεζό και έναν αριθμό');
       return;
     }
 
