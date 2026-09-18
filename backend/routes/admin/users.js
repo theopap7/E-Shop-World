@@ -20,7 +20,7 @@ router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
         GROUP BY order_id
       ) ref ON ref.order_id = o.id
       GROUP BY u.id
-      ORDER BY order_count DESC, u.created_at DESC
+      ORDER BY total_spent DESC, u.created_at DESC
     `);
     res.json({ success: true, users });
   } catch (error) {
