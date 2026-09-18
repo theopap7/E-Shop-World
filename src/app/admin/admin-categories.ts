@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AdminService, AdminCategory } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 
 @Component({
   selector: 'app-admin-categories',
@@ -30,7 +31,8 @@ export class AdminCategoriesComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -111,8 +113,9 @@ export class AdminCategoriesComponent implements OnInit {
     });
   }
 
-  deleteCategory(id: number, name: string): void {
-    if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις την κατηγορία "${name}";`)) return;
+  async deleteCategory(id: number, name: string): Promise<void> {
+    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις την κατηγορία "${name}";`, { danger: true });
+    if (!ok) return;
 
     this.adminService.deleteCategory(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {

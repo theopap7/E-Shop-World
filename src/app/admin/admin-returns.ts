@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { AdminService } from '../services/admin.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { environment } from '../../environments/environment';
@@ -60,7 +61,7 @@ export class AdminReturnsComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private http: HttpClient, private toastService: ToastService, private adminService: AdminService) {}
+  constructor(private http: HttpClient, private toastService: ToastService, private adminService: AdminService, private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.loadReturns();
@@ -81,9 +82,10 @@ export class AdminReturnsComponent implements OnInit {
     });
   }
 
-  updateStatus(r: ReturnRequest, status: 'approved' | 'rejected'): void {
+  async updateStatus(r: ReturnRequest, status: 'approved' | 'rejected'): Promise<void> {
     const label = status === 'approved' ? 'έγκριση' : 'απόρριψη';
-    if (!confirm(`Επιβεβαίωση ${label} αιτήματος #${r.id};`)) return;
+    const ok = await this.confirmService.confirm(`Επιβεβαίωση ${label} αιτήματος #${r.id};`, { danger: status === 'rejected' });
+    if (!ok) return;
 
     this.processingId = r.id;
     this.http.patch<{ success: boolean; message: string }>(`${this.apiUrl}/${r.id}`, {

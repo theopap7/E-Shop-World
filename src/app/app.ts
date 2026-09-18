@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CartSidebarComponent } from './cart-sidebar/cart-sidebar';
 import { ToastContainerComponent } from './toast/toast';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb';
 import { HeaderComponent } from './header/header';
 import { FooterComponent } from './footer/footer';
@@ -10,10 +11,11 @@ import { EmailVerifyBannerComponent } from './email-verify-banner/email-verify-b
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ RouterModule, CartSidebarComponent, ToastContainerComponent, BreadcrumbComponent, HeaderComponent, FooterComponent, EmailVerifyBannerComponent ],
+  imports: [ RouterModule, CartSidebarComponent, ToastContainerComponent, ConfirmDialogComponent, BreadcrumbComponent, HeaderComponent, FooterComponent, EmailVerifyBannerComponent ],
   template: `
     <app-cart-sidebar></app-cart-sidebar>
     <app-toast-container></app-toast-container>
+    <app-confirm-dialog></app-confirm-dialog>
     <div class="app-shell">
       <app-email-verify-banner></app-email-verify-banner>
       <div class="layout-wrapper">

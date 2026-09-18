@@ -6,6 +6,7 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { OrderService, OrderDetailResponse } from '../services/order.service';
 import { AdminService } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { CartService } from '../services/cart.service';
 import { statusLabel } from '../services/order-status.util';
 import { returnStatusLabel as returnStatusLabelUtil } from '../services/return-status.util';
@@ -118,7 +119,8 @@ export class OrderDetailsComponent implements OnInit {
     private router: Router,
     private adminService: AdminService,
     private toastService: ToastService,
-    private cartService: CartService
+    private cartService: CartService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -193,8 +195,9 @@ export class OrderDetailsComponent implements OnInit {
     return status || '—';
   }
 
-  cancelOrder(): void {
-    if (!confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;')) return;
+  async cancelOrder(): Promise<void> {
+    const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;', { danger: true });
+    if (!ok) return;
 
     this.isCancelling = true;
     this.orderService.cancelOrder(this.orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

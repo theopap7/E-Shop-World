@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../services/cart.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
 @Component({
@@ -20,7 +21,7 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(public cartService: CartService, private toastService: ToastService) {}
+  constructor(public cartService: CartService, private toastService: ToastService, private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.cartService.isOpen$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(open => {
@@ -65,8 +66,9 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
     this.toastService.info(`${productName} αφαιρέθηκε από το καλάθι`);
   }
 
-  clearCart(): void {
-    if (!confirm('Θέλεις να αδειάσεις το καλάθι;')) return;
+  async clearCart(): Promise<void> {
+    const ok = await this.confirmService.confirm('Θέλεις να αδειάσεις το καλάθι;', { danger: true });
+    if (!ok) return;
     this.cartService.clear();
     this.toastService.info('Το καλάθι αδειάστηκε');
   }

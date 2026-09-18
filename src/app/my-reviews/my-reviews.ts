@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EligibleProduct, Review, ReviewService } from '../services/review.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
@@ -32,7 +33,8 @@ export class MyReviewsComponent implements OnInit {
 
   constructor(
     private reviewService: ReviewService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -67,9 +69,10 @@ export class MyReviewsComponent implements OnInit {
     });
   }
 
-  deleteReview(reviewId: number): void {
+  async deleteReview(reviewId: number): Promise<void> {
     if (this.deletingId === reviewId) return;
-    if (!confirm('Διαγραφή κριτικής;')) return;
+    const ok = await this.confirmService.confirm('Διαγραφή κριτικής;', { danger: true });
+    if (!ok) return;
 
     this.deletingId = reviewId;
     this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { WishlistService } from '../services/wishlist.service';
 import { CartService } from '../services/cart.service';
+import { ConfirmService } from '../services/confirm.service';
 import { ProductDto } from '../services/product.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
@@ -31,7 +32,8 @@ export class WishlistComponent implements OnInit {
   constructor(
     public wishlistService: WishlistService,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -56,8 +58,9 @@ export class WishlistComponent implements OnInit {
     this.cartService.openSidebar();
   }
 
-  clearAll(): void {
-    if (confirm('Διαγραφή όλων των αγαπημένων;')) {
+  async clearAll(): Promise<void> {
+    const ok = await this.confirmService.confirm('Διαγραφή όλων των αγαπημένων;', { danger: true });
+    if (ok) {
       this.wishlistService.clear();
     }
   }

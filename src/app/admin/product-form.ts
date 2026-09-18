@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { environment } from '../../environments/environment';
 import { Category, ProductImage } from '../services/product.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
@@ -103,7 +104,8 @@ export class ProductFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -365,9 +367,10 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  deleteGalleryImage(imageId: number): void {
+  async deleteGalleryImage(imageId: number): Promise<void> {
     if (!this.productId) return;
-    if (!confirm('Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτή την εικόνα;')) return;
+    const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτή την εικόνα;', { danger: true });
+    if (!ok) return;
 
     this.http.delete<{ success: boolean }>(
       `${environment.apiUrl}/admin/products/${this.productId}/images/${imageId}`

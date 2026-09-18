@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { ReviewService, Review } from '../services/review.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 
 @Component({
   selector: 'app-reviews',
@@ -56,7 +57,8 @@ export class ReviewsComponent implements OnInit {
   constructor(
     private reviewService: ReviewService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -196,8 +198,9 @@ export class ReviewsComponent implements OnInit {
     });
   }
 
-  deleteReview(reviewId: number): void {
-    if (!confirm('Διαγραφή κριτικής;')) return;
+  async deleteReview(reviewId: number): Promise<void> {
+    const ok = await this.confirmService.confirm('Διαγραφή κριτικής;', { danger: true });
+    if (!ok) return;
 
     this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {

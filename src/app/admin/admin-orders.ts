@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AdminService, AdminOrder } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { statusLabel } from '../services/order-status.util';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 
@@ -74,7 +75,8 @@ export class AdminOrdersComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -131,12 +133,15 @@ export class AdminOrdersComponent implements OnInit {
     }
   }
 
-  updateStatus(orderId: number, newStatus: string): void {
+  async updateStatus(orderId: number, newStatus: string): Promise<void> {
     if (this.updatingId === orderId) return;
 
-    if (newStatus === 'cancelled' && !confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`)) {
-      this.resyncSelect(orderId);
-      return;
+    if (newStatus === 'cancelled') {
+      const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`, { danger: true });
+      if (!ok) {
+        this.resyncSelect(orderId);
+        return;
+      }
     }
 
     this.updatingId = orderId;

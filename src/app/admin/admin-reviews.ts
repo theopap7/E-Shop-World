@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AdminService, AdminReviewDto } from '../services/admin.service';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
@@ -24,7 +25,7 @@ export class AdminReviewsComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private adminService: AdminService, private toastService: ToastService) {}
+  constructor(private adminService: AdminService, private toastService: ToastService, private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.loadReviews();
@@ -48,8 +49,9 @@ export class AdminReviewsComponent implements OnInit {
     });
   }
 
-  deleteReview(reviewId: number, productName: string): void {
-    if (!confirm(`Διαγραφή review για "${productName}";`)) {
+  async deleteReview(reviewId: number, productName: string): Promise<void> {
+    const ok = await this.confirmService.confirm(`Διαγραφή review για "${productName}";`, { danger: true });
+    if (!ok) {
       return;
     }
 

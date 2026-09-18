@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
 
@@ -52,7 +53,8 @@ export class AdminDiscountsComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -202,8 +204,9 @@ export class AdminDiscountsComponent implements OnInit {
     });
   }
 
-  deleteCode(id: number, code: string): void {
-    if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`)) return;
+  async deleteCode(id: number, code: string): Promise<void> {
+    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`, { danger: true });
+    if (!ok) return;
 
     this.http.delete<{ success: boolean; message?: string }>(`${this.apiUrl}/${id}`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {

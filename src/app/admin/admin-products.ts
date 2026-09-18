@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService, Product } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
+import { ConfirmService } from '../services/confirm.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 
@@ -31,7 +32,8 @@ export class AdminProductsComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -56,9 +58,10 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  deleteProduct(id: number, name: string): void {
+  async deleteProduct(id: number, name: string): Promise<void> {
     if (this.deletingId === id) return;
-    if (!confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το "${name}";`)) {
+    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το "${name}";`, { danger: true });
+    if (!ok) {
       return;
     }
 
