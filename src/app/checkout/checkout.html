@@ -171,7 +171,6 @@
           </label>
           <small class="err" *ngIf="form.get('paymentDetails.iban')?.touched && form.get('paymentDetails.iban')?.invalid">
             <span *ngIf="form.get('paymentDetails.iban')?.errors?.['required']">Υποχρεωτικό πεδίο</span>
-            <span *ngIf="form.get('paymentDetails.iban')?.errors?.['pattern']">Βάλε έγκυρο IBAN</span>
             <span *ngIf="form.get('paymentDetails.iban')?.errors?.['ibanChecksum']">Το IBAN δεν είναι έγκυρο</span>
           </small>
         </div>
