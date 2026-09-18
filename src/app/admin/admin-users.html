@@ -52,8 +52,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let u of pagedUsers" [class.active-buyer]="u.order_count > 0">
-              <td class="mono">{{ u.id }}</td>
+            <tr *ngFor="let u of pagedUsers; let i = index" [class.active-buyer]="u.order_count > 0">
+              <td class="mono">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
               <td>
                 <div class="user-name">{{ u.first_name }} {{ u.last_name }}</div>
                 <div class="user-email">{{ u.email }}</div>
