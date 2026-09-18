@@ -229,6 +229,12 @@
                   {{ showNewPassword ? '🙈' : '👁️' }}
                 </button>
               </div>
+
+              <p
+                class="form-hint"
+                *ngIf="newPassword && !isNewPasswordValid()">
+                ⚠️ Τουλάχιστον 8 χαρακτήρες, ένα κεφαλαίο, ένα πεζό και έναν αριθμό
+              </p>
             </div>
 
             <div class="form-group">
@@ -269,6 +275,7 @@
                 !newPassword ||
                 !confirmPassword ||
                 newPassword !== confirmPassword ||
+                !isNewPasswordValid() ||
                 changingPassword
               ">
               <span *ngIf="!changingPassword">🔐 Ενημέρωση κωδικού</span>

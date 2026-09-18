@@ -99,6 +99,10 @@ export class ProfileComponent {
     this.router.navigate(['/login']);
   }
 
+  isNewPasswordValid(): boolean {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(this.newPassword);
+  }
+
   changePassword() {
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
       this.toastService.warning('Συμπλήρωσε όλα τα πεδία');
@@ -110,7 +114,7 @@ export class ProfileComponent {
       return;
     }
 
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(this.newPassword)) {
+    if (!this.isNewPasswordValid()) {
       this.toastService.warning('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, ένα κεφαλαίο, ένα πεζό και έναν αριθμό');
       return;
     }
