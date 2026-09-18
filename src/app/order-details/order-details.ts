@@ -3,6 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { Subject, EMPTY } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 import { OrderService, OrderDetailResponse } from '../services/order.service';
 import { AdminService } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
@@ -112,6 +114,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   private destroyRef = inject(DestroyRef);
+  private reload$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -125,6 +128,40 @@ export class OrderDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.isAdminPage = this.router.url.startsWith('/admin');
+
+    // switchMap cancels any in-flight request when a newer one comes in (route change
+    // or a manual reload), so a slow response can't overwrite a newer one's data.
+    // Subscribed before paramMap below, since paramMap emits synchronously on subscribe
+    // and would otherwise fire loadDetails() -> reload$.next() before anyone is listening.
+    this.reload$.pipe(
+      switchMap(() => {
+        this.isLoading = true;
+        this.error = null;
+
+        const request = this.isAdminPage
+          ? this.orderService.getAdminOrderDetails(this.orderId)
+          : this.orderService.getOrderDetails(this.orderId);
+
+        return request.pipe(
+          catchError(err => {
+            this.error = err?.error?.message || 'Αποτυχία φόρτωσης λεπτομερειών.';
+            this.isLoading = false;
+            return EMPTY;
+          })
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((res: OrderDetailResponse) => {
+      this.order = res?.order ?? null;
+      if (this.order) this.order.return_request = res?.returnRequest ?? null;
+      this.items = res?.items ?? [];
+      this.returnResolvedByLine = {};
+      for (const r of res?.returnResolvedItems ?? []) {
+        this.returnResolvedByLine[lineKey(r.product_id, r.size)] = r.status;
+      }
+      this.returnRequests = res?.returnRequests ?? [];
+      this.isLoading = false;
+    });
 
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = Number(params.get('orderId'));
@@ -141,31 +178,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   loadDetails(): void {
-
-    this.isLoading = true;
-    this.error = null;
-
-    const request = this.isAdminPage
-      ? this.orderService.getAdminOrderDetails(this.orderId)
-      : this.orderService.getOrderDetails(this.orderId);
-
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res: OrderDetailResponse) => {
-        this.order = res?.order ?? null;
-        if (this.order) this.order.return_request = res?.returnRequest ?? null;
-        this.items = res?.items ?? [];
-        this.returnResolvedByLine = {};
-        for (const r of res?.returnResolvedItems ?? []) {
-          this.returnResolvedByLine[lineKey(r.product_id, r.size)] = r.status;
-        }
-        this.returnRequests = res?.returnRequests ?? [];
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.error = err?.error?.message || 'Αποτυχία φόρτωσης λεπτομερειών.';
-        this.isLoading = false;
-      },
-    });
+    this.reload$.next();
   }
 
   statusLabel = statusLabel;
