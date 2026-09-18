@@ -63,6 +63,7 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   private marker: L.Marker | null = null;
   private query$ = new Subject<AddressParts>();
   private viewReady = false;
+  private requestId = 0;
 
   ngAfterViewInit(): void {
     this.map = L.map(this.mapEl.nativeElement).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
@@ -75,7 +76,7 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     this.query$
       .pipe(
         debounceTime(1500),
-        switchMap((parts) => this.geocode(parts))
+        switchMap((parts) => this.geocode(parts, ++this.requestId))
       )
       .subscribe((result) => this.applyResult(result));
 
@@ -150,10 +151,12 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   }
 
   private async geocode(
-    parts: AddressParts
+    parts: AddressParts,
+    requestId: number
   ): Promise<{ lat: number; lon: number; zipConfirmed: boolean } | null> {
     const queries = this.candidateQueries(parts);
     const wantZip = parts.zip.replace(/\s+/g, '');
+    const isCurrent = () => requestId === this.requestId;
 
     for (let i = 0; i < queries.length; i++) {
       if (i > 0) await new Promise((r) => setTimeout(r, 1100)); // stay under Nominatim's 1 req/s policy
@@ -162,7 +165,7 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
         const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=${encodeURIComponent(queries[i])}`;
         const res = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!res.ok) {
-          this.status = 'error';
+          if (isCurrent()) this.status = 'error';
           return null;
         }
         const data = await res.json();
@@ -175,12 +178,12 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
           return { lat: parseFloat(best.lat), lon: parseFloat(best.lon), zipConfirmed };
         }
       } catch {
-        this.status = 'error';
+        if (isCurrent()) this.status = 'error';
         return null;
       }
     }
 
-    this.status = 'not-found';
+    if (isCurrent()) this.status = 'not-found';
     return null;
   }
 
