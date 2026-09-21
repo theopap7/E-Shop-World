@@ -9,7 +9,8 @@
   align-items: center;
   flex-wrap: wrap;
   list-style: none;
-  margin: 0;
+  /* pull the list left by the links' own padding so the first label lines up with the page content */
+  margin: 0 0 0 calc(-1 * var(--space-2));
   padding: 0;
   gap: var(--space-2);
 }
@@ -59,6 +60,7 @@
 /* Responsive */
 @media (max-width: 640px) {
   .breadcrumb-list {
+    margin-left: calc(-1 * var(--space-1));
     gap: var(--space-1);
   }
 
