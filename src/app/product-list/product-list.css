@@ -1,3 +1,10 @@
+.page-header h2 {
+  margin: 0 0 16px;
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
+}
+
 /* ===== FILTERS BAR ===== */
 .filters-bar {
   display: flex;

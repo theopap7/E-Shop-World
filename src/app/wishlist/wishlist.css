@@ -35,10 +35,10 @@
 }
 
 .page-header h2 {
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
   margin: 0 0 8px 0;
-  color: #1f2937;
-  font-size: 28px;
-  font-weight: 700;
 }
 
 .page-header p {
@@ -319,10 +319,6 @@
 @media (max-width: 768px) {
   .wishlist-grid {
     grid-template-columns: 1fr;
-  }
-
-  .page-header h2 {
-    font-size: 24px;
   }
 
   .actions-bar {

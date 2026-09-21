@@ -21,10 +21,10 @@ section.page {
 }
 
 .header-title .title {
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
   margin: 0;
-  font-size: 24px;
-  font-weight: 900;
-  color: #111827;
 }
 
 .subtitle {

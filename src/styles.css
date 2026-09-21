@@ -22,6 +22,8 @@
   --text-xl: 20px;
   --text-2xl: 24px;
   --text-3xl: 28px;
+  --page-title-size: 26px;
+  --page-title-weight: 800;
 
   /* Colors */
   --color-primary: #6366f1;
@@ -70,6 +72,12 @@ html, body {
 /* Reserve scrollbar space on every page so the header doesn't shift between short and long pages. */
 html {
   scrollbar-gutter: stable;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-title-size: 22px;
+  }
 }
 
 body {

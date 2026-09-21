@@ -11,11 +11,11 @@
 
 /* ΤΙΤΛΟΣ */
 .register-container h2 {
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
   text-align: center;
-  font-size: 26px;
   margin-bottom: 20px;
-  font-weight: 700;
-  color: #6366f1;
 }
 
 .register-container form {

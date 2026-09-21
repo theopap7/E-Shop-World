@@ -46,10 +46,10 @@
 }
 
 .page-title {
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
   margin: 0 0 6px 0;
-  font-size: 26px;
-  font-weight: 700;
-  color: #1f2937;
 }
 
 .page-subtitle { margin: 0; }

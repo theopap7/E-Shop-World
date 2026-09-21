@@ -40,10 +40,10 @@
 }
 
 .page-header h2 {
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
   margin: 0;
-  font-size: 24px;
-  font-weight: 800;
-  color: #111827;
 }
 
 /* Card */
