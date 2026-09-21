@@ -10,9 +10,10 @@
 }
 
 h2 {
-  font-size: 26px;
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
   margin-bottom: 10px;
-  color: #6366f1;
+  color: var(--color-text);
 }
 
 .subtitle {
