@@ -45,6 +45,7 @@
 
 /* Image */
 .product-image-wrap {
+  align-self: start;
   border-radius: 8px;
   background: #f9fafb;
 }
