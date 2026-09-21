@@ -35,7 +35,7 @@
       <div class="item-body">
         <div class="item-top">
           <a class="item-name" [routerLink]="['/products', item.productId]" (click)="close()">{{ item.name }}</a>
-          <div class="item-price">{{ item.price | number:'1.2-2' }}€</div>
+          <div class="item-price">{{ item.price | number:'1.2-2' }}€ / τεμ</div>
         </div>
         <div *ngIf="item.size" class="item-size">Μέγεθος: {{ item.size }}</div>
         <div class="item-bottom">

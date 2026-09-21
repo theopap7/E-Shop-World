@@ -290,6 +290,19 @@
   width: 100%;
   padding: 10px;
   font-size: 14px;
+  font-weight: 600;
+  background: white;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-cart-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
 }
 
 /* Mobile */
