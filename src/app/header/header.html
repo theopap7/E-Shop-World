@@ -4,7 +4,7 @@
     <span class="brand-title">Shop</span>
   </a>
 
-  <div class="top-actions">
+  <div class="top-actions" *ngIf="!isAuthPage">
 
     <a routerLink="/wishlist" class="action-chip">
       <span class="chip-icon">❤️</span>

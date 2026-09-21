@@ -1,11 +1,14 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
 import { CartService } from '../services/cart.service';
 import { AuthService } from '../services/auth.service';
 import { WishlistService } from '../services/wishlist.service';
 import { ToastService } from '../services/toast.service';
+
+const AUTH_ONLY_PATHS = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'];
 
 @Component({
   selector: 'app-header',
@@ -19,6 +22,7 @@ export class HeaderComponent implements OnInit {
   isLoggedIn = false;
   isAdmin = false;
   wishlistCount = 0;
+  isAuthPage = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -31,6 +35,14 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isAuthPage = AUTH_ONLY_PATHS.some(p => this.router.url.startsWith(p));
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(e => {
+      this.isAuthPage = AUTH_ONLY_PATHS.some(p => e.urlAfterRedirects.startsWith(p));
+    });
+
     this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.cartCount = this.cartService.getCount();
     });
