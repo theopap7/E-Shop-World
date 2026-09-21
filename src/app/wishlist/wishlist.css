@@ -33,9 +33,7 @@
 }
 /* Page Header */
 .page-header {
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto 32px auto;
+  margin-bottom: 32px;
 }
 
 .page-header h2 {

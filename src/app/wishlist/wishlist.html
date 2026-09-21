@@ -1,9 +1,9 @@
 <section class="page">
   <div class="container">
 
-    <a routerLink="/profile" class="back-button">
+    <a [routerLink]="fromProfile ? '/profile' : '/dashboard'" class="back-button">
       <span class="back-icon">←</span>
-      <span>Πίσω στο προφίλ μου</span>
+      <span>{{ fromProfile ? 'Πίσω στο προφίλ μου' : 'Πίσω στο κατάστημα' }}</span>
     </a>
 
     <div class="page-header">

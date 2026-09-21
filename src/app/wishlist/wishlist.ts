@@ -26,6 +26,7 @@ export class WishlistComponent implements OnInit {
 
   items: ProductDto[] = [];
   isLoading = true;
+  fromProfile = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -38,6 +39,7 @@ export class WishlistComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true;
+    this.fromProfile = history.state?.from === 'profile';
 
     this.wishlistService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(items => {
       this.items = items;

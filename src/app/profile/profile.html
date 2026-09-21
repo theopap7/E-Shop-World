@@ -44,7 +44,7 @@
             <span class="action-arrow">→</span>
           </a>
 
-          <a routerLink="/wishlist" class="action-link">
+          <a routerLink="/wishlist" [state]="{ from: 'profile' }" class="action-link">
             <span class="action-icon">❤️</span>
             <div class="action-content">
               <div class="action-title">Τα Αγαπημένα μου</div>
