@@ -35,6 +35,7 @@ import { EmailVerifyBannerComponent } from './email-verify-banner/email-verify-b
 
     .layout-wrapper {
       flex: 1;
+      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
       padding: 12px 20px 0;
