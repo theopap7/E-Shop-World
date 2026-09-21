@@ -3,6 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { AdminService, AdminStats, ChartData } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { statusLabel } from '../services/order-status.util';
@@ -50,11 +52,26 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private topProductsChart: Chart | null = null;
 
   private destroyRef = inject(DestroyRef);
+  private rangeChange$ = new Subject<string>();
 
   constructor(private adminService: AdminService, private toastService: ToastService) {}
 
   ngOnInit(): void {
     this.loadDashboard();
+
+    this.rangeChange$.pipe(
+      switchMap(range => this.adminService.getChartsForRange(range)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.renderRevenueChart(res.dailyOrders ?? []);
+          this.renderStatusChart(res.statusBreakdown ?? []);
+          this.renderTopProductsChart(res.topProducts ?? []);
+        }
+      },
+      error: () => this.toastService.error('Αποτυχία φόρτωσης στατιστικών')
+    });
   }
 
   ngOnDestroy(): void {
@@ -92,16 +109,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   onRangeChange(range: string): void {
     this.selectedRange = range;
-    this.adminService.getChartsForRange(range).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.renderRevenueChart(res.dailyOrders ?? []);
-          this.renderStatusChart(res.statusBreakdown ?? []);
-          this.renderTopProductsChart(res.topProducts ?? []);
-        }
-      },
-      error: () => this.toastService.error('Αποτυχία φόρτωσης στατιστικών')
-    });
+    this.rangeChange$.next(range);
   }
 
   private renderRevenueChart(raw: ChartData['dailyOrders']): void {
