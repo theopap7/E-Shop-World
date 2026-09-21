@@ -67,6 +67,11 @@ html, body {
   height: 100%;
 }
 
+/* Reserve scrollbar space on every page so the header doesn't shift between short and long pages. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
