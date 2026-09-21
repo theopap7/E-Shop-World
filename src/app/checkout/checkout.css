@@ -340,23 +340,3 @@ hr {
 .remove-discount-btn:hover {
   color: #dc2626;
 }
-
-.discount-codes-hint {
-  margin-top: 20px;
-  padding: 16px;
-  background: #eff6ff;
-  border: 1px solid #dbeafe;
-  border-radius: 8px;
-}
-
-.discount-codes-hint h4 {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  color: #1e40af;
-}
-
-.hint-text {
-  margin: 0;
-  font-size: 13px;
-  color: #3b82f6;
-}
