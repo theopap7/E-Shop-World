@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { EMPTY } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { EMPTY, Subject } from 'rxjs';
+import { switchMap, catchError, takeUntil } from 'rxjs/operators';
 import { ProductService, ProductDto, ProductImage } from '../services/product.service';
 import { CartService } from '../services/cart.service';
 import { WishlistService } from '../services/wishlist.service';
@@ -34,6 +34,7 @@ export class ProductDetailComponent implements OnInit {
   addedToCart = false;
   selectedQty = 1;
   selectedSize: string | null = null;
+  private cancelRelated$ = new Subject<void>();
 
   get availableStock(): number {
     if (!this.product) return 0;
@@ -115,6 +116,7 @@ export class ProductDetailComponent implements OnInit {
         this.selectedSize = null;
         this.relatedProducts = [];
         this.recentlyViewed = [];
+        this.cancelRelated$.next();
 
         return this.productService.getProduct(id).pipe(
           catchError((err: { status: number }) => {
@@ -162,7 +164,7 @@ export class ProductDetailComponent implements OnInit {
     }
 
     this.productService.getProducts({ category: this.product.category_name })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntil(this.cancelRelated$), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           if (res?.success) {
