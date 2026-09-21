@@ -122,8 +122,13 @@
 
 .quick-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:16px;
+}
+
+/* 7 cards: let the last one fill the free slots so no row ends with a hole */
+.quick-card:last-child:nth-child(4n+3){
+  grid-column:span 2;
 }
 
 .quick-card{
@@ -281,9 +286,27 @@
 
 /* RESPONSIVE */
 
+@media (max-width:1100px){
+  .quick-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .quick-card:last-child:nth-child(4n+3){
+    grid-column:auto;
+  }
+
+  .quick-card:last-child:nth-child(odd){
+    grid-column:1 / -1;
+  }
+}
+
 @media (max-width:900px){
   .quick-grid{
     grid-template-columns:1fr;
+  }
+
+  .quick-card:last-child:nth-child(odd){
+    grid-column:auto;
   }
 
   .stats-grid{
