@@ -7,7 +7,7 @@
 
     <div class="page-header">
       <h2>Οι Κριτικές μου</h2>
-      <p class="muted">Δες τις αξιολογήσεις που έχεις γράψει</p>
+      <p class="muted">Δες τις αξιολογήσεις σου και τα προϊόντα που περιμένουν κριτική</p>
     </div>
 
     <app-skeleton *ngIf="isLoading" type="card" [count]="3"></app-skeleton>
@@ -40,10 +40,10 @@
       </div>
     </div>
 
-    <div *ngIf="!isLoading && !error && reviews.length === 0 && eligibleProducts.length === 0" class="empty-state">
+    <div *ngIf="!isLoading && !error && reviews.length === 0" class="empty-state">
       <div class="empty-icon">⭐</div>
       <h3>Δεν έχεις γράψει ακόμα κριτικές</h3>
-      <p>Οι κριτικές σου για προϊόντα που έχεις αγοράσει θα εμφανίζονται εδώ.</p>
+      <p>Οι κριτικές σου θα εμφανίζονται εδώ.</p>
     </div>
 
     <div *ngFor="let review of reviews" class="review-card">
