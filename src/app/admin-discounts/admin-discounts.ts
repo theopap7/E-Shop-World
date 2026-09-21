@@ -128,6 +128,10 @@ export class AdminDiscountsComponent implements OnInit {
       this.toastService.warning('Η αξία πρέπει να είναι μεγαλύτερη από 0');
       return;
     }
+    if (this.form.type === 'percentage' && this.form.value > 100) {
+      this.toastService.warning('Το ποσοστό πρέπει να είναι 0-100');
+      return;
+    }
     if (this.form.maxUses != null && this.form.maxUses < 1) {
       this.toastService.warning('Οι μέγιστες χρήσεις πρέπει να είναι τουλάχιστον 1 (άφησε κενό για απεριόριστες)');
       return;
