@@ -82,7 +82,7 @@
 
             <td>
               <div class="rating-cell">
-                <span class="stars">{{ getStars(review.rating) }}</span>
+                <app-rating-stars class="stars" [rating]="review.rating"></app-rating-stars>
                 <span class="muted small">{{ review.rating }}/5</span>
               </div>
             </td>

@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -11,7 +12,7 @@ import { ConfirmService } from '../services/confirm.service';
 @Component({
   selector: 'app-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, RatingStarsComponent],
   templateUrl: './reviews.html',
   styleUrl: './reviews.css'
 })
@@ -101,9 +102,6 @@ export class ReviewsComponent implements OnInit {
     return star <= activeRating ? 'star filled' : 'star';
   }
 
-  getReviewStars(rating: number): string {
-    return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-  }
 
   submitReview(): void {
     if (this.newRating === 0) {

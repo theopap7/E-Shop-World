@@ -78,7 +78,7 @@
             {{ review.first_name }} {{ review.last_name }}
           </div>
           <div class="review-stars">
-            {{ getReviewStars(review.rating) }}
+            <app-rating-stars [rating]="review.rating"></app-rating-stars>
           </div>
           <div class="review-date">
             {{ review.created_at | date:'dd/MM/yyyy' }}

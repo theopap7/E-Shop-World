@@ -8,11 +8,12 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
 
 @Component({
   selector: 'app-my-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SkeletonComponent, ImageUrlPipe],
+  imports: [CommonModule, RouterModule, FormsModule, SkeletonComponent, ImageUrlPipe, RatingStarsComponent],
   templateUrl: './my-reviews.html',
   styleUrl: './my-reviews.css'
 })
@@ -145,9 +146,6 @@ export class MyReviewsComponent implements OnInit {
     });
   }
 
-  getReviewStars(rating: number): string {
-    return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-  }
 
   setEditRating(rating: number): void {
     this.editRating = rating;

@@ -7,11 +7,12 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
 
 @Component({
   selector: 'app-admin-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, PaginationComponent, ImageUrlPipe],
+  imports: [CommonModule, RouterModule, PaginationComponent, ImageUrlPipe, RatingStarsComponent],
   templateUrl: './admin-reviews.html',
   styleUrl: './admin-reviews.css'
 })
@@ -75,7 +76,4 @@ export class AdminReviewsComponent implements OnInit {
     return this.reviews.slice(start, start + this.pageSize);
   }
 
-  getStars(rating: number): string {
-    return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-  }
 }
