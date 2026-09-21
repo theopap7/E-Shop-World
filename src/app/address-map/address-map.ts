@@ -8,7 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import * as L from 'leaflet';
 
@@ -64,6 +64,8 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   private query$ = new Subject<AddressParts>();
   private viewReady = false;
   private requestId = 0;
+  private querySub: Subscription | null = null;
+  private destroyed = false;
 
   ngAfterViewInit(): void {
     this.map = L.map(this.mapEl.nativeElement).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
@@ -73,7 +75,7 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     }).addTo(this.map);
     this.viewReady = true;
 
-    this.query$
+    this.querySub = this.query$
       .pipe(
         debounceTime(1500),
         switchMap((parts) => this.geocode(parts, ++this.requestId))
@@ -105,7 +107,10 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
+    this.querySub?.unsubscribe();
     this.map?.remove();
+    this.map = null;
   }
 
   private buildParts(): AddressParts | null {
@@ -160,6 +165,7 @@ export class AddressMapComponent implements OnChanges, AfterViewInit, OnDestroy 
 
     for (let i = 0; i < queries.length; i++) {
       if (i > 0) await new Promise((r) => setTimeout(r, 1100)); // stay under Nominatim's 1 req/s policy
+      if (this.destroyed) return null;
 
       try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=${encodeURIComponent(queries[i])}`;
