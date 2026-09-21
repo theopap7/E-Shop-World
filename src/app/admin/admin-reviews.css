@@ -6,13 +6,6 @@
 
 
 /* Header */
-.header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:14px;
-  margin-bottom:14px;
-}
 
 .page-title{
   font-size:var(--page-title-size);
@@ -302,8 +295,4 @@
 @media (max-width:1024px){
   .panel{ overflow-x:auto; }
   .table{ min-width:980px; }
-}
-
-@media (max-width:640px){
-  .header{ flex-direction:column; align-items:flex-start; }
 }

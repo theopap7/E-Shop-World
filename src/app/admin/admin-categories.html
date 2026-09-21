@@ -1,18 +1,20 @@
 <section class="page">
     <div class="container">
 
-      <div class="header-actions">
-        <a [routerLink]="['/admin']" class="back-button">
-          <span>← Πίσω στον πίνακα διαχειριστή</span>
-        </a>
-      </div>
+      <header class="admin-header">
+        <div class="header-left">
+          <h1 class="page-title">Κατηγορίες</h1>
+        </div>
 
-      <div class="page-header">
-        <h2>Κατηγορίες</h2>
-        <button class="btn btn-primary" type="button" (click)="openCreateModal()">
-          + Νέα Κατηγορία
-        </button>
-      </div>
+        <div class="admin-header-actions">
+          <a [routerLink]="['/admin']" class="back-button">
+            <span>← Πίσω στον πίνακα διαχειριστή</span>
+          </a>
+          <button class="btn btn-primary" type="button" (click)="openCreateModal()">
+            + Νέα Κατηγορία
+          </button>
+        </div>
+      </header>
 
     <div *ngIf="isLoading" class="card">
       Φόρτωση...

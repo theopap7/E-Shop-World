@@ -25,25 +25,7 @@
   transform: translateX(-3px);
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 10px 26px rgba(17, 24, 39, .06);
-  margin-bottom: 28px;
-}
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
 
 .page-title {
   font-size: var(--page-title-size);
