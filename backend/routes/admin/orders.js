@@ -5,6 +5,7 @@ const { authenticateToken, isAdmin } = require('../../middleware/auth');
 const { sendOrderStatusEmail } = require('../../utils/mailer');
 const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
+const { formatEur, formatDateTime } = require('../../utils/format');
 
 router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -259,7 +260,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       partially_refunded: 'Μερική επιστροφή',
       cancelled: 'Ακυρώθηκε'
     };
-    const statusMap = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Απεστάλη', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
+    const statusMap = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Αποστολή', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
     const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };
 
     const q = (val) => {
@@ -269,8 +270,8 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       if (/^[=+\-@]/.test(str)) str = `'${str}`;
       return `"${str.replace(/"/g, '""')}"`;
     };
-    const eur = (val) => `€${Number(val).toFixed(2)}`;
-    const date = new Date(order.created_at).toLocaleString('el-GR');
+    const eur = formatEur;
+    const date = formatDateTime(order.created_at);
 
     const csvRows = [
       ['Αριθμός', order.id],
@@ -281,7 +282,6 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       ['Τηλέφωνο', order.phone],
       ['Δώρο', order.is_gift ? (order.gift_message || 'Ναι') : 'Όχι'],
       ['Τρόπος Αποστολής', shippingMethodMap[order.shipping_method] || order.shipping_method],
-      ['Κόστος Μεταφορικών', eur(order.shipping_cost)],
       ['Τρόπος Πληρωμής', paymentMethodMap[order.payment_method] || order.payment_method],
       ['Κατάσταση Πληρωμής', paymentStatusMap[order.payment_status?.toLowerCase()] || order.payment_status],
       ['Διεύθυνση', order.ship_address1],

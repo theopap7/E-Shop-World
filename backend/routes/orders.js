@@ -7,6 +7,7 @@ const { authenticateToken } = require('../middleware/auth');
 const { discountLimiter } = require('../middleware/rateLimiters');
 const { sendOrderConfirmationEmail } = require('../utils/mailer');
 const { restoreStock } = require('../utils/stock');
+const { formatEur, formatDate } = require('../utils/format');
 
 // Only rate-limit checkout attempts that carry a discount code, so a discount-code
 // brute-force can't bypass the /validate-discount limiter by going through /orders instead.
@@ -739,7 +740,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     doc.font('RobotoBold').fontSize(11).text('ΣΤΟΙΧΕΙΑ ΠΑΡΑΓΓΕΛΙΑΣ', 50, 120);
     doc.font('Roboto').fontSize(10)
       .text(`Αριθμός: ${order.id}`, 50, 136)
-      .text(`Ημερομηνία: ${new Date(order.created_at).toLocaleDateString('el-GR')}`, 50, 151)
+      .text(`Ημερομηνία: ${formatDate(order.created_at)}`, 50, 151)
       .text(`Email: ${order.email}`, 50, 166, { width: 230, lineBreak: false })
       .text(`Τρόπος Πληρωμής: ${paymentMethod}`, 50, 181, { width: 230, lineBreak: false })
       .text(`Τρόπος Αποστολής: ${shippingMethod}`, 50, 196, { width: 230, lineBreak: false });
@@ -774,14 +775,14 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
 
     let tableY = order.shipping_method === 'pickup' ? 260 : (order.ship_notes ? 360 : (order.floor ? 320 : 305));
 
-    const cols = { product: 60, qty: 330, price: 410, total: 490 };
+    const cols = { product: 60, qty: 330, price: 400, total: 480 };
 
     doc.rect(50, tableY - 5, 500, 20).fill('#f2f2f2').fillColor('black');
     doc.font('RobotoBold')
       .text('Προϊόν', cols.product, tableY)
       .text('Ποσότητα', cols.qty, tableY, { width: 60, align: 'right' })
-      .text('Τιμή', cols.price, tableY, { width: 60, align: 'right' })
-      .text('Σύνολο', cols.total, tableY, { width: 60, align: 'right' });
+      .text('Τιμή', cols.price, tableY, { width: 70, align: 'right' })
+      .text('Σύνολο', cols.total, tableY, { width: 70, align: 'right' });
 
     tableY += 25;
     doc.moveTo(50, tableY - 5).lineTo(550, tableY - 5).stroke();
@@ -791,8 +792,8 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       const label = size ? `${title} (${size})` : title;
       doc.text(label, cols.product, tableY, { width: 260 })
         .text(quantity.toString(), cols.qty, tableY, { width: 60, align: 'right' })
-        .text(`€${Number(price).toFixed(2)}`, cols.price, tableY, { width: 60, align: 'right' })
-        .text(`€${(quantity * price).toFixed(2)}`, cols.total, tableY, { width: 60, align: 'right' });
+        .text(formatEur(price), cols.price, tableY, { width: 70, align: 'right' })
+        .text(formatEur(quantity * price), cols.total, tableY, { width: 70, align: 'right' });
       tableY += 28;
     });
 
@@ -804,13 +805,13 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       doc.fontSize(12).text(label, 330, y).text(value, 450, y, { width: 100, align: 'right' });
     };
 
-    summaryRow('Προϊόντα', `€${Number(order.subtotal).toFixed(2)}`, tableY);
+    summaryRow('Προϊόντα', formatEur(order.subtotal), tableY);
     tableY += 20;
-    summaryRow('Μεταφορικά', `€${Number(order.shipping_cost).toFixed(2)}`, tableY);
+    summaryRow('Μεταφορικά', formatEur(order.shipping_cost), tableY);
     tableY += 20;
 
     if (order.discount_amount > 0) {
-      summaryRow(`Έκπτωση (${order.discount_code})`, `-€${Number(order.discount_amount).toFixed(2)}`, tableY);
+      summaryRow(`Έκπτωση (${order.discount_code})`, `-${formatEur(order.discount_amount)}`, tableY);
       tableY += 20;
     }
 
@@ -819,7 +820,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
 
     doc.font('RobotoBold').fontSize(14)
       .text('Σύνολο Παραγγελίας', 330, tableY, { width: 160, lineBreak: false })
-      .text(`€${Number(order.total_amount).toFixed(2)}`, 470, tableY, { width: 80, align: 'right' });
+      .text(formatEur(order.total_amount), 470, tableY, { width: 80, align: 'right' });
 
     tableY += 30;
     doc.moveTo(50, tableY).lineTo(550, tableY).lineWidth(0.5).strokeColor('#cccccc').stroke();

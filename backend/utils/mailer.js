@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { formatEur } = require('./format');
 
 const useSendGrid = !!process.env.SENDGRID_API_KEY;
 if (useSendGrid) {
@@ -141,8 +142,8 @@ async function sendOrderConfirmationEmail(toEmail, order) {
     <tr>
       <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">${item.name}${item.size ? ` <span style="color:#888;">(${item.size})</span>` : ''}</td>
       <td style="padding:8px 0; border-bottom:1px solid #f0f0f0; text-align:center;">${item.quantity}</td>
-      <td style="padding:8px 0; border-bottom:1px solid #f0f0f0; text-align:right;">€${Number(item.unit_price).toFixed(2)}</td>
-      <td style="padding:8px 0; border-bottom:1px solid #f0f0f0; text-align:right;">€${(item.quantity * item.unit_price).toFixed(2)}</td>
+      <td style="padding:8px 0; border-bottom:1px solid #f0f0f0; text-align:right;">${formatEur(item.unit_price)}</td>
+      <td style="padding:8px 0; border-bottom:1px solid #f0f0f0; text-align:right;">${formatEur(item.quantity * item.unit_price)}</td>
     </tr>
   `).join('');
 
@@ -176,10 +177,10 @@ async function sendOrderConfirmationEmail(toEmail, order) {
           </table>
 
           <table style="width:100%;font-size:14px;margin-top:12px;">
-            <tr><td style="color:#888;">Υποσύνολο</td><td style="text-align:right;">€${Number(order.subtotal).toFixed(2)}</td></tr>
-            <tr><td style="color:#888;">Μεταφορικά</td><td style="text-align:right;">€${Number(order.shippingCost).toFixed(2)}</td></tr>
-            ${order.discountAmount > 0 ? `<tr><td style="color:#16a34a;">Έκπτωση (${order.discountCode})</td><td style="text-align:right;color:#16a34a;">-€${Number(order.discountAmount).toFixed(2)}</td></tr>` : ''}
-            <tr><td style="font-weight:bold;padding-top:8px;font-size:16px;">Σύνολο</td><td style="text-align:right;font-weight:bold;font-size:16px;padding-top:8px;">€${Number(order.totalAmount).toFixed(2)}</td></tr>
+            <tr><td style="color:#888;">Υποσύνολο</td><td style="text-align:right;">${formatEur(order.subtotal)}</td></tr>
+            <tr><td style="color:#888;">Μεταφορικά</td><td style="text-align:right;">${formatEur(order.shippingCost)}</td></tr>
+            ${order.discountAmount > 0 ? `<tr><td style="color:#16a34a;">Έκπτωση (${order.discountCode})</td><td style="text-align:right;color:#16a34a;">-${formatEur(order.discountAmount)}</td></tr>` : ''}
+            <tr><td style="font-weight:bold;padding-top:8px;font-size:16px;">Σύνολο</td><td style="text-align:right;font-weight:bold;font-size:16px;padding-top:8px;">${formatEur(order.totalAmount)}</td></tr>
           </table>
 
           <div style="margin-top:20px;display:flex;gap:20px;">
