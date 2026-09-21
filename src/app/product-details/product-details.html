@@ -74,7 +74,7 @@
         <h1 class="product-name">{{ product.name }}</h1>
 
         <div class="product-price">
-          {{ product.price | number:'1.2-2' }}€
+          {{ product.price | currency }}
         </div>
 
         <div class="stock-status">
@@ -165,7 +165,7 @@
             (error)="$any($event.target).src='no-image.svg'"
           />
           <div class="related-name">{{ p.name }}</div>
-          <div class="related-price">{{ p.price | number:'1.2-2' }}€</div>
+          <div class="related-price">{{ p.price | currency }}</div>
         </a>
       </div>
     </ng-template>

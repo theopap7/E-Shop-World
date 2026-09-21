@@ -48,7 +48,7 @@
 
             <td>
               <span *ngIf="code.min_order_amount > 0">
-                {{ code.min_order_amount }}€
+                {{ code.min_order_amount | currency }}
               </span>
               <span *ngIf="code.min_order_amount === 0" class="muted">—</span>
             </td>
@@ -152,7 +152,7 @@
         <input
           type="number"
           class="form-input"
-          [placeholder]="form.type === 'percentage' ? '10 = 10%' : '50 = 50€'"
+          [placeholder]="form.type === 'percentage' ? '10 = 10%' : '50 = 50 €'"
           [(ngModel)]="form.value"
           min="0"
           [max]="form.type === 'percentage' ? 100 : 999999"

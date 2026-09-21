@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, DestroyRef, inject, ElementRef, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatCurrency } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -163,9 +163,18 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { position: 'top' } },
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.dataset.yAxisID === 'yRevenue'
+                ? `${ctx.dataset.label}: ${formatCurrency(Number(ctx.parsed.y), 'el', '€', 'EUR')}`
+                : `${ctx.dataset.label}: ${ctx.parsed.y}`
+            }
+          }
+        },
         scales: {
-          yRevenue: { type: 'linear', position: 'left', beginAtZero: true, ticks: { callback: v => `€${v}` } },
+          yRevenue: { type: 'linear', position: 'left', beginAtZero: true, ticks: { callback: v => formatCurrency(Number(v), 'el', '€', 'EUR', '1.0-0') } },
           yOrders: { type: 'linear', position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } }
         }
       }

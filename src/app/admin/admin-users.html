@@ -65,7 +65,7 @@
               </td>
               <td class="right">
                 <strong [class.revenue]="u.total_spent > 0">
-                  {{ u.total_spent | number:'1.2-2' }}€
+                  {{ u.total_spent | currency }}
                 </strong>
               </td>
               <td>

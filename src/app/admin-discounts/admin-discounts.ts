@@ -1,6 +1,6 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatCurrency, formatNumber } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
@@ -240,8 +240,8 @@ export class AdminDiscountsComponent implements OnInit {
 
   getValueDisplay(code: DiscountCode): string {
     return code.type === 'percentage'
-      ? `${code.value}%`
-      : `${code.value}€`;
+      ? `${formatNumber(Number(code.value), 'el', '1.0-2')}%`
+      : formatCurrency(Number(code.value), 'el', '€', 'EUR');
   }
 
   isExpired(expiresAt: string | null): boolean {

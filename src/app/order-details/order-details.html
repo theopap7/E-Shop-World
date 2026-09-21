@@ -105,7 +105,7 @@
                 <div *ngIf="it.size" class="item-size-tag">{{ it.size }}</div>
                 <div class="muted">
                   Ποσότητα: {{ it.quantity }}
-                  × {{ it.unit_price | number:'1.2-2' }} €
+                  × {{ it.unit_price | currency }}
                 </div>
                 <a
                   *ngIf="!isAdminPage && order.status === 'delivered'"
@@ -119,7 +119,7 @@
 
               <div class="line">
                 <span class="line-label">Σύνολο</span>
-                {{ it.line_total | number:'1.2-2' }} €
+                {{ it.line_total | currency }}
               </div>
 
             </div>
@@ -245,12 +245,12 @@
 
           <div class="row">
             <span>Κόστος Προϊόντων</span>
-            <strong>{{ order.subtotal | number:'1.2-2' }} €</strong>
+            <strong>{{ order.subtotal | currency }}</strong>
           </div>
 
           <div class="row">
             <span>Μεταφορικά</span>
-            <strong>{{ order.shipping_cost | number:'1.2-2' }} €</strong>
+            <strong>{{ order.shipping_cost | currency }}</strong>
           </div>
 
           <div
@@ -262,14 +262,14 @@
             </span>
 
             <strong class="discount-value">
-              -{{ order.discount_amount | number:'1.2-2' }} €
+              -{{ order.discount_amount | currency }}
             </strong>
 
           </div>
 
           <div class="row total-row">
             <span><strong>Σύνολο</strong></span>
-            <strong>{{ order.total_amount | number:'1.2-2' }} €</strong>
+            <strong>{{ order.total_amount | currency }}</strong>
           </div>
 
           <div class="cancel-section" *ngIf="canCancel">
@@ -318,7 +318,7 @@
                     <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty > 1 ? item.selectedQty - 1 : 1">−</button>
                     <span class="qty-val">{{ item.selectedQty }}</span>
                     <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty < item.maxQty ? item.selectedQty + 1 : item.maxQty">+</button>
-                    <span class="return-item-price">{{ (item.selectedQty * item.unitPrice) | number:'1.2-2' }} €</span>
+                    <span class="return-item-price">{{ (item.selectedQty * item.unitPrice) | currency }}</span>
                   </div>
                   <div class="return-item-qty" *ngIf="!item.selected && !item.blockedStatus">
                     <span class="muted">{{ item.maxQty }} τεμ.</span>

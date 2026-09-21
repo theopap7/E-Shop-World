@@ -1,7 +1,7 @@
 <div class="reviews-section">
 
   <div class="rating-summary" *ngIf="total > 0">
-    <div class="big-rating">{{ average }}</div>
+    <div class="big-rating">{{ average | number:'1.1-1' }}</div>
     <div class="rating-info">
       <div class="stars-display">
         <span *ngFor="let star of starsArray"

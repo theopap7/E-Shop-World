@@ -135,11 +135,11 @@
         <h3>Αποστολή</h3>
         <label>
           <input type="radio" value="courier_standard" formControlName="shippingMethod" />
-          Τυπική Αποστολή (+3€)
+          Τυπική Αποστολή (+3,00&nbsp;€)
         </label>
         <label>
           <input type="radio" value="courier_express" formControlName="shippingMethod" />
-          Γρήγορη Αποστολή (+6€)
+          Γρήγορη Αποστολή (+6,00&nbsp;€)
         </label>
         <label>
           <input type="radio" value="pickup" formControlName="shippingMethod" />
@@ -243,13 +243,13 @@
             <strong>{{ it.name }}</strong>
             <div class="muted">x{{ it.quantity }}<span *ngIf="it.size"> · {{ it.size }}</span></div>
           </div>
-          <div>{{ (it.price * it.quantity) | number:'1.2-2' }}€</div>
+          <div>{{ (it.price * it.quantity) | currency }}</div>
         </div>
 
         <hr />
 
-        <div class="row"><span>Υποσύνολο</span><span>{{ subtotal | number:'1.2-2' }}€</span></div>
-        <div class="row"><span>Μεταφορικά</span><span>{{ shippingCost | number:'1.2-2' }}€</span></div>
+        <div class="row"><span>Υποσύνολο</span><span>{{ subtotal | currency }}</span></div>
+        <div class="row"><span>Μεταφορικά</span><span>{{ shippingCost | currency }}</span></div>
 
         <div class="discount-section">
           <h4>Έχεις κωδικό έκπτωσης;</h4>
@@ -281,12 +281,12 @@
               Έκπτωση ({{ appliedDiscount.code }})
               <button type="button" (click)="removeDiscount()" class="remove-discount-btn" aria-label="Αφαίρεση κωδικού έκπτωσης">✕</button>
             </span>
-            <span class="discount-amount">-{{ discountAmount | number:'1.2-2' }}€</span>
+            <span class="discount-amount">-{{ discountAmount | currency }}</span>
           </div>
         </div>
 
         <hr>
-        <div class="row total"><span>Σύνολο</span><span>{{ total | number:'1.2-2' }}€</span></div>
+        <div class="row total"><span>Σύνολο</span><span>{{ total | currency }}</span></div>
 
       </div>
     </div>

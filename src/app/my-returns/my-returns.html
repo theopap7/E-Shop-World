@@ -64,13 +64,13 @@
                       (error)="$any($event.target).src='no-image.svg'"
                     />
                     <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
-                    <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | number:'1.2-2' }} € = <strong>{{ (item.quantity * item.unit_price) | number:'1.2-2' }} €</strong></span>
+                    <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | currency }} = <strong>{{ (item.quantity * item.unit_price) | currency }}</strong></span>
                   </div>
                 </div>
               </div>
               <div class="info-row" *ngIf="r.status === 'approved'">
                 <span class="info-label">Επιστροφή</span>
-                <strong style="color:#059669">{{ r.refund_amount | number:'1.2-2' }} €</strong>
+                <strong style="color:#059669">{{ r.refund_amount | currency }}</strong>
               </div>
               <div class="info-row" *ngIf="r.admin_note">
                 <span class="info-label">Σχόλιο Διαχειριστή</span>

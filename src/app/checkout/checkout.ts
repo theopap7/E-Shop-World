@@ -1,6 +1,6 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatNumber } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
   AbstractControl,
@@ -330,7 +330,7 @@ export class CheckoutComponent implements OnInit {
           
           let message = `Κωδικός "${res.discount.code}" εφαρμόστηκε!`;
           if (res.discount.type === 'percentage') {
-            message += ` (-${res.discount.value}%)`;
+            message += ` (-${formatNumber(Number(res.discount.value), 'el', '1.0-2')}%)`;
           }
           this.toastService.success(message);
           
