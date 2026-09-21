@@ -248,7 +248,7 @@
 
       <div class="image-block" *ngIf="isEditMode">
         <div class="image-block-head">
-          <label class="image-title">Gallery Εικόνων</label>
+          <label class="image-title">Συλλογή εικόνων</label>
           <small class="image-hint">Επιπλέον εικόνες προϊόντος</small>
         </div>
 
@@ -259,7 +259,7 @@
           </div>
         </div>
 
-        <p class="muted-text" *ngIf="galleryImages.length === 0">Δεν υπάρχουν εικόνες gallery.</p>
+        <p class="muted-text" *ngIf="galleryImages.length === 0">Δεν υπάρχουν εικόνες στη συλλογή.</p>
 
         <input type="file" #galleryInput accept="image/*" (change)="onGalleryFileSelected($event)" class="file-hidden" />
 
@@ -269,7 +269,7 @@
           style="margin-top:10px"
           [disabled]="uploadingGallery"
           (click)="galleryInput.click()">
-          {{ uploadingGallery ? 'Ανέβασμα...' : '+ Προσθήκη εικόνας gallery' }}
+          {{ uploadingGallery ? 'Ανέβασμα...' : '+ Προσθήκη εικόνας στη συλλογή' }}
         </button>
       </div>
 

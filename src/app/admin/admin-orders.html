@@ -167,35 +167,35 @@
 >
 
   <option value="pending" [disabled]="order.status !== 'pending'">
-    Σε αναμονή
+    {{ statusLabel('pending') }}
   </option>
 
   <option
     value="processing"
     [disabled]="order.status !== 'pending'"
   >
-    Σε επεξεργασία
+    {{ statusLabel('processing') }}
   </option>
 
   <option
     value="shipped"
     [disabled]="order.status !== 'processing'"
   >
-    Αποστολή
+    {{ statusLabel('shipped') }}
   </option>
 
   <option
     value="delivered"
     [disabled]="order.status !== 'shipped'"
   >
-    Παραδόθηκε
+    {{ statusLabel('delivered') }}
   </option>
 
   <option
     value="cancelled"
     [disabled]="order.status === 'delivered'"
   >
-    Ακυρώθηκε
+    {{ statusLabel('cancelled') }}
   </option>
 
 </select>

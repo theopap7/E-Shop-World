@@ -14,7 +14,7 @@
 
   <ng-container *ngIf="status === 'error' || status === 'missing-token'">
     <h2>Μη έγκυρος σύνδεσμος</h2>
-    <p class="subtitle">{{ status === 'missing-token' ? 'Λείπει το token επιβεβαίωσης.' : errorMessage }}</p>
+    <p class="subtitle">{{ status === 'missing-token' ? 'Ο σύνδεσμος επιβεβαίωσης δεν είναι έγκυρος.' : errorMessage }}</p>
   </ng-container>
 
   <p class="back-link">
