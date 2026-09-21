@@ -18,7 +18,7 @@
           <h2 class="title">Παραγγελία{{ orderId ? ' #' + orderId : '' }}</h2>
 
           <div class="meta" *ngIf="order">
-            <span class="meta-text">{{ order.created_at | date:'short' }}</span>
+            <span class="meta-text">{{ order.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
             <span class="dot">•</span>
 
             <span
