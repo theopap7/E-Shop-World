@@ -49,8 +49,8 @@ describe('Register', () => {
       firstName: 'Theo',
       lastName: 'Pap',
       email: 'theo@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123',
+      confirmPassword: 'Password123',
     });
 
     tick(500); // let the email async validator's debounce + stubbed HTTP call resolve
