@@ -116,7 +116,7 @@
           <div class="qty-selector" *ngIf="availableStock > 0">
             <label class="qty-label">Ποσότητα</label>
             <select class="qty-select" [(ngModel)]="selectedQty">
-              <option *ngFor="let n of qtyOptions" [value]="n">{{ n }}</option>
+              <option *ngFor="let n of qtyOptions" [ngValue]="n">{{ n }}</option>
             </select>
           </div>
 
