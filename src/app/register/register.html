@@ -39,8 +39,9 @@
       <label for="password">Κωδικός</label>
       <div class="password-wrapper">
         <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" />
-        <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1">
-          {{ showPassword ? '🙈' : '👁️' }}
+        <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1"
+                [attr.aria-label]="showPassword ? 'Απόκρυψη κωδικού' : 'Εμφάνιση κωδικού'">
+          <app-eye-icon [crossed]="showPassword"></app-eye-icon>
         </button>
       </div>
       <small class="err" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')">
@@ -58,8 +59,9 @@
       <label for="confirmPassword">Επιβεβαίωση Κωδικού</label>
       <div class="password-wrapper">
         <input id="confirmPassword" formControlName="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" />
-        <button type="button" class="toggle-password" (click)="showConfirmPassword = !showConfirmPassword" tabindex="-1">
-          {{ showConfirmPassword ? '🙈' : '👁️' }}
+        <button type="button" class="toggle-password" (click)="showConfirmPassword = !showConfirmPassword" tabindex="-1"
+                [attr.aria-label]="showConfirmPassword ? 'Απόκρυψη κωδικού' : 'Εμφάνιση κωδικού'">
+          <app-eye-icon [crossed]="showConfirmPassword"></app-eye-icon>
         </button>
       </div>
       <small class="err" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('required')">

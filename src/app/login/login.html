@@ -14,8 +14,9 @@
       <label for="password">Κωδικός</label>
       <div class="password-wrapper">
         <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" />
-        <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1">
-          {{ showPassword ? '🙈' : '👁️' }}
+        <button type="button" class="toggle-password" (click)="showPassword = !showPassword" tabindex="-1"
+                [attr.aria-label]="showPassword ? 'Απόκρυψη κωδικού' : 'Εμφάνιση κωδικού'">
+          <app-eye-icon [crossed]="showPassword"></app-eye-icon>
         </button>
       </div>
       <div *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched">

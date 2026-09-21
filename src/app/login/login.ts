@@ -4,11 +4,12 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { EyeIconComponent } from '../shared/eye-icon/eye-icon.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, EyeIconComponent],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })

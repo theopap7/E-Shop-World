@@ -1,7 +1,7 @@
 /* Κεντρικό στυλ για την register φόρμα — ίδιο look με login */
 .register-container {
   max-width: 400px;
-  margin: 50px auto;
+  margin: max(50px, 13vh) auto;
   padding: 30px;
   background-color: #fff;
   border: 1px solid #e5e7eb;
@@ -110,7 +110,7 @@
   padding-right: 42px;
 }
 
-.toggle-password {
+.register-container .toggle-password {
   position: absolute;
   right: 10px;
   width: auto !important;
@@ -118,13 +118,14 @@
   border: none !important;
   box-shadow: none !important;
   cursor: pointer;
-  font-size: 18px;
+  display: inline-flex;
   padding: 4px;
   line-height: 1;
   color: #64748b;
 }
 
-.toggle-password:hover {
+.register-container .toggle-password:hover:not(:disabled) {
   background: none !important;
+  color: #4f46e5;
   transform: none;
 }

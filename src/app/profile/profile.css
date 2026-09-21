@@ -353,7 +353,8 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  font-size: 18px;
+  display: inline-flex;
+  color: #64748b;
   line-height: 1;
   padding: 6px;
   border-radius: 6px;
@@ -361,6 +362,7 @@
 }
 
 .toggle-btn:hover {
+  color: #4f46e5;
   opacity: 1;
   background: #f3f4f6;
 }

@@ -202,8 +202,9 @@
                 <button
                   type="button"
                   class="toggle-btn"
-                  (click)="showCurrentPassword = !showCurrentPassword">
-                  {{ showCurrentPassword ? '🙈' : '👁️' }}
+                  (click)="showCurrentPassword = !showCurrentPassword"
+                  [attr.aria-label]="showCurrentPassword ? 'Απόκρυψη κωδικού' : 'Εμφάνιση κωδικού'">
+                  <app-eye-icon [crossed]="showCurrentPassword"></app-eye-icon>
                 </button>
               </div>
             </div>
@@ -225,8 +226,9 @@
                 <button
                   type="button"
                   class="toggle-btn"
-                  (click)="showNewPassword = !showNewPassword">
-                  {{ showNewPassword ? '🙈' : '👁️' }}
+                  (click)="showNewPassword = !showNewPassword"
+                  [attr.aria-label]="showNewPassword ? 'Απόκρυψη κωδικού' : 'Εμφάνιση κωδικού'">
+                  <app-eye-icon [crossed]="showNewPassword"></app-eye-icon>
                 </button>
               </div>
 
@@ -254,8 +256,9 @@
                 <button
                   type="button"
                   class="toggle-btn"
-                  (click)="showConfirmPassword = !showConfirmPassword">
-                  {{ showConfirmPassword ? '🙈' : '👁️' }}
+                  (click)="showConfirmPassword = !showConfirmPassword"
+                  [attr.aria-label]="showConfirmPassword ? 'Απόκρυψη κωδικού' : 'Εμφάνιση κωδικού'">
+                  <app-eye-icon [crossed]="showConfirmPassword"></app-eye-icon>
                 </button>
               </div>
 

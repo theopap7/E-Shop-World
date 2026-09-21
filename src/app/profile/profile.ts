@@ -6,11 +6,12 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { environment } from '../../environments/environment';
+import { EyeIconComponent } from '../shared/eye-icon/eye-icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-profile',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, EyeIconComponent],
   styleUrl: './profile.css',
   templateUrl: './profile.html',
 })

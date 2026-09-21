@@ -6,11 +6,12 @@ import { Router, RouterModule } from '@angular/router';
 import { catchError, map, of, switchMap, timer } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { EyeIconComponent } from '../shared/eye-icon/eye-icon.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, EyeIconComponent],
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
