@@ -31,12 +31,15 @@ export class OrderTimelineComponent {
       return this.getCancelledSteps();
     }
 
+    // Delivered is the final state, so the last step is done rather than "in progress".
+    const isDelivered = this.currentStatus === 'delivered';
+
     return statuses.map((status, index) => ({
       label: statusLabel(status),
       status: status,
       icon: this.getIcon(status, index <= currentIndex),
-      completed: index < currentIndex,
-      active: index === currentIndex
+      completed: index < currentIndex || isDelivered,
+      active: index === currentIndex && !isDelivered
     }));
   }
 
