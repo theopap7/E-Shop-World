@@ -13,7 +13,7 @@ router.get('/admin/products', authenticateToken, isAdmin, async (req, res) => {
         c.name AS category_name
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
-      ORDER BY p.created_at DESC
+      ORDER BY p.id ASC
     `);
     res.json({ success: true, products: rows });
   } catch (error) {
