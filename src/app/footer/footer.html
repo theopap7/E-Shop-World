@@ -18,7 +18,7 @@
       <a href="mailto:support&#64;shop.example">support&#64;shop.example</a>
     </div>
 
-    <div class="footer-col">
+    <div class="footer-col" *ngIf="isLoggedIn">
       <h4>Λογαριασμός</h4>
       <a routerLink="/profile/orders">Οι Παραγγελίες μου</a>
       <a routerLink="/profile/returns">Οι Επιστροφές μου</a>
@@ -28,7 +28,6 @@
 
   <div class="footer-bottom">
     <span>© {{ year }} Shop. Με επιφύλαξη κάθε δικαιώματος.</span>
-    <a routerLink="/terms" class="terms-link">Όροι Χρήσης &amp; Απορρήτου</a>
     <span class="tech-credit">Built with Angular &amp; Node.js</span>
   </div>
 </footer>

@@ -3,7 +3,6 @@
 ========================= */
 
 section.page {
-  min-height: 100vh;
   background: transparent;
   padding: 24px 16px;
 }

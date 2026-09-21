@@ -91,16 +91,6 @@
   color: var(--color-text-faint);
 }
 
-.terms-link {
-  color: var(--color-text-faint);
-  text-decoration: none;
-}
-
-.terms-link:hover {
-  color: var(--color-primary-hover);
-  text-decoration: underline;
-}
-
 @media (max-width: 640px) {
   .footer-main {
     grid-template-columns: 1fr;
