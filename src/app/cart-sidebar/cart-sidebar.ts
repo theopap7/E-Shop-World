@@ -67,7 +67,7 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
   }
 
   async clearCart(): Promise<void> {
-    const ok = await this.confirmService.confirm('Θέλεις να αδειάσεις το καλάθι;', { danger: true });
+    const ok = await this.confirmService.confirm('Θέλεις να αδειάσεις το καλάθι;', { danger: true, confirmText: 'Αφαίρεση όλων' });
     if (!ok) return;
     this.cartService.clear();
     this.toastService.info('Το καλάθι αδειάστηκε');

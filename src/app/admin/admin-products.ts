@@ -60,7 +60,7 @@ export class AdminProductsComponent implements OnInit {
 
   async deleteProduct(id: number, name: string): Promise<void> {
     if (this.deletingId === id) return;
-    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το "${name}";`, { danger: true });
+    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις το "${name}";`, { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) {
       return;
     }

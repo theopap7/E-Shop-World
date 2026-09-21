@@ -61,7 +61,7 @@ export class WishlistComponent implements OnInit {
   }
 
   async clearAll(): Promise<void> {
-    const ok = await this.confirmService.confirm('Διαγραφή όλων των αγαπημένων;', { danger: true });
+    const ok = await this.confirmService.confirm('Να αφαιρεθούν όλα τα προϊόντα από τα αγαπημένα;', { danger: true, confirmText: 'Αφαίρεση όλων' });
     if (ok) {
       this.wishlistService.clear();
     }

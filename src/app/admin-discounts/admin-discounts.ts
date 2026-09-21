@@ -209,7 +209,7 @@ export class AdminDiscountsComponent implements OnInit {
   }
 
   async deleteCode(id: number, code: string): Promise<void> {
-    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`, { danger: true });
+    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον κωδικό "${code}";`, { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) return;
 
     this.http.delete<{ success: boolean; message?: string }>(`${this.apiUrl}/${id}`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

@@ -71,7 +71,7 @@ export class MyReviewsComponent implements OnInit {
 
   async deleteReview(reviewId: number): Promise<void> {
     if (this.deletingId === reviewId) return;
-    const ok = await this.confirmService.confirm('Διαγραφή κριτικής;', { danger: true });
+    const ok = await this.confirmService.confirm('Διαγραφή κριτικής;', { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) return;
 
     this.deletingId = reviewId;

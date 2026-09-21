@@ -137,7 +137,7 @@ export class AdminOrdersComponent implements OnInit {
     if (this.updatingId === orderId) return;
 
     if (newStatus === 'cancelled') {
-      const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`, { danger: true });
+      const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${orderId}; Αυτή η ενέργεια δεν αναιρείται.`, { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
       if (!ok) {
         this.resyncSelect(orderId);
         return;

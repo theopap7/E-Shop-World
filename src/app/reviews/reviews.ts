@@ -199,7 +199,7 @@ export class ReviewsComponent implements OnInit {
   }
 
   async deleteReview(reviewId: number): Promise<void> {
-    const ok = await this.confirmService.confirm('Διαγραφή κριτικής;', { danger: true });
+    const ok = await this.confirmService.confirm('Διαγραφή κριτικής;', { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) return;
 
     this.reviewService.deleteReview(reviewId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

@@ -3,6 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService, CartItem } from '../services/cart.service';
+import { ConfirmService } from '../services/confirm.service';
+import { ToastService } from '../services/toast.service';
 import { Router, RouterModule } from '@angular/router';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 
@@ -23,7 +25,9 @@ export class CartComponent implements OnInit {
 
   constructor(
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private confirmService: ConfirmService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -53,8 +57,11 @@ export class CartComponent implements OnInit {
     this.cartService.removeFromCart(productId, size);
   }
 
-  clear(): void {
+  async clear(): Promise<void> {
+    const ok = await this.confirmService.confirm('Θέλεις να αδειάσεις το καλάθι;', { danger: true, confirmText: 'Αφαίρεση όλων' });
+    if (!ok) return;
     this.cartService.clear();
+    this.toastService.info('Το καλάθι αδειάστηκε');
   }
 
   goToCheckout(): void {

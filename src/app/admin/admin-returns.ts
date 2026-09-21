@@ -83,8 +83,13 @@ export class AdminReturnsComponent implements OnInit {
   }
 
   async updateStatus(r: ReturnRequest, status: 'approved' | 'rejected'): Promise<void> {
-    const label = status === 'approved' ? 'έγκριση' : 'απόρριψη';
-    const ok = await this.confirmService.confirm(`Επιβεβαίωση ${label} αιτήματος #${r.id};`, { danger: status === 'rejected' });
+    const approving = status === 'approved';
+    const ok = await this.confirmService.confirm(
+      approving
+        ? `Να εγκριθεί το αίτημα επιστροφής #${r.id};`
+        : `Να απορριφθεί το αίτημα επιστροφής #${r.id};`,
+      { danger: !approving, confirmText: approving ? 'Έγκριση' : 'Απόρριψη' }
+    );
     if (!ok) return;
 
     this.processingId = r.id;

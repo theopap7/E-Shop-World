@@ -209,7 +209,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   async cancelOrder(): Promise<void> {
-    const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;', { danger: true });
+    const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;', { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
     if (!ok) return;
 
     this.isCancelling = true;

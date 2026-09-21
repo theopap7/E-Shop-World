@@ -50,7 +50,7 @@ export class AdminReviewsComponent implements OnInit {
   }
 
   async deleteReview(reviewId: number, productName: string): Promise<void> {
-    const ok = await this.confirmService.confirm(`Διαγραφή review για "${productName}";`, { danger: true });
+    const ok = await this.confirmService.confirm(`Να διαγραφεί η κριτική για "${productName}";`, { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) {
       return;
     }
