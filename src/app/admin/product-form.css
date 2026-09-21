@@ -254,13 +254,13 @@ textarea{
 }
 
 .size-chip:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--color-primary);
+  color: var(--color-primary-hover);
 }
 
 .size-chip.active {
-  border-color: #3b82f6;
-  background: #3b82f6;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: white;
 }
 

@@ -172,8 +172,8 @@
 
 .category-badge {
   display: inline-block;
-  background: #eff6ff;
-  color: #3b82f6;
+  background: var(--color-primary-tint);
+  color: var(--color-primary-hover);
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 11px;
@@ -194,7 +194,7 @@
 }
 
 .product-name-link:hover .product-name {
-  color: #3b82f6;
+  color: var(--color-primary-hover);
 }
 
 /* Reviews */
@@ -269,7 +269,7 @@
 .price {
   font-size: 20px;
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--color-primary-hover);
 }
 
 .wishlist-footer .btn {
@@ -299,7 +299,7 @@
 .btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
 }
 
 .btn-primary:disabled {

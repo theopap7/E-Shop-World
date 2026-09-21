@@ -111,7 +111,7 @@
 }
 
 .order-group-header .order-link:hover {
-  color: #3b82f6;
+  color: var(--color-primary-hover);
   text-decoration: underline;
 }
 
@@ -147,7 +147,7 @@
 .dot { color: #d1d5db; }
 
 .order-link {
-  color: #3b82f6;
+  color: var(--color-primary-hover);
   text-decoration: none;
   font-weight: 600;
 }

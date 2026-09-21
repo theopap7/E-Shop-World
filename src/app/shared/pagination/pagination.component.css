@@ -38,8 +38,8 @@
 }
 
 .page-btn.active {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: white;
   font-weight: 600;
   cursor: default;

@@ -34,7 +34,7 @@
 
 .breadcrumb-link:hover {
   color: var(--color-primary-hover);
-  background: #eff6ff;
+  background: var(--color-primary-tint);
   text-decoration: underline;
 }
 

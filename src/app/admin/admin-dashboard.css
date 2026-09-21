@@ -1,6 +1,6 @@
 .page{
   min-height: 100vh;
-  background: #f6f7fb;
+  background: transparent;
   padding: 28px 16px;
   color: #111827;
 }
@@ -216,7 +216,7 @@
 
 .quick-card:hover .quick-arrow{
   transform:translateX(4px);
-  color:#2563eb;
+  color:var(--color-primary-hover);
 }
 
 /* STATS */

@@ -150,7 +150,7 @@
 }
 
 .item-name:hover {
-  color: #2563eb;
+  color: var(--color-primary-hover);
   text-decoration: underline;
 }
 
@@ -218,7 +218,7 @@
 
 .item-subtotal {
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--color-primary-hover);
   font-size: 15px;
   text-align: right;
 }
@@ -259,7 +259,7 @@
 }
 
 .total-row strong {
-  color: #3b82f6;
+  color: var(--color-primary-hover);
   font-size: 22px;
 }
 

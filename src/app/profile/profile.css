@@ -68,12 +68,12 @@
 
 /* Profile Card */
 .profile-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-brand);
   border-radius: 16px;
   padding: 32px;
   color: white;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
   height: fit-content;
 }
 
@@ -206,7 +206,7 @@
 
 .action-link:hover .action-arrow {
   transform: translateX(4px);
-  color: #3b82f6;
+  color: var(--color-primary-hover);
 }
 
 .divider {
@@ -216,11 +216,11 @@
 }
 
 .admin-link:hover {
-  background: #eff6ff;
+  background: var(--color-primary-tint);
 }
 
 .admin-link .action-icon {
-  background: #dbeafe;
+  background: var(--color-primary-tint-strong);
 }
 
 /* Password Form */
@@ -252,8 +252,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* Buttons */
@@ -377,7 +377,7 @@
 
 .toggle-btn:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .form-hint {

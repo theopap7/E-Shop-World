@@ -111,7 +111,7 @@
 .dot { color: #d1d5db; }
 
 .order-link {
-  color: #3b82f6;
+  color: var(--color-primary-hover);
   text-decoration: none;
   font-weight: 600;
 }
@@ -200,7 +200,7 @@
 
 .admin-note-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--color-primary);
 }
 
 .action-buttons {

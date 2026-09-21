@@ -87,11 +87,11 @@
 }
 
 .thumb-btn.active {
-  border-color: #2563eb;
+  border-color: var(--color-primary);
 }
 
 .thumb-btn:hover {
-  border-color: #93c5fd;
+  border-color: var(--color-primary-light);
 }
 
 /* Info */
@@ -103,8 +103,8 @@
 
 .badge {
   display: inline-block;
-  background: #eff6ff;
-  color: #3b82f6;
+  background: var(--color-primary-tint);
+  color: var(--color-primary-hover);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 13px;
@@ -122,7 +122,7 @@
 .product-price {
   font-size: 30px;
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--color-primary-hover);
 }
 
 .stock-status {
@@ -193,13 +193,13 @@
 }
 
 .size-btn:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--color-primary);
+  color: var(--color-primary-hover);
 }
 
 .size-btn.selected {
-  border-color: #3b82f6;
-  background: #3b82f6;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: white;
 }
 
@@ -250,13 +250,13 @@
 }
 
 .qty-select:hover {
-  border-color: #3b82f6;
+  border-color: var(--color-primary);
 }
 
 .qty-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241,0.1);
 }
 
 .btn {

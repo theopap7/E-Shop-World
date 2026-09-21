@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: #f6f7fb;
+  background: transparent;
   padding: 28px 16px;
   color: #111827;
 }
@@ -169,7 +169,6 @@
   color: #6b7280;
   font-size: 15px;
 }
-
 .review-top {
   display: flex;
   justify-content: space-between;
@@ -311,8 +310,8 @@
 }
 
 .edit-textarea:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .edit-stars {

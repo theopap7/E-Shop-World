@@ -1,6 +1,6 @@
 .page{
   min-height:100vh;
-  background:#f6f7fb;
+  background:transparent;
   padding:28px 16px;
   color:#111827;
 }
@@ -92,8 +92,8 @@
 }
 
 .search-input:focus{
-  border-color:#2563eb;
-  box-shadow:0 0 0 3px rgba(37,99,235,.1);
+  border-color:var(--color-primary);
+  box-shadow:0 0 0 3px rgba(99, 102, 241,.1);
 }
 
 .search-clear{
@@ -195,8 +195,8 @@
 }
 
 .order-badge.has-orders{
-  background:#dbeafe;
-  color:#1d4ed8;
+  background:var(--color-primary-tint-strong);
+  color:var(--color-primary-hover);
 }
 
 .revenue{

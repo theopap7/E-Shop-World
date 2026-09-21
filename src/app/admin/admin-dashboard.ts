@@ -146,7 +146,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           {
             label: 'Έσοδα (€)',
             data: revenueData,
-            backgroundColor: '#2563eb',
+            backgroundColor: '#6366f1',
             borderRadius: 4,
             yAxisID: 'yRevenue'
           },
@@ -207,7 +207,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         datasets: [{
           label: 'Τεμάχια πωλήθηκαν',
           data: raw.map(r => r.total_sold),
-          backgroundColor: '#2563eb',
+          backgroundColor: '#6366f1',
           borderRadius: 6
         }]
       },

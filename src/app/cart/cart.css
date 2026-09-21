@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: #f6f7fb;
+  background: transparent;
   padding: 28px 16px;
   color: #111827;
 }
@@ -108,8 +108,8 @@
   transition: border-color 0.2s;
 }
 
-.qty-select:hover { border-color: #3b82f6; }
-.qty-select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.qty-select:hover { border-color: var(--color-primary); }
+.qty-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241,0.1); }
 
 .btn-danger {
   background: #ef4444;
