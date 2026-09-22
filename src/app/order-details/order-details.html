@@ -215,6 +215,11 @@
             <strong>{{ paymentMethodLabel(order.payment_method) }}</strong>
           </div>
 
+          <div class="row" *ngIf="order.payment_method === 'bank_transfer' && order.payment_iban">
+            <span>IBAN επιστροφής</span>
+            <strong>{{ order.payment_iban }}</strong>
+          </div>
+
           <div class="row">
             <span>Κατάσταση πληρωμής</span>
 

@@ -165,8 +165,14 @@
         <div *ngIf="form.get('paymentMethod')?.value === 'bank_transfer'"
              formGroupName="paymentDetails"
              style="margin-top: 10px;">
+
+          <div class="alert alert-info">
+            <p><strong>Στοιχεία κατάθεσης:</strong> E-Shop ΙΚΕ — IBAN: GR16 0110 1250 0000 0001 2300 695 (Εθνική Τράπεζα)</p>
+            <p>Κάνε την κατάθεση με το ποσό της παραγγελίας και θα επιβεβαιώσουμε την πληρωμή εντός 1-2 εργάσιμων ημερών.</p>
+          </div>
+
           <label>
-            IBAN
+            Το IBAN σου (για τυχόν επιστροφή χρημάτων)
             <input formControlName="iban" />
           </label>
           <small class="err" *ngIf="form.get('paymentDetails.iban')?.touched && form.get('paymentDetails.iban')?.invalid">

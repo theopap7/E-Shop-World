@@ -33,7 +33,7 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
       `SELECT
          o.id, o.user_id, o.total_amount, o.status, o.created_at,
          o.subtotal, o.shipping_cost, o.shipping_method,
-         o.payment_method, o.payment_status,
+         o.payment_method, o.payment_status, o.payment_iban,
          o.recipient_name, o.phone,
          o.ship_country, o.ship_city, o.ship_zip, o.ship_address1, o.ship_notes, o.floor,
          o.discount_code, o.discount_amount, o.is_gift, o.gift_message,

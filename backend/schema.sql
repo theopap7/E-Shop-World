@@ -56,6 +56,7 @@ CREATE TABLE orders (
   shipping_cost DECIMAL(10,2) NOT NULL DEFAULT 0,
   payment_method ENUM('cod', 'card_mock', 'bank_transfer') NOT NULL,
   payment_status ENUM('pending', 'paid', 'refunded', 'partially_refunded', 'cancelled') DEFAULT 'pending',
+  payment_iban VARCHAR(34),
   discount_code VARCHAR(100),
   discount_amount DECIMAL(10,2) DEFAULT 0,
   is_gift TINYINT(1) NOT NULL DEFAULT 0,

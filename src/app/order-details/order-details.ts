@@ -31,6 +31,7 @@ type OrderDto = {
   shipping_cost: number;
   payment_method: string;
   payment_status: string;
+  payment_iban?: string | null;
   subtotal: number;
   discount_code?: string | null;
   discount_amount?: number | null;

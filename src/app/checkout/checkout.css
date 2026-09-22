@@ -84,6 +84,20 @@
   color: #6d4c00;
 }
 
+.alert-info {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-border);
+  color: var(--color-primary-deep);
+}
+
+.alert-info p {
+  margin: 0 0 6px;
+}
+
+.alert-info p:last-child {
+  margin-bottom: 0;
+}
+
 .discount-expired-prompt p {
   margin: 0 0 8px;
 }

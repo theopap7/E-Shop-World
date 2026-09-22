@@ -26,6 +26,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
     shipping,
     shippingMethod,
     paymentMethod,
+    paymentIban,
     discountCode,
     isGift,
     giftMessage
@@ -215,19 +216,23 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
 
     const computedTotal = Number((subtotal + shippingCost - discountAmount).toFixed(2));
 
+    const normalizedIban = paymentMethod === 'bank_transfer' && paymentIban
+      ? String(paymentIban).trim().toUpperCase()
+      : null;
+
     const [orderResult] = await conn.query(
       `INSERT INTO orders (
          user_id, total_amount, status, recipient_name, phone,
          ship_country, ship_city, ship_zip, ship_address1, ship_notes,
-         shipping_method, shipping_cost, payment_method, payment_status,
+         shipping_method, shipping_cost, payment_method, payment_status, payment_iban,
          subtotal, floor, discount_code, discount_amount, is_gift, gift_message
-       ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId, computedTotal,
         recipientName.trim(), String(phone).trim(),
         ship.country || 'GR', ship.city, ship.zip, ship.address1, ship.notes || null,
         shippingMethod, shippingCost,
-        paymentMethod, paymentStatus,
+        paymentMethod, paymentStatus, normalizedIban,
         subtotal, ship.floor || null,
         finalDiscountCode, discountAmount,
         giftFlag, trimmedGiftMessage
@@ -400,7 +405,7 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
       `SELECT
          id, user_id, total_amount, status, created_at,
          subtotal, shipping_cost, shipping_method,
-         payment_method, payment_status,
+         payment_method, payment_status, payment_iban,
          recipient_name, phone,
          ship_country, ship_city, ship_zip, ship_address1, ship_notes, floor,
          discount_code, discount_amount, is_gift, gift_message
