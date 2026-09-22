@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 /* Skeleton Wrapper */
 .skeleton-wrapper {
   display: flex;

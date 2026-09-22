@@ -108,9 +108,7 @@
     </span>
   </div>
 
-  <div *ngIf="isLoading" class="grid">
-    <app-skeleton type="card" [count]="6"></app-skeleton>
-  </div>
+  <app-skeleton *ngIf="isLoading" type="card" [count]="6"></app-skeleton>
 
   <div *ngIf="!isLoading && errorMessage" class="alert alert-error">
     {{ errorMessage }}

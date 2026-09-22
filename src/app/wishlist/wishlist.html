@@ -11,9 +11,7 @@
       <p>Προϊόντα που σου αρέσουν</p>
     </div>
     
-    <div *ngIf="isLoading" class="wishlist-grid">
-      <app-skeleton type="card" [count]="4"></app-skeleton>
-    </div>
+    <app-skeleton *ngIf="isLoading" type="card" [count]="4"></app-skeleton>
 
     <div *ngIf="!isLoading && error" class="alert alert-error">
       Αποτυχία φόρτωσης αγαπημένων.
