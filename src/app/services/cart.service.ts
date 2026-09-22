@@ -161,8 +161,10 @@ export class CartService implements OnDestroy {
 
   reorderItems(items: Array<{ id: number; name: string; price: number; quantity?: number; stock: number; image_url?: string; size?: string }>): void {
     const cart = [...this.itemsSubject.value];
+    let addedCount = 0;
     for (const item of items) {
       if (item.stock <= 0) continue;
+      addedCount++;
       const qty = item.quantity ?? 1;
       const existing = cart.find(i => i.productId === item.id && (i.size ?? '') === (item.size ?? ''));
       if (existing) {
@@ -172,6 +174,12 @@ export class CartService implements OnDestroy {
         cart.push({ productId: item.id, name: item.name, price: item.price, quantity: Math.min(qty, item.stock), stock: item.stock, image_url: item.image_url, size: item.size });
       }
     }
+
+    if (addedCount === 0) {
+      this.toastService.error('Τα προϊόντα αυτής της παραγγελίας δεν είναι πλέον διαθέσιμα');
+      return;
+    }
+
     this.setItems(cart);
     this.toastService.success('Τα προϊόντα προστέθηκαν στο καλάθι!');
     this.openSidebar();
