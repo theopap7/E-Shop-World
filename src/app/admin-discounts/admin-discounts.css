@@ -51,7 +51,23 @@
 /* Table */
 .table-wrap {
   padding: 0;
-  overflow: hidden;
+  overflow-x: auto;
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.alert-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.alert-error .btn {
+  margin-top: 10px;
 }
 
 .table {

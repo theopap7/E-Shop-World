@@ -112,9 +112,9 @@
     <app-skeleton type="card" [count]="6"></app-skeleton>
   </div>
 
-  <div *ngIf="!isLoading && errorMessage" class="error">
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-error">
     {{ errorMessage }}
-    <button class="btn-outline" type="button" (click)="fetchProducts()">
+    <button class="btn btn-primary" type="button" (click)="fetchProducts()">
       Ξαναδοκίμασε
     </button>
   </div>

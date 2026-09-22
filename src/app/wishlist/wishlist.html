@@ -15,13 +15,20 @@
       <app-skeleton type="card" [count]="4"></app-skeleton>
     </div>
 
-    <div *ngIf="!isLoading && items.length === 0" class="empty-state">
+    <div *ngIf="!isLoading && error" class="alert alert-error">
+      Αποτυχία φόρτωσης αγαπημένων.
+      <button class="btn btn-primary" type="button" (click)="retry()">
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading && !error && items.length === 0" class="empty-state">
       <div class="empty-icon">🤍</div>
       <h3>Δεν έχεις αγαπημένα προϊόντα</h3>
       <p>Πάτησε την καρδιά στα προϊόντα που σου αρέσουν για να τα προσθέσεις εδώ!</p>
     </div>
 
-    <div *ngIf="!isLoading && items.length > 0">
+    <div *ngIf="!isLoading && !error && items.length > 0">
 
       <div class="actions-bar">
         <span class="count">{{ items.length }} {{ items.length === 1 ? 'προϊόν' : 'προϊόντα' }}</span>

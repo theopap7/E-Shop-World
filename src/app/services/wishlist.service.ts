@@ -14,6 +14,8 @@ export class WishlistService implements OnDestroy {
   private readonly apiUrl = environment.apiUrl;
   private readonly itemsSubject = new BehaviorSubject<ProductDto[]>([]);
   readonly items$ = this.itemsSubject.asObservable();
+  private readonly loadErrorSubject = new BehaviorSubject<boolean>(false);
+  readonly loadError$ = this.loadErrorSubject.asObservable();
 
   private authSub: Subscription;
   private previousUser: AuthUser | null = null;
@@ -46,11 +48,18 @@ export class WishlistService implements OnDestroy {
     this.authSub.unsubscribe();
   }
 
+  reload(): void {
+    this.loadFromApi();
+  }
+
   private loadFromApi(): void {
+    this.loadErrorSubject.next(false);
+
     this.http
       .get<{ success: boolean; items: ProductDto[] }>(`${this.apiUrl}/wishlist`, { withCredentials: true })
       .pipe(catchError(() => {
         this.toastService.error('Αποτυχία φόρτωσης αγαπημένων');
+        this.loadErrorSubject.next(true);
         return EMPTY;
       }))
       .subscribe(res => {

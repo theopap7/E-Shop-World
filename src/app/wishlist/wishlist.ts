@@ -26,6 +26,7 @@ export class WishlistComponent implements OnInit {
 
   items: ProductDto[] = [];
   isLoading = true;
+  error = false;
   fromProfile = false;
 
   private destroyRef = inject(DestroyRef);
@@ -45,6 +46,16 @@ export class WishlistComponent implements OnInit {
       this.items = items;
       this.isLoading = false;
     });
+
+    this.wishlistService.loadError$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(hasError => {
+      this.error = hasError;
+      if (hasError) this.isLoading = false;
+    });
+  }
+
+  retry(): void {
+    this.isLoading = true;
+    this.wishlistService.reload();
   }
 
   remove(productId: number): void {

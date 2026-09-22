@@ -11,8 +11,11 @@
 
     <div *ngIf="isLoading" class="card">Φόρτωση...</div>
 
-    <div *ngIf="!isLoading && error" class="card">
-      <p>{{ error }}</p>
+    <div *ngIf="!isLoading && error" class="card alert alert-error">
+      <div>{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadReturns()">
+        Ξαναδοκίμασε
+      </button>
     </div>
 
     <div *ngIf="!isLoading && !error && groups.length === 0" class="empty-state">

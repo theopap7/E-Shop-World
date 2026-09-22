@@ -31,6 +31,7 @@ interface DiscountCode {
 export class AdminDiscountsComponent implements OnInit {
   codes: DiscountCode[] = [];
   isLoading = false;
+  error = false;
 
   showModal = false;
   isEditMode = false;
@@ -63,6 +64,7 @@ export class AdminDiscountsComponent implements OnInit {
 
   loadCodes(): void {
     this.isLoading = true;
+    this.error = false;
 
     this.http.get<{ codes: DiscountCode[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
@@ -71,6 +73,7 @@ export class AdminDiscountsComponent implements OnInit {
       },
       error: () => {
         this.toastService.error('Σφάλμα φόρτωσης κωδικών');
+        this.error = true;
         this.isLoading = false;
       }
     });

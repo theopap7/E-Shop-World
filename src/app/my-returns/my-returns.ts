@@ -37,7 +37,13 @@ export class MyReturnsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadReturns();
+  }
+
+  loadReturns(): void {
     this.isLoading = true;
+    this.error = null;
+
     this.orderService.getMyReturns().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.groups = this.buildGroups(res.returns || []);

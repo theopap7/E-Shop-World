@@ -20,7 +20,14 @@
       Φόρτωση...
     </div>
 
-    <div *ngIf="!isLoading" class="card table-wrap">
+    <div *ngIf="!isLoading && error" class="card alert alert-error">
+      <div>Σφάλμα φόρτωσης κωδικών έκπτωσης.</div>
+      <button class="btn btn-primary" type="button" (click)="loadCodes()">
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading && !error" class="card table-wrap">
 
       <div *ngIf="codes.length === 0" class="empty-state">
         Δεν υπάρχουν κωδικοί έκπτωσης

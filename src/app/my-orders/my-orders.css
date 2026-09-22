@@ -94,6 +94,23 @@ section.page {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
+.alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  margin: 10px 0;
+}
+
+.alert-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.alert-error .btn {
+  margin-top: 10px;
+}
+
 .btn-outline {
   background: #ffffff;
   border-color: #e5e7eb;
