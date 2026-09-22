@@ -142,7 +142,12 @@
 
     </div>
 
-    <div class="related-products" *ngIf="!isLoading && relatedProducts.length > 0">
+    <div class="related-products" *ngIf="!isLoading && isLoadingRelated">
+      <h2 class="related-title">Σχετικά Προϊόντα</h2>
+      <app-skeleton type="card" [count]="4"></app-skeleton>
+    </div>
+
+    <div class="related-products" *ngIf="!isLoading && !isLoadingRelated && relatedProducts.length > 0">
       <h2 class="related-title">Σχετικά Προϊόντα</h2>
       <ng-container *ngTemplateOutlet="relatedGrid; context: { $implicit: relatedProducts }"></ng-container>
     </div>

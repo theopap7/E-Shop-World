@@ -67,4 +67,10 @@ export class ProductService {
       `${this.baseUrl}/products/${id}`
     );
   }
+
+  getRelatedProducts(id: number): Observable<{ success: boolean; products: ProductDto[] }> {
+    return this.http.get<{ success: boolean; products: ProductDto[] }>(
+      `${this.baseUrl}/products/${id}/related`
+    );
+  }
 }

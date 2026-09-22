@@ -130,4 +130,29 @@ router.get('/products/:id', async (req, res) => {
   }
 });
 
+router.get('/products/:id/related', async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+
+    if (isNaN(productId)) {
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο ID προϊόντος' });
+    }
+
+    const [rows] = await db.query(`
+      SELECT p.id, p.name, p.price, p.image_url
+      FROM products p
+      WHERE p.category_id = (SELECT category_id FROM products WHERE id = ?)
+        AND p.id != ?
+        AND p.stock > 0
+      ORDER BY p.created_at DESC
+      LIMIT 4
+    `, [productId, productId]);
+
+    res.json({ success: true, products: rows });
+  } catch (error) {
+    console.error('Get related products error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;

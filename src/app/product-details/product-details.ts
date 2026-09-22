@@ -30,6 +30,7 @@ export class ProductDetailComponent implements OnInit {
   isLoading = true;
   error = '';
   relatedProducts: ProductDto[] = [];
+  isLoadingRelated = false;
   recentlyViewed: RecentlyViewedProduct[] = [];
   addedToCart = false;
   selectedQty = 1;
@@ -158,23 +159,23 @@ export class ProductDetailComponent implements OnInit {
   }
 
   loadRelatedProducts(): void {
-    if (!this.product?.category_name) {
+    if (!this.product) {
       this.relatedProducts = [];
       return;
     }
 
-    this.productService.getProducts({ category: this.product.category_name })
+    this.isLoadingRelated = true;
+
+    this.productService.getRelatedProducts(this.product.id)
       .pipe(takeUntil(this.cancelRelated$), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          if (res?.success) {
-            this.relatedProducts = res.products
-              .filter(p => p.id !== this.product!.id)
-              .slice(0, 4);
-          }
+          this.relatedProducts = res?.success ? res.products : [];
+          this.isLoadingRelated = false;
         },
         error: () => {
           this.relatedProducts = [];
+          this.isLoadingRelated = false;
         }
       });
   }
