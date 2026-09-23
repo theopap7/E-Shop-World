@@ -10,6 +10,7 @@ jest.mock('../../utils/mailer', () => ({
 }));
 
 const request = require('supertest');
+const { formatEur } = require('../../utils/format');
 const db = require('../../db');
 const app = require('../../server');
 const { authCookie } = require('../../test-utils/authCookie');
@@ -184,5 +185,23 @@ describe('GET /api/admin/orders/:id/csv', () => {
     const res = await request(app).get('/api/admin/orders/1/csv').set('Cookie', admin());
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toMatch(/text\/csv/);
+    expect(res.text).not.toMatch(/Έκπτωση/);
+  });
+
+  it('adds a discount row so the lines add up to the order total', async () => {
+    db.query
+      .mockResolvedValueOnce([[{
+        id: 2, created_at: new Date(), status: 'delivered', payment_method: 'cod', payment_status: 'paid',
+        total_amount: '166.00', subtotal: '200.00', shipping_cost: '6.00', shipping_method: 'courier_express',
+        discount_code: 'SAVE20', discount_amount: '40.00',
+        ship_address1: 'Main St', ship_city: 'Athens', ship_zip: '12345', ship_country: 'GR',
+        floor: null, ship_notes: null, recipient_name: 'Test', phone: '69000', first_name: 'A', last_name: 'B', email: 'a@b.com'
+      }]])
+      .mockResolvedValueOnce([[{ name: 'Product', quantity: 1, unit_price: '200.00' }]]);
+
+    const res = await request(app).get('/api/admin/orders/2/csv').set('Cookie', admin());
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('"Κωδικός Έκπτωσης","SAVE20"');
+    expect(res.text).toContain(`"Έκπτωση","−${formatEur(40)}"`);
   });
 });

@@ -5,7 +5,7 @@ const { authenticateToken, isAdmin } = require('../../middleware/auth');
 const { sendOrderStatusEmail } = require('../../utils/mailer');
 const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
-const { formatEur, formatDateTime } = require('../../utils/format');
+const { formatEur, formatDateTime, formatPhone, formatZip, formatFloor } = require('../../utils/format');
 
 const STATUS_LABELS = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Αποστολή', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
 
@@ -235,6 +235,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     const [rows] = await db.query(`
       SELECT o.id, o.created_at, o.status, o.payment_method, o.payment_status,
              o.total_amount, o.subtotal, o.shipping_cost, o.shipping_method,
+             o.discount_code, o.discount_amount,
              o.ship_address1, o.ship_city, o.ship_zip,
              o.ship_country, o.floor, o.ship_notes,
              o.recipient_name, o.phone, o.is_gift, o.gift_message,
@@ -280,22 +281,25 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       ['Κατάσταση', STATUS_LABELS[order.status] || order.status],
       ['Πελάτης', order.recipient_name],
       ['Email', order.email],
-      ['Τηλέφωνο', order.phone],
+      ['Τηλέφωνο', formatPhone(order.phone)],
       ['Δώρο', order.is_gift ? (order.gift_message || 'Ναι') : 'Όχι'],
       ['Τρόπος Αποστολής', shippingMethodMap[order.shipping_method] || order.shipping_method],
       ['Τρόπος Πληρωμής', paymentMethodMap[order.payment_method] || order.payment_method],
       ['Κατάσταση Πληρωμής', paymentStatusMap[order.payment_status?.toLowerCase()] || order.payment_status],
       ['Διεύθυνση', order.ship_address1],
       ['Πόλη', order.ship_city],
-      ['ΤΚ', order.ship_zip],
+      ['ΤΚ', formatZip(order.ship_zip)],
       ['Χώρα', order.ship_country],
-      ['Όροφος', order.floor],
+      ['Όροφος', formatFloor(order.floor)],
       ['Σημειώσεις', order.ship_notes],
       ...items.map(({ name, quantity, unit_price, size }, i) =>
         [`Προϊόν ${i + 1}`, `${name}${size ? ` (${size})` : ''} x${quantity} (${eur(unit_price)})`]
       ),
       ['Κόστος Προϊόντων', eur(order.subtotal)],
       ['Μεταφορικά', eur(order.shipping_cost)],
+      ...(Number(order.discount_amount) > 0
+        ? [['Κωδικός Έκπτωσης', order.discount_code], ['Έκπτωση', `−${eur(order.discount_amount)}`]]
+        : []),
       ['Σύνολο', eur(order.total_amount)]
     ];
 

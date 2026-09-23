@@ -38,4 +38,25 @@ function formatDateTime(value) {
   return date ? `${dateFormatter.format(date)} ${timeFormatter.format(date)}` : '';
 }
 
-module.exports = { formatEur, formatDate, formatDateTime };
+function formatPhone(value) {
+  const raw = String(value ?? '').replace(/\s+/g, '');
+  const match = /^(?:\+30|0030)?(\d{10})$/.exec(raw);
+  if (!match) return String(value ?? '');
+  const digits = match[1];
+  const grouped = `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  return raw.length > 10 ? `(+30) ${grouped}` : grouped;
+}
+
+function formatZip(value) {
+  const raw = String(value ?? '').replace(/\s+/g, '');
+  return /^\d{5}$/.test(raw) ? `${raw.slice(0, 3)} ${raw.slice(3)}` : String(value ?? '');
+}
+
+function formatFloor(value) {
+  const raw = String(value ?? '').trim();
+  if (!/^\d+$/.test(raw)) return raw;
+  const floor = Number(raw);
+  return floor === 0 ? 'Ισόγειο' : `${floor}ος`;
+}
+
+module.exports = { formatEur, formatDate, formatDateTime, formatPhone, formatZip, formatFloor };
