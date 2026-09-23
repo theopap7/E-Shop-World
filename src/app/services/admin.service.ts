@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, Subscription, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface Product {
   id: number;
@@ -101,10 +102,17 @@ interface ApiResponse {
 }
 
 @Injectable({ providedIn: 'root' })
-export class AdminService {
+export class AdminService implements OnDestroy {
   private readonly baseUrl = `${environment.apiUrl}/admin`;
+  private authSub: Subscription;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {
+    this.authSub = this.auth.user$.subscribe(() => this.invalidateStatsCache());
+  }
+
+  ngOnDestroy(): void {
+    this.authSub.unsubscribe();
+  }
 
   getProducts(): Observable<{ success: boolean; products: Product[] }> {
     return this.http.get<{ success: boolean; products: Product[] }>(`${this.baseUrl}/products`);

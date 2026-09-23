@@ -19,6 +19,7 @@ import { DiscountService, DiscountValidationResponse } from '../services/discoun
 import { ToastService } from '../services/toast.service';
 import { AddressMapComponent } from '../address-map/address-map';
 import { AuthService } from '../services/auth.service';
+import { AdminService } from '../services/admin.service';
 
 /** Rejects a MM/YY expiry that has already passed (format is checked separately). */
 function cardNotExpiredValidator(): ValidatorFn {
@@ -94,7 +95,8 @@ export class CheckoutComponent implements OnInit {
     private router: Router,
     private discountService: DiscountService,
     private toastService: ToastService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {
     this.form = this.fb.group({
       recipientName: ['', [Validators.required, Validators.minLength(2)]],
@@ -445,6 +447,7 @@ export class CheckoutComponent implements OnInit {
           this.success = `Η παραγγελία δημιουργήθηκε (Order #${id}).`;
           this.toastService.success('Η παραγγελία ολοκληρώθηκε! 🎉');
           this.cart.clear();
+          this.adminService.invalidateStatsCache();
 
           setTimeout(() => {
             this.isSubmitting = false;
