@@ -7,6 +7,7 @@ const { authenticateToken } = require('../middleware/auth');
 const { discountLimiter } = require('../middleware/rateLimiters');
 const { sendOrderConfirmationEmail } = require('../utils/mailer');
 const { restoreStock } = require('../utils/stock');
+const { isDiscountExpired } = require('../utils/discountRules');
 const { formatEur, formatDate } = require('../utils/format');
 
 // Only rate-limit checkout attempts that carry a discount code, so a discount-code
@@ -186,7 +187,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
         return res.status(400).json({ success: false, message: 'Έχεις ήδη χρησιμοποιήσει αυτόν τον κωδικό έκπτωσης' });
       }
 
-      if (d.expires_at && new Date(d.expires_at) < new Date()) {
+      if (isDiscountExpired(d.expires_at)) {
         await conn.rollback();
         return res.status(400).json({ success: false, message: 'Ο κωδικός έχει λήξει' });
       }

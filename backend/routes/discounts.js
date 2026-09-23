@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
 const { discountLimiter } = require('../middleware/rateLimiters');
+const { isDiscountExpired } = require('../utils/discountRules');
 
 router.post('/validate-discount', authenticateToken, discountLimiter, async (req, res) => {
   try {
@@ -33,7 +34,7 @@ router.post('/validate-discount', authenticateToken, discountLimiter, async (req
       return res.status(400).json({ success: false, message: 'Έχεις ήδη χρησιμοποιήσει αυτόν τον κωδικό έκπτωσης' });
     }
 
-    if (discount.expires_at && new Date(discount.expires_at) < new Date()) {
+    if (isDiscountExpired(discount.expires_at)) {
       return res.status(400).json({ success: false, message: 'Ο κωδικός έχει λήξει' });
     }
 
