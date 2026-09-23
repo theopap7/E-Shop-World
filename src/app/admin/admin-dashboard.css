@@ -195,7 +195,7 @@
 .quick-card--returns .quick-icon{ background: linear-gradient(135deg, #64748b, #475569); box-shadow: 0 4px 10px rgba(71, 85, 105, 0.25); }
 /* products keep the default indigo gradient of .quick-icon */
 .quick-card--categories .quick-icon{ background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25); }
-.quick-card--discounts .quick-icon{ background: linear-gradient(135deg, #ec4899, #db2777); box-shadow: 0 4px 10px rgba(236, 72, 153, 0.25); }
+.quick-card--discounts .quick-icon{ background: linear-gradient(135deg, #fde047, #eab308); box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3); }
 .quick-card--users .quick-icon{ background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 4px 10px rgba(6, 182, 212, 0.25); }
 .quick-card--reviews .quick-icon{ background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25); }
 
