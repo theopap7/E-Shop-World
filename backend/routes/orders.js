@@ -738,8 +738,8 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     const paymentMethod = paymentMethodMap[order.payment_method] || order.payment_method;
     const shippingMethod = shippingMethodMap[order.shipping_method] || order.shipping_method;
 
-    doc.font('RobotoBold').fontSize(24).text('ECommerce', 50, 45);
-    doc.font('Roboto').fontSize(10).text('support@ecommerce.com', 50, 70).text('www.ecommerce.com', 50, 85);
+    doc.font('RobotoBold').fontSize(24).text('E-Shop', 50, 45);
+    doc.font('Roboto').fontSize(10).text('support@e-shop.example', 50, 70).text('e-shop-world.vercel.app', 50, 85);
     doc.font('RobotoBold').fontSize(20).text('ΑΠΟΔΕΙΞΗ ΠΑΡΑΓΓΕΛΙΑΣ', 320, 50);
     doc.moveTo(50, 105).lineTo(550, 105).lineWidth(0.5).stroke();
 
@@ -834,7 +834,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     doc.font('Roboto').fontSize(9)
       .fillColor('#888888')
       .text('Ευχαριστούμε για την παραγγελία σας!', 50, tableY, { align: 'center', width: 500 })
-      .text('Για οποιαδήποτε απορία επικοινωνήστε μαζί μας στο support@ecommerce.com', 50, tableY + 13, { align: 'center', width: 500 });
+      .text('Για οποιαδήποτε απορία επικοινωνήστε μαζί μας στο support@e-shop.example', 50, tableY + 13, { align: 'center', width: 500 });
 
     doc.end();
   } catch (error) {
