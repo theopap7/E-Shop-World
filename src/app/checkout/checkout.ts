@@ -368,6 +368,14 @@ export class CheckoutComponent implements OnInit {
     this.toastService.info('Ο κωδικός έκπτωσης αφαιρέθηκε');
   }
 
+  private scrollToFirstInvalidField(): void {
+    setTimeout(() => {
+      const field = document.querySelector<HTMLElement>('form input.ng-invalid, form textarea.ng-invalid');
+      field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      field?.focus({ preventScroll: true });
+    });
+  }
+
   submit(): void {
     if (this.isSubmitting) return;
 
@@ -396,6 +404,7 @@ export class CheckoutComponent implements OnInit {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.error = 'Διόρθωσε τα λάθη στη φόρμα.';
+      this.scrollToFirstInvalidField();
       return;
     }
 

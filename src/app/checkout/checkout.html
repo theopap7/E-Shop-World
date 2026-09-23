@@ -234,7 +234,7 @@
           Πρέπει να αποδεχτείς τους όρους
         </small>
 
-        <button type="submit" [disabled]="isSubmitting || form.invalid || items.length === 0 || !isEmailVerified" class="btn">
+        <button type="submit" [disabled]="isSubmitting || items.length === 0 || !isEmailVerified" class="btn">
           {{ isSubmitting ? 'Γίνεται καταχώρηση...' : 'Ολοκλήρωση παραγγελίας' }}
         </button>
       </form>
