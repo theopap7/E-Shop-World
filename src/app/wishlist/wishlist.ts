@@ -9,6 +9,7 @@ import { ConfirmService } from '../services/confirm.service';
 import { ProductDto } from '../services/product.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { STAR_CLASSES, starFill } from '../shared/star-fill';
 
 @Component({
   selector: 'app-wishlist',
@@ -51,6 +52,10 @@ export class WishlistComponent implements OnInit {
       this.error = hasError;
       if (hasError) this.isLoading = false;
     });
+  }
+
+  starClass(star: number, rating: number | string | null): string {
+    return STAR_CLASSES[starFill(star, rating)];
   }
 
   retry(): void {

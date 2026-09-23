@@ -9,6 +9,7 @@ import { WishlistService } from '../services/wishlist.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { STAR_CLASSES, starFill } from '../shared/star-fill';
 
 @Component({
   selector: 'app-product-list',
@@ -200,14 +201,8 @@ export class ProductListComponent implements OnInit {
     this.cartService.addToCart(product);
   }
 
-  getStarClass(star: number, rating: number): string {
-    if (star <= Math.floor(rating)) {
-      return 'star-filled';
-    } else if (star === Math.ceil(rating) && rating % 1 >= 0.5) {
-      return 'star-half';
-    } else {
-      return 'star-empty';
-    }
+  getStarClass(star: number, rating: number | string | null): string {
+    return STAR_CLASSES[starFill(star, rating)];
   }
 
   toggleWishlist(product: ProductDto, event: Event): void {

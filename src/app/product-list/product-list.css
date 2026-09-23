@@ -379,8 +379,10 @@
 }
 
 .star-half {
-  color: #fbbf24;
-  opacity: 0.6;
+  background: linear-gradient(90deg, #fbbf24 50%, var(--color-border-strong) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .star-empty {

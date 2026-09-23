@@ -5,7 +5,7 @@
     <div class="rating-info">
       <div class="stars-display">
         <span *ngFor="let star of starsArray"
-              [class]="star <= average ? 'star filled' : 'star'">
+              [class]="summaryStarClass(star)">
           ★
         </span>
       </div>

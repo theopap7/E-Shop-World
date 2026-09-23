@@ -8,6 +8,7 @@ import { ReviewService, Review } from '../services/review.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
+import { starFill } from '../shared/star-fill';
 
 @Component({
   selector: 'app-reviews',
@@ -110,6 +111,11 @@ export class ReviewsComponent implements OnInit {
 
   clearHovered(): void {
     this.hoveredRating = 0;
+  }
+
+  summaryStarClass(star: number): string {
+    const fill = starFill(star, this.average);
+    return fill === 'full' ? 'star filled' : fill === 'half' ? 'star half' : 'star';
   }
 
   getStarClass(star: number): string {

@@ -43,6 +43,13 @@
   text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
 }
 
+.stars-display .star.half {
+  background: linear-gradient(90deg, #fbbf24 50%, rgba(255, 255, 255, 0.3) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .total-reviews {
   font-size: 14px;
   opacity: 0.9;

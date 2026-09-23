@@ -164,7 +164,7 @@
         <div class="product-reviews" *ngIf="p.review_count > 0">
           <div class="stars-mini">
             <span *ngFor="let star of [1,2,3,4,5]"
-                  [class]="getStarClass(star, p.average_rating || 0)">
+                  [class]="getStarClass(star, p.average_rating)">
               ★
             </span>
           </div>

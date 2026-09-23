@@ -71,7 +71,7 @@
             <div class="product-reviews" *ngIf="item.review_count > 0">
               <div class="stars-mini">
                 <span *ngFor="let star of [1,2,3,4,5]"
-                      [class]="star <= (item.average_rating || 0) ? 'star-filled' : 'star-empty'">
+                      [class]="starClass(star, item.average_rating)">
                   ★
                 </span>
               </div>
