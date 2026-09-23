@@ -213,3 +213,39 @@ describe('POST /api/orders/:id/return', () => {
     expect(conn.query.mock.calls[6][1]).toEqual([42, 6, 'Κάλτσες', 2, 20, null, 'Ελαττωματικές']);
   });
 });
+
+describe('PATCH /api/orders/:id/cancel', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  function cancelConn(order) {
+    return {
+      query: jest.fn().mockResolvedValueOnce([[order]]).mockResolvedValue([[]]),
+      beginTransaction: jest.fn().mockResolvedValue(undefined),
+      commit: jest.fn().mockResolvedValue(undefined),
+      rollback: jest.fn().mockResolvedValue(undefined),
+      release: jest.fn()
+    };
+  }
+
+  it('lets the customer cancel an order that is still being prepared', async () => {
+    const conn = cancelConn({ id: 10, user_id: 1, status: 'processing', payment_status: 'paid', discount_code: null });
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app).patch('/api/orders/10/cancel').set('Cookie', authCookie());
+
+    expect(res.status).toBe(200);
+    expect(conn.commit).toHaveBeenCalled();
+    expect(conn.query.mock.calls[1][1]).toEqual(['refunded', 10]);
+  });
+
+  it('refuses to cancel an order that has already been shipped', async () => {
+    const conn = cancelConn({ id: 10, user_id: 1, status: 'shipped', payment_status: 'paid', discount_code: null });
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app).patch('/api/orders/10/cancel').set('Cookie', authCookie());
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Η παραγγελία δεν μπορεί πλέον να ακυρωθεί, γιατί έχει ήδη αποσταλεί');
+    expect(conn.rollback).toHaveBeenCalled();
+  });
+});

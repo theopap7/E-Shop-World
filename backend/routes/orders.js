@@ -681,9 +681,12 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
 
     const order = rows[0];
 
-    if (order.status !== 'pending') {
+    if (order.status !== 'pending' && order.status !== 'processing') {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: 'Μπορείτε να ακυρώσετε μόνο παραγγελίες σε αναμονή' });
+      const message = order.status === 'cancelled'
+        ? 'Η παραγγελία έχει ήδη ακυρωθεί'
+        : 'Η παραγγελία δεν μπορεί πλέον να ακυρωθεί, γιατί έχει ήδη αποσταλεί';
+      return res.status(400).json({ success: false, message });
     }
 
     const newPaymentStatus = order.payment_status === 'paid' ? 'refunded' : 'cancelled';

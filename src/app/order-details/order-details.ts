@@ -123,7 +123,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   get canCancel(): boolean {
-    return !this.isAdminPage && this.order?.status === 'pending';
+    return !this.isAdminPage && (this.order?.status === 'pending' || this.order?.status === 'processing');
   }
 
   get canReturn(): boolean {
