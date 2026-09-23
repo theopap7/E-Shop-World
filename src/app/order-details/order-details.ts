@@ -13,6 +13,7 @@ import { CartService } from '../services/cart.service';
 import { statusLabel } from '../services/order-status.util';
 import { returnStatusLabel as returnStatusLabelUtil } from '../services/return-status.util';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { STORE_BANK_ACCOUNT, formatIban } from '../shared/store-bank';
 
 type OrderDto = {
   id: number;
@@ -194,6 +195,8 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   statusLabel = statusLabel;
+  formatIban = formatIban;
+  readonly storeBank = STORE_BANK_ACCOUNT;
 
   shippingMethodLabel(method: string): string {
     if (method === 'courier_standard') return 'Τυπική Αποστολή';

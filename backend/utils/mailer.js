@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const { formatEur } = require('./format');
+const { STORE_BANK_ACCOUNT } = require('./storeBank');
 
 const useSendGrid = !!process.env.SENDGRID_API_KEY;
 if (useSendGrid) {
@@ -151,6 +152,18 @@ async function sendOrderConfirmationEmail(toEmail, order) {
     ? `<p style="margin:4px 0;">${order.address}</p>`
     : `<p style="margin:4px 0;">Παραλαβή από κατάστημα</p>`;
 
+  const bankTransferHtml = order.paymentMethod === 'bank_transfer'
+    ? `
+          <div style="margin-top:20px;padding:14px 16px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;font-size:14px;">
+            <h4 style="margin:0 0 8px;color:#2563eb;">Στοιχεία κατάθεσης</h4>
+            <p style="margin:4px 0;">Δικαιούχος: <strong>${STORE_BANK_ACCOUNT.holder}</strong></p>
+            <p style="margin:4px 0;">IBAN: <strong>${STORE_BANK_ACCOUNT.iban}</strong> (${STORE_BANK_ACCOUNT.bank})</p>
+            <p style="margin:4px 0;">Ποσό: <strong>${formatEur(order.totalAmount)}</strong></p>
+            <p style="margin:4px 0;">Αιτιολογία: <strong>Παραγγελία #${order.id}</strong></p>
+            <p style="margin:8px 0 0;color:#555;font-size:13px;">Θα επιβεβαιώσουμε την πληρωμή εντός 1-2 εργάσιμων ημερών από την κατάθεση.</p>
+          </div>`
+    : '';
+
   return send({
     to: toEmail,
     subject: `Επιβεβαίωση Παραγγελίας #${order.id}`,
@@ -194,7 +207,7 @@ async function sendOrderConfirmationEmail(toEmail, order) {
               <p style="margin:4px 0;color:#555;font-size:14px;">${paymentMethodLabel}</p>
             </div>
           </div>
-
+${bankTransferHtml}
           <p style="margin-top:24px;color:#888;font-size:13px;">Μπορείτε να παρακολουθείτε την παραγγελία σας από τον λογαριασμό σας.</p>
         </div>
       </div>

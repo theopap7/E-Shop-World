@@ -20,6 +20,7 @@ import { ToastService } from '../services/toast.service';
 import { AddressMapComponent } from '../address-map/address-map';
 import { AuthService } from '../services/auth.service';
 import { AdminService } from '../services/admin.service';
+import { STORE_BANK_ACCOUNT } from '../shared/store-bank';
 
 /** Rejects a MM/YY expiry that has already passed (format is checked separately). */
 function cardNotExpiredValidator(): ValidatorFn {
@@ -83,6 +84,7 @@ export class CheckoutComponent implements OnInit {
   discountExpiredPrompt = false;
   orderingForOther = false;
   resendingVerification = false;
+  readonly storeBank = STORE_BANK_ACCOUNT;
 
   private destroyRef = inject(DestroyRef);
 
