@@ -131,6 +131,7 @@
   padding:14px 16px;
   border-bottom:1px solid #e5e7eb;
   white-space:nowrap;
+  text-align:left;
 }
 
 .table tbody td{
@@ -143,7 +144,8 @@
   background:#fbfdff;
 }
 
-.right{ text-align:right; }
+.right,
+.table thead th.right{ text-align:right; }
 
 /* Make comment column stable */
 .table th:nth-child(4),

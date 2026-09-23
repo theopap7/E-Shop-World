@@ -154,7 +154,8 @@
   color:#6b7280;
 }
 
-.right{
+.right,
+.table th.right{
   text-align:right;
 }
 

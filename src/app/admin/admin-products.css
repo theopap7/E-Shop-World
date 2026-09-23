@@ -102,6 +102,7 @@
   padding:14px 14px;
   border-bottom:1px solid #e5e7eb;
   z-index:1;
+  text-align:left;
 }
 
 .table tbody td{
@@ -120,7 +121,8 @@
 }
 
 .mono{ font-variant-numeric: tabular-nums; font-weight:900; }
-.right{ text-align:right; }
+.right,
+.table thead th.right{ text-align:right; }
 .muted{ color:#6b7280; }
 
 /* Thumbnail */
