@@ -1,7 +1,7 @@
 const ORDER_STATUS_LABELS = {
   pending: 'Σε αναμονή',
   processing: 'Σε επεξεργασία',
-  shipped: 'Αποστολή',
+  shipped: 'Απεστάλη',
   delivered: 'Παραδόθηκε',
   cancelled: 'Ακυρώθηκε',
 };
