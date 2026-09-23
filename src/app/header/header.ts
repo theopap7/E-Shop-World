@@ -23,6 +23,7 @@ export class HeaderComponent implements OnInit {
   isAdmin = false;
   wishlistCount = 0;
   isAuthPage = false;
+  loginQueryParams: { returnUrl: string } | null = null;
 
   private destroyRef = inject(DestroyRef);
 
@@ -35,13 +36,11 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isAuthPage = AUTH_ONLY_PATHS.some(p => this.router.url.startsWith(p));
+    this.updateRouteState(this.router.url);
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(e => {
-      this.isAuthPage = AUTH_ONLY_PATHS.some(p => e.urlAfterRedirects.startsWith(p));
-    });
+    ).subscribe(e => this.updateRouteState(e.urlAfterRedirects));
 
     this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.cartCount = this.cartService.getCount();
@@ -57,6 +56,12 @@ export class HeaderComponent implements OnInit {
       this.wishlistCount = this.wishlistService.getCount();
     });
     this.wishlistCount = this.wishlistService.getCount();
+  }
+
+  private updateRouteState(url: string): void {
+    this.isAuthPage = AUTH_ONLY_PATHS.some(p => url.startsWith(p));
+    const keepsPage = !this.isAuthPage && !['/', '/dashboard', '/404'].includes(url);
+    this.loginQueryParams = keepsPage ? { returnUrl: url } : null;
   }
 
   toggleCart(): void {

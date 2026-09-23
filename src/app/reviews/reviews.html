@@ -61,7 +61,7 @@
   </div>
 
   <div *ngIf="!isLoggedIn" class="login-prompt">
-    <a routerLink="/login">Συνδέσου</a> για να γράψεις κριτική.
+    <a routerLink="/login" [queryParams]="{ returnUrl: loginReturnUrl }">Συνδέσου</a> για να γράψεις κριτική.
   </div>
 
   <div *ngIf="isLoading" class="loading">Φόρτωση κριτικών...</div>

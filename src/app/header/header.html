@@ -36,7 +36,7 @@
     </ng-container>
 
     <ng-template #loginLink>
-      <a routerLink="/login" class="action-chip primary">
+      <a routerLink="/login" [queryParams]="loginQueryParams" class="action-chip primary">
         <span class="chip-icon">🔑</span>
         <span class="chip-text">Σύνδεση</span>
       </a>

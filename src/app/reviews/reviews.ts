@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ReviewService, Review } from '../services/review.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
@@ -61,8 +61,13 @@ export class ReviewsComponent implements OnInit {
     private reviewService: ReviewService,
     private authService: AuthService,
     private toastService: ToastService,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private router: Router
   ) {}
+
+  get loginReturnUrl(): string {
+    return `${this.router.url.split('#')[0]}#reviews`;
+  }
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
