@@ -199,7 +199,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
 
       if (subtotal < Number(d.min_order_amount)) {
         await conn.rollback();
-        return res.status(400).json({ success: false, message: `Ελάχιστο ποσό παραγγελίας: ${d.min_order_amount}€` });
+        return res.status(400).json({ success: false, message: `Ελάχιστο ποσό παραγγελίας: ${formatEur(d.min_order_amount)}` });
       }
 
       if (d.type === 'percentage') {

@@ -6,6 +6,7 @@ jest.mock('../db', () => ({
 }));
 
 const request = require('supertest');
+const { formatEur } = require('../utils/format');
 const db = require('../db');
 const app = require('../server');
 const { authCookie } = require('../test-utils/authCookie');
@@ -107,6 +108,7 @@ describe('POST /api/validate-discount', () => {
       .set('Cookie', user())
       .send({ code: 'SALE10', orderTotal: 20 });
     expect(res.status).toBe(400);
+    expect(res.body.message).toBe(`Ελάχιστο ποσό παραγγελίας: ${formatEur(50)}`);
   });
 
   it('applies a percentage discount', async () => {

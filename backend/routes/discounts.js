@@ -4,6 +4,7 @@ const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
 const { discountLimiter } = require('../middleware/rateLimiters');
 const { isDiscountExpired } = require('../utils/discountRules');
+const { formatEur } = require('../utils/format');
 
 router.post('/validate-discount', authenticateToken, discountLimiter, async (req, res) => {
   try {
@@ -48,7 +49,7 @@ router.post('/validate-discount', authenticateToken, discountLimiter, async (req
     }
 
     if (total < Number(discount.min_order_amount)) {
-      return res.status(400).json({ success: false, message: `Ελάχιστο ποσό παραγγελίας: ${discount.min_order_amount}€` });
+      return res.status(400).json({ success: false, message: `Ελάχιστο ποσό παραγγελίας: ${formatEur(discount.min_order_amount)}` });
     }
 
     let discountAmount = 0;
