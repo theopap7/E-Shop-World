@@ -43,6 +43,7 @@ export class ReviewsComponent implements OnInit {
 
   isLoggedIn = false;
   currentUserId: number | null = null;
+  canReview = false;
 
   get hasExistingReview(): boolean {
     if (!this.currentUserId) return false;
@@ -67,6 +68,20 @@ export class ReviewsComponent implements OnInit {
     const user = this.authService.getUser();
     this.currentUserId = user?.id || null;
     this.loadReviews();
+    this.loadEligibility();
+  }
+
+  loadEligibility(): void {
+    if (!this.isLoggedIn) return;
+
+    this.reviewService.getEligibleProducts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        this.canReview = res.products.some(p => p.product_id === this.productId);
+      },
+      error: () => {
+        this.canReview = false;
+      }
+    });
   }
 
   loadReviews(): void {
@@ -204,6 +219,7 @@ export class ReviewsComponent implements OnInit {
       next: () => {
         this.toastService.success('Η κριτική διαγράφηκε');
         this.loadReviews();
+        this.loadEligibility();
       },
       error: (err) => {
         this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής');

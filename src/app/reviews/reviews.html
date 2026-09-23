@@ -15,7 +15,7 @@
 
   <h3>Κριτικές Πελατών</h3>
 
-  <div class="review-form" *ngIf="isLoggedIn && !hasExistingReview">
+  <div class="review-form" *ngIf="isLoggedIn && !hasExistingReview && canReview">
     <h4>Γράψε κριτική</h4>
 
     <div class="star-input" (mouseleave)="clearHovered()">
@@ -54,6 +54,10 @@
   <div *ngIf="isLoggedIn && hasExistingReview" class="already-reviewed">
     <p>✅ Έχεις ήδη γράψει κριτική για αυτό το προϊόν.</p>
     <p>Μπορείς να την επεξεργαστείς ή να τη διαγράψεις παρακάτω.</p>
+  </div>
+
+  <div *ngIf="isLoggedIn && !hasExistingReview && !canReview" class="login-prompt">
+    Μπορείς να γράψεις κριτική αφού αγοράσεις και παραλάβεις αυτό το προϊόν.
   </div>
 
   <div *ngIf="!isLoggedIn" class="login-prompt">
