@@ -10,6 +10,7 @@ import { AdminService } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { CartService } from '../services/cart.service';
+import { ReviewService } from '../services/review.service';
 import { statusLabel } from '../services/order-status.util';
 import { paymentMethodLabel, paymentStatusLabel, shippingMethodLabel } from '../services/order-labels.util';
 import { returnStatusLabel as returnStatusLabelUtil, returnItemSymbol } from '../services/return-status.util';
@@ -94,6 +95,7 @@ export class OrderDetailsComponent implements OnInit {
   returnItems: { productId: number; productName: string; size: string | null; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number; reason: string; blockedStatus: 'approved' | 'rejected' | null }[] = [];
   returnResolvedByLine: Record<string, 'approved' | 'rejected'> = {};
   returnRequests: NonNullable<OrderDetailResponse['returnRequests']> = [];
+  reviewableProductIds: Set<number> | null = null;
 
   get discountRatio(): number {
     const subtotal = Number(this.order?.subtotal ?? 0);
@@ -160,7 +162,8 @@ export class OrderDetailsComponent implements OnInit {
     private adminService: AdminService,
     private toastService: ToastService,
     private cartService: CartService,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private reviewService: ReviewService
   ) {}
 
   ngOnInit(): void {
@@ -198,6 +201,7 @@ export class OrderDetailsComponent implements OnInit {
       }
       this.returnRequests = res?.returnRequests ?? [];
       this.isLoading = false;
+      this.loadReviewEligibility();
     });
 
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
@@ -216,6 +220,22 @@ export class OrderDetailsComponent implements OnInit {
 
   loadDetails(): void {
     this.reload$.next();
+  }
+
+  private loadReviewEligibility(): void {
+    if (this.isAdminPage || this.order?.status !== 'delivered') return;
+    this.reviewService.getEligibleProducts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        this.reviewableProductIds = new Set((res.products ?? []).map(p => p.product_id));
+      },
+      error: () => {
+        this.reviewableProductIds = null;
+      }
+    });
+  }
+
+  hasReviewed(productId: number): boolean {
+    return !!this.reviewableProductIds && !this.reviewableProductIds.has(productId);
   }
 
   statusLabel = statusLabel;

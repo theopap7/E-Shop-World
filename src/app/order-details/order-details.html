@@ -108,7 +108,7 @@
                   × {{ it.unit_price | currency }}
                 </div>
                 <a
-                  *ngIf="!isAdminPage && order.status === 'delivered'"
+                  *ngIf="!isAdminPage && order.status === 'delivered' && !hasReviewed(it.product_id)"
                   [routerLink]="['/products', it.product_id]"
                   fragment="reviews"
                   class="write-review-link"
