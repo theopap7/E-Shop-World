@@ -193,7 +193,7 @@
 
   <option
     value="cancelled"
-    [disabled]="order.status === 'delivered'"
+    [disabled]="order.status !== 'pending' && order.status !== 'processing'"
   >
     {{ statusLabel('cancelled') }}
   </option>

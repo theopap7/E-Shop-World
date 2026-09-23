@@ -7,6 +7,8 @@ const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
 const { formatEur, formatDateTime } = require('../../utils/format');
 
+const STATUS_LABELS = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Αποστολή', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
+
 router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -129,7 +131,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
 
     if (!allowedTransitions[currentStatus].includes(status)) {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από ${currentStatus} σε ${status}` });
+      return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από «${STATUS_LABELS[currentStatus]}» σε «${STATUS_LABELS[status]}»` });
     }
 
     // COD auto-marks paid on delivery and card_mock is paid at checkout, but a
@@ -260,7 +262,6 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       partially_refunded: 'Μερική επιστροφή',
       cancelled: 'Ακυρώθηκε'
     };
-    const statusMap = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Αποστολή', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
     const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };
 
     const q = (val) => {
@@ -276,7 +277,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     const csvRows = [
       ['Αριθμός', order.id],
       ['Ημερομηνία', date],
-      ['Κατάσταση', statusMap[order.status] || order.status],
+      ['Κατάσταση', STATUS_LABELS[order.status] || order.status],
       ['Πελάτης', order.recipient_name],
       ['Email', order.email],
       ['Τηλέφωνο', order.phone],
