@@ -54,6 +54,25 @@ describe('adminGuard', () => {
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
+  it('keeps the admin on the current page when the server is unreachable', async () => {
+    authSpy.isLoggedIn.and.returnValue(true);
+    authSpy.fetchCurrentUser.and.returnValue(throwError(() => ({ status: 0 })));
+    (routerSpy as any).navigated = true;
+
+    expect(await runGuard()).toBeFalse();
+    expect(toastSpy.error).toHaveBeenCalledWith('Ο διακομιστής δεν απαντά. Δοκίμασε ξανά σε λίγο.');
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
+
+  it('sends the admin to /dashboard when the server is unreachable on first load', async () => {
+    authSpy.isLoggedIn.and.returnValue(true);
+    authSpy.fetchCurrentUser.and.returnValue(throwError(() => ({ status: 0 })));
+
+    expect(await runGuard()).toBeFalse();
+    expect(toastSpy.error).toHaveBeenCalledWith('Ο διακομιστής δεν απαντά. Δοκίμασε ξανά σε λίγο.');
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard']);
+  });
+
   it('redirects to /login when a locally-forged admin flag fails server verification', async () => {
     // Regression test: localStorage can be edited client-side (e.g. role: 'admin'
     // spoofed via devtools), so isLoggedIn() alone must never be enough to admit access.

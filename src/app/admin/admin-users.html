@@ -16,7 +16,12 @@
       <div class="panel-title">Φόρτωση χρηστών...</div>
     </div>
 
-    <div *ngIf="!isLoading && error" class="panel alert">{{ error }}</div>
+    <div *ngIf="!isLoading && error" class="panel alert">
+      <div>{{ error }}</div>
+      <button class="btn btn-primary" type="button" (click)="loadUsers()">
+        Ξαναδοκίμασε
+      </button>
+    </div>
 
     <div *ngIf="!isLoading && !error" class="panel">
 

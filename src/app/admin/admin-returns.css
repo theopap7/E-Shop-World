@@ -297,15 +297,25 @@
   border-color: #059669;
 }
 
-.btn-danger-outline {
-  background: white;
-  color: #ef4444;
-  border-color: #fca5a5;
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
-.btn-danger-outline:hover:not(:disabled) {
-  background: #fee2e2;
-  border-color: #ef4444;
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+.alert-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.alert-error .btn {
+  margin-top: 10px;
 }
 
 .pill {
@@ -343,4 +353,3 @@
     min-width: 0;
   }
 }
-

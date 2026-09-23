@@ -261,3 +261,13 @@
     padding: 10px 8px;
   }
 }
+
+.alert-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.alert-error .btn {
+  margin-top: 10px;
+}

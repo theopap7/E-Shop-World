@@ -44,6 +44,7 @@ export class AdminReturnsComponent implements OnInit {
   returns: ReturnRequest[] = [];
   isLoading = false;
   processingId: number | null = null;
+  error = false;
   adminNotes: Record<number, string> = {};
   decisions: Record<number, Decision> = {};
   currentPage = 1;
@@ -66,6 +67,7 @@ export class AdminReturnsComponent implements OnInit {
 
   loadReturns(): void {
     this.isLoading = true;
+    this.error = false;
     this.http.get<{ success: boolean; returns: ReturnRequest[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.returns = res.returns || [];
@@ -74,7 +76,7 @@ export class AdminReturnsComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.toastService.error('Σφάλμα φόρτωσης αιτημάτων');
+        this.error = true;
         this.isLoading = false;
       }
     });

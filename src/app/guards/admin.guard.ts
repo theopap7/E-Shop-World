@@ -25,7 +25,12 @@ export const adminGuard: CanActivateFn = () => {
       router.navigate(['/dashboard']);
       return false;
     }),
-    catchError(() => {
+    catchError((error) => {
+      if (error?.status === 0 || error?.status >= 500) {
+        toast.error('Ο διακομιστής δεν απαντά. Δοκίμασε ξανά σε λίγο.');
+        if (!router.navigated) router.navigate(['/dashboard']);
+        return of(false);
+      }
       router.navigate(['/login']);
       return of(false);
     })

@@ -17,11 +17,18 @@
 
     <div *ngIf="isLoading" class="card">Φόρτωση...</div>
 
-    <div *ngIf="!isLoading && returns.length === 0" class="card empty-state">
+    <div *ngIf="!isLoading && error" class="card alert-error">
+      <div>Σφάλμα φόρτωσης αιτημάτων επιστροφής.</div>
+      <button class="btn btn-primary" type="button" (click)="loadReturns()">
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading && !error && returns.length === 0" class="card empty-state">
       <p>Δεν υπάρχουν αιτήματα επιστροφής.</p>
     </div>
 
-    <div *ngIf="!isLoading && returns.length > 0" class="returns-list">
+    <div *ngIf="!isLoading && !error && returns.length > 0" class="returns-list">
       <div class="return-card" *ngFor="let r of pagedReturns">
 
         <div class="return-header">

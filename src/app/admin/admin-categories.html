@@ -20,7 +20,14 @@
       Φόρτωση...
     </div>
 
-    <div *ngIf="!isLoading" class="card table-wrap">
+    <div *ngIf="!isLoading && error" class="card alert-error">
+      <div>Σφάλμα φόρτωσης κατηγοριών.</div>
+      <button class="btn btn-primary" type="button" (click)="loadCategories()">
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading && !error" class="card table-wrap">
 
       <div *ngIf="categories.length === 0" class="empty-state">
         Δεν υπάρχουν κατηγορίες

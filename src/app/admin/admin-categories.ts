@@ -19,6 +19,7 @@ export class AdminCategoriesComponent implements OnInit {
   isLoading = false;
 
   showModal = false;
+  error = false;
   isEditMode = false;
   editingCategoryId: number | null = null;
   isSaving = false;
@@ -41,6 +42,7 @@ export class AdminCategoriesComponent implements OnInit {
 
   loadCategories(): void {
     this.isLoading = true;
+    this.error = false;
 
     this.adminService.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
@@ -48,7 +50,7 @@ export class AdminCategoriesComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.toastService.error('Σφάλμα φόρτωσης κατηγοριών');
+        this.error = true;
         this.isLoading = false;
       }
     });

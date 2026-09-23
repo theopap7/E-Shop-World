@@ -26,6 +26,12 @@ export class AdminUsersComponent implements OnInit {
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.isLoading = true;
+    this.error = null;
     this.adminService.getUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) this.users = res.users;
