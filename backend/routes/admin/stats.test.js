@@ -47,6 +47,16 @@ describe('GET /api/admin/stats', () => {
     expect(res.body.stats.totalRevenue).toBe(500);
     expect(res.body.charts.topProducts).toHaveLength(1);
   });
+
+  it('limits the initial status and top-product charts to the same 30 days as the revenue chart', async () => {
+    db.query.mockResolvedValue([[{ total: 0 }]]);
+
+    await request(app).get('/api/admin/stats').set('Cookie', admin());
+
+    const chartSql = db.query.mock.calls.slice(7).map(([sql]) => sql);
+    expect(chartSql).toHaveLength(3);
+    chartSql.forEach(sql => expect(sql).toMatch(/INTERVAL 29 DAY/));
+  });
 });
 
 describe('GET /api/admin/stats/charts', () => {

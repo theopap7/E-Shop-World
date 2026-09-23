@@ -39,13 +39,19 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
         WHERE o.created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
         GROUP BY day ORDER BY day ASC
       `),
-      db.query(`SELECT status, COUNT(*) AS count FROM orders GROUP BY status`),
+      db.query(`
+        SELECT status, COUNT(*) AS count
+        FROM orders
+        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
+        GROUP BY status
+      `),
       db.query(`
         SELECT p.name, SUM(oi.quantity) AS total_sold
         FROM order_items oi
         JOIN products p ON p.id = oi.product_id
         JOIN orders o ON o.id = oi.order_id
         WHERE o.status != 'cancelled'
+          AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
         GROUP BY oi.product_id, p.name
         ORDER BY total_sold DESC LIMIT 5
       `)
