@@ -68,7 +68,11 @@ export class AdminDiscountsComponent implements OnInit {
 
     this.http.get<{ codes: DiscountCode[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
-        this.codes = res.codes || [];
+        this.codes = (res.codes || []).map(code => ({
+          ...code,
+          value: Number(code.value),
+          min_order_amount: Number(code.min_order_amount)
+        }));
         this.isLoading = false;
       },
       error: () => {
