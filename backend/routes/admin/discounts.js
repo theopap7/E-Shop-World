@@ -12,7 +12,7 @@ router.get('/admin/discount-codes', authenticateToken, isAdmin, async (req, res)
     res.json({ success: true, codes: rows });
   } catch (error) {
     console.error('Get discount codes error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -25,7 +25,7 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
     }
 
     if (!['percentage', 'fixed'].includes(type)) {
-      return res.status(400).json({ success: false, message: 'Τύπος πρέπει να είναι percentage ή fixed' });
+      return res.status(400).json({ success: false, message: 'Ο τύπος πρέπει να είναι «Ποσοστό» ή «Σταθερό»' });
     }
 
     const valueNum = Number(value);
@@ -62,7 +62,7 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
     res.json({ success: true, message: 'Κωδικός δημιουργήθηκε' });
   } catch (error) {
     console.error('Create discount code error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -76,7 +76,7 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
     }
 
     if (!['percentage', 'fixed'].includes(type)) {
-      return res.status(400).json({ success: false, message: 'Τύπος πρέπει να είναι percentage ή fixed' });
+      return res.status(400).json({ success: false, message: 'Ο τύπος πρέπει να είναι «Ποσοστό» ή «Σταθερό»' });
     }
 
     const valueNum = Number(value);
@@ -120,7 +120,7 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
     res.json({ success: true, message: 'Ο κωδικός ενημερώθηκε' });
   } catch (error) {
     console.error('Update discount code error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -144,7 +144,7 @@ router.delete('/admin/discount-codes/:id', authenticateToken, isAdmin, async (re
     res.json({ success: true, message: 'Κωδικός διαγράφηκε' });
   } catch (error) {
     console.error('Delete discount code error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

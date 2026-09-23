@@ -75,7 +75,7 @@ router.get('/products', async (req, res) => {
     res.json({ success: true, products });
   } catch (error) {
     console.error('Get products error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -128,7 +128,7 @@ router.get('/products/:id', async (req, res) => {
     res.json({ success: true, product, galleryImages });
   } catch (error) {
     console.error('Get product error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -153,7 +153,7 @@ router.get('/products/:id/related', async (req, res) => {
     res.json({ success: true, products: rows });
   } catch (error) {
     console.error('Get related products error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

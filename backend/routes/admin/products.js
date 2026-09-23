@@ -18,7 +18,7 @@ router.get('/admin/products', authenticateToken, isAdmin, async (req, res) => {
     res.json({ success: true, products: rows });
   } catch (error) {
     console.error('Admin get products error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -44,7 +44,7 @@ router.get('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
     res.json({ success: true, product });
   } catch (error) {
     console.error('Admin get product error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -125,7 +125,7 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
     }
   } catch (error) {
     console.error('Admin create product error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -194,7 +194,7 @@ router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
     }
   } catch (error) {
     console.error('Admin update product error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -255,7 +255,7 @@ router.get('/admin/products/:id/images', authenticateToken, isAdmin, async (req,
     res.json({ success: true, images });
   } catch (error) {
     console.error('Gallery get error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

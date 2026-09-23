@@ -22,7 +22,7 @@ router.get('/reviews/my', authenticateToken, async (req, res) => {
     res.json({ success: true, reviews });
   } catch (error) {
     console.error('Get my reviews error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -44,7 +44,7 @@ router.get('/reviews/eligible', authenticateToken, async (req, res) => {
     res.json({ success: true, products });
   } catch (error) {
     console.error('Get eligible-for-review products error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -79,7 +79,7 @@ router.get('/reviews/:productId', async (req, res) => {
     });
   } catch (error) {
     console.error('Get reviews error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -122,7 +122,7 @@ router.post('/reviews/:productId', authenticateToken, async (req, res) => {
     res.status(201).json({ success: true, message: 'Η κριτική υποβλήθηκε με επιτυχία!' });
   } catch (error) {
     console.error('Post review error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -155,7 +155,7 @@ router.put('/reviews/:reviewId', authenticateToken, async (req, res) => {
     res.json({ success: true, message: 'Η κριτική ενημερώθηκε επιτυχώς!' });
   } catch (error) {
     console.error('Update review error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -180,7 +180,7 @@ router.delete('/reviews/:reviewId', authenticateToken, async (req, res) => {
     res.json({ success: true, message: 'Η κριτική διαγράφηκε επιτυχώς' });
   } catch (error) {
     console.error('Delete review error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

@@ -72,7 +72,7 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('Admin stats error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -125,7 +125,7 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
     res.json({ success: true, dailyOrders, statusBreakdown, topProducts });
   } catch (error) {
     console.error('Admin charts error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

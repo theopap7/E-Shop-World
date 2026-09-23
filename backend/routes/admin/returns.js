@@ -32,7 +32,7 @@ router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
     return res.json({ success: true, returns });
   } catch (error) {
     console.error('Admin returns error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -98,11 +98,11 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
     }
 
     await conn.commit();
-    return res.json({ success: true, message: status === 'approved' ? 'Αίτημα εγκρίθηκε — stock & refund ενημερώθηκαν' : 'Αίτημα απορρίφθηκε' });
+    return res.json({ success: true, message: status === 'approved' ? 'Το αίτημα εγκρίθηκε — το απόθεμα και η επιστροφή χρημάτων ενημερώθηκαν' : 'Το αίτημα απορρίφθηκε' });
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Update return error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   } finally {
     if (conn) conn.release();
   }

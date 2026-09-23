@@ -20,7 +20,7 @@ router.get('/admin/reviews', authenticateToken, isAdmin, async (req, res) => {
     res.json({ success: true, reviews });
   } catch (error) {
     console.error('Admin get all reviews error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

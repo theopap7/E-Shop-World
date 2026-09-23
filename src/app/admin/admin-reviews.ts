@@ -44,7 +44,7 @@ export class AdminReviewsComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.error = 'Σφάλμα φόρτωσης reviews.';
+        this.error = 'Σφάλμα φόρτωσης κριτικών.';
         this.isLoading = false;
       }
     });
@@ -62,11 +62,11 @@ export class AdminReviewsComponent implements OnInit {
           this.reviews = this.reviews.filter(r => r.id !== reviewId);
           const maxPage = Math.max(1, Math.ceil(this.reviews.length / this.pageSize));
           if (this.currentPage > maxPage) this.currentPage = maxPage;
-          this.toastService.success('Review διαγράφηκε επιτυχώς!');
+          this.toastService.success('Η κριτική διαγράφηκε επιτυχώς!');
         }
       },
       error: (err) => {
-        this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής review.');
+        this.toastService.error(err.error?.message || 'Σφάλμα διαγραφής κριτικής.');
       }
     });
   }

@@ -25,7 +25,7 @@ router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
     res.json({ success: true, users });
   } catch (error) {
     console.error('Admin users error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

@@ -72,7 +72,7 @@ router.post('/validate-discount', authenticateToken, discountLimiter, async (req
     });
   } catch (error) {
     console.error('Validate discount error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

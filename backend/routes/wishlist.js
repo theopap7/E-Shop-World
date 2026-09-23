@@ -24,36 +24,36 @@ router.get('/wishlist', authenticateToken, async (req, res) => {
     res.json({ success: true, items: rows });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
 router.post('/wishlist/:productId', authenticateToken, async (req, res) => {
   const productId = parseInt(req.params.productId);
-  if (isNaN(productId)) return res.status(400).json({ success: false, message: 'Invalid product ID' });
+  if (isNaN(productId)) return res.status(400).json({ success: false, message: 'Μη έγκυρο ID προϊόντος' });
 
   try {
     const [product] = await db.query('SELECT id FROM products WHERE id = ?', [productId]);
-    if (!product.length) return res.status(404).json({ success: false, message: 'Product not found' });
+    if (!product.length) return res.status(404).json({ success: false, message: 'Το προϊόν δεν βρέθηκε' });
 
     await db.query('INSERT IGNORE INTO wishlists (user_id, product_id) VALUES (?, ?)', [req.user.id, productId]);
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
 router.delete('/wishlist/:productId', authenticateToken, async (req, res) => {
   const productId = parseInt(req.params.productId);
-  if (isNaN(productId)) return res.status(400).json({ success: false, message: 'Invalid product ID' });
+  if (isNaN(productId)) return res.status(400).json({ success: false, message: 'Μη έγκυρο ID προϊόντος' });
 
   try {
     await db.query('DELETE FROM wishlists WHERE user_id = ? AND product_id = ?', [req.user.id, productId]);
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -63,7 +63,7 @@ router.delete('/wishlist', authenticateToken, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

@@ -19,7 +19,7 @@ describe('authenticateToken', () => {
     authenticateToken(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'No token provided' });
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Πρέπει να συνδεθείς' });
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -32,7 +32,7 @@ describe('authenticateToken', () => {
     authenticateToken(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Invalid token' });
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Η συνεδρία δεν είναι έγκυρη. Συνδέσου ξανά.' });
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -71,7 +71,7 @@ describe('isAdmin', () => {
     isAdmin(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Access denied. Admin only.' });
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Δεν έχεις δικαίωμα πρόσβασης.' });
     expect(next).not.toHaveBeenCalled();
   });
 

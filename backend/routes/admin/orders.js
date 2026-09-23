@@ -23,7 +23,7 @@ router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
     res.json({ success: true, orders: rows });
   } catch (error) {
     console.error('Admin get orders error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -89,7 +89,7 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
     res.json({ success: true, order, items, returnRequest, returnRequests: returnRequestsWithItems });
   } catch (error) {
     console.error('Admin order details error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -195,7 +195,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Admin update order status error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   } finally {
     if (conn) conn.release();
   }
@@ -224,7 +224,7 @@ router.patch('/admin/orders/:id/confirm-payment', authenticateToken, isAdmin, as
     res.json({ success: true, message: 'Η πληρωμή επιβεβαιώθηκε' });
   } catch (error) {
     console.error('Confirm payment error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -306,7 +306,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     res.send('﻿' + csv);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

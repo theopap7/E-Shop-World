@@ -77,7 +77,7 @@ router.post('/verify-email', async (req, res) => {
     const { token } = req.body;
 
     if (!token) {
-      return res.status(400).json({ success: false, message: 'Λείπει το token επιβεβαίωσης' });
+      return res.status(400).json({ success: false, message: 'Λείπει ο σύνδεσμος επιβεβαίωσης' });
     }
 
     const [rows] = await db.query(
@@ -157,7 +157,7 @@ router.get('/check-email', checkEmailLimiter, async (req, res) => {
     res.json({ success: true, exists: rows.length > 0 });
   } catch (error) {
     console.error('Check email error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -257,7 +257,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Me error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -350,7 +350,7 @@ router.put('/me', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -384,7 +384,7 @@ router.post('/change-password', authenticateToken, passwordLimiter, async (req, 
     return res.json({ success: true, message: 'Ο κωδικός άλλαξε επιτυχώς' });
   } catch (error) {
     console.error('Change password error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
 
   }
 });

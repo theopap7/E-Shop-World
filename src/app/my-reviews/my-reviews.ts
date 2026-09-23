@@ -111,7 +111,7 @@ export class MyReviewsComponent implements OnInit {
 
   updateReview(reviewId: number): void {
     if (this.editRating < 1 || this.editRating > 5) {
-      this.updateError = 'Το rating πρέπει να είναι από 1 έως 5.';
+      this.updateError = 'Η βαθμολογία πρέπει να είναι από 1 έως 5.';
       return;
     }
 

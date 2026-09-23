@@ -126,7 +126,7 @@ export class ReviewsComponent implements OnInit {
 
   submitReview(): void {
     if (this.newRating === 0) {
-      this.submitError = 'Παρακαλώ επίλεξε rating!';
+      this.submitError = 'Επίλεξε βαθμολογία από 1 έως 5 αστέρια.';
       return;
     }
 
@@ -188,7 +188,7 @@ export class ReviewsComponent implements OnInit {
 
   updateReview(): void {
     if (this.editRating === 0) {
-      this.updateError = 'Παρακαλώ επίλεξε rating!';
+      this.updateError = 'Επίλεξε βαθμολογία από 1 έως 5 αστέρια.';
       return;
     }
 

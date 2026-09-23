@@ -455,7 +455,7 @@ export class CheckoutComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           const id = res.orderId!;
-          this.success = `Η παραγγελία δημιουργήθηκε (Order #${id}).`;
+          this.success = `Η παραγγελία #${id} δημιουργήθηκε.`;
           this.toastService.success('Η παραγγελία ολοκληρώθηκε! 🎉');
           this.cart.clear();
           this.adminService.invalidateStatsCache();

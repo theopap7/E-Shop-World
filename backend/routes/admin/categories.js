@@ -16,7 +16,7 @@ router.get('/admin/categories', authenticateToken, isAdmin, async (req, res) => 
     res.json({ success: true, categories });
   } catch (error) {
     console.error('Admin get categories error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -43,7 +43,7 @@ router.post('/admin/categories', authenticateToken, isAdmin, async (req, res) =>
     res.status(201).json({ success: true, message: 'Η κατηγορία δημιουργήθηκε επιτυχώς', categoryId: result.insertId });
   } catch (error) {
     console.error('Admin create category error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -75,7 +75,7 @@ router.put('/admin/categories/:id', authenticateToken, isAdmin, async (req, res)
     res.json({ success: true, message: 'Η κατηγορία ενημερώθηκε επιτυχώς' });
   } catch (error) {
     console.error('Admin update category error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -100,7 +100,7 @@ router.delete('/admin/categories/:id', authenticateToken, isAdmin, async (req, r
     res.json({ success: true, message: `Η κατηγορία "${categories[0].name}" διαγράφηκε επιτυχώς` });
   } catch (error) {
     console.error('Admin delete category error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

@@ -180,7 +180,7 @@ export class OrderDetailsComponent implements OnInit {
       const id = Number(params.get('orderId'));
 
       if (!Number.isFinite(id)) {
-        this.error = 'Μη έγκυρο order id.';
+        this.error = 'Μη έγκυρος αριθμός παραγγελίας.';
         this.isLoading = false;
         return;
       }

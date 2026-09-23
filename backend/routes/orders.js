@@ -69,7 +69,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
   for (const item of items) {
     const { productId, quantity } = item;
     if (!productId || !Number.isInteger(Number(quantity)) || Number(quantity) <= 0) {
-      return res.status(400).json({ success: false, message: 'Μη έγκυρο order item' });
+      return res.status(400).json({ success: false, message: 'Μη έγκυρο προϊόν στην παραγγελία' });
     }
   }
 
@@ -354,7 +354,7 @@ router.get('/my-orders', authenticateToken, async (req, res) => {
     return res.json({ success: true, orders });
   } catch (error) {
     console.error('My orders error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -389,7 +389,7 @@ router.get('/my-returns', authenticateToken, async (req, res) => {
     return res.json({ success: true, returns });
   } catch (error) {
     console.error('My returns error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -472,7 +472,7 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Order details error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 
@@ -628,7 +628,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Return request error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   } finally {
     if (conn) conn.release();
   }
@@ -692,7 +692,7 @@ router.patch('/orders/:id/cancel', authenticateToken, async (req, res) => {
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Cancel order error:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   } finally {
     if (conn) conn.release();
   }
@@ -839,7 +839,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     doc.end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
   }
 });
 

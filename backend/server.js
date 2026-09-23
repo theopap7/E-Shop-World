@@ -41,12 +41,12 @@ app.use('/api', require('./routes/admin/returns'));
 app.use('/api', require('./routes/admin/categories'));
 
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
+  res.status(404).json({ success: false, message: 'Η διαδρομή δεν βρέθηκε' });
 });
 
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ success: false, message: 'Internal server error' });
+  res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
 });
 
 if (require.main === module) {
