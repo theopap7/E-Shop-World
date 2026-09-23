@@ -55,14 +55,14 @@
             type="number"
             formControlName="price"
             step="0.01"
-            min="0"
+            min="0.01"
           />
 
           <small
             class="err"
             *ngIf="form.get('price')?.touched && form.get('price')?.invalid">
 
-            Η τιμή πρέπει να είναι ≥ 0
+            Η τιμή πρέπει να είναι μεγαλύτερη από 0
 
           </small>
 

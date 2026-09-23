@@ -72,7 +72,7 @@ router.post('/admin/products', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { name, description, price, stock, category_id, image_url, sizes, sizeStock } = req.body;
 
-    if (!name || !price) {
+    if (!name || price === undefined || price === null || price === '') {
       return res.status(400).json({ success: false, message: 'Το όνομα και η τιμή είναι υποχρεωτικά' });
     }
 
@@ -134,7 +134,7 @@ router.put('/admin/products/:id', authenticateToken, isAdmin, async (req, res) =
     const productId = Number(req.params.id);
     const { name, description, price, stock, category_id, image_url, sizes, sizeStock } = req.body;
 
-    if (!name || !price) {
+    if (!name || price === undefined || price === null || price === '') {
       return res.status(400).json({ success: false, message: 'Το όνομα και η τιμή είναι υποχρεωτικά' });
     }
 

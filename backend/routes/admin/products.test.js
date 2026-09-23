@@ -78,6 +78,7 @@ describe('POST /api/admin/products', () => {
       .set('Cookie', admin())
       .send({ name: 'X', price: 0, stock: 5 });
     expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Η τιμή πρέπει να είναι θετικός αριθμός');
   });
 
   it('rejects a negative stock value', async () => {
