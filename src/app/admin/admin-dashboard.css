@@ -5,6 +5,35 @@
 }
 
 
+.panel{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 10px 26px rgba(17,24,39,.06);
+}
+
+.panel-title{ font-weight:900; margin-bottom:8px; }
+.skeleton-lines{ display:grid; gap:10px; }
+.sk{ height:12px; border-radius:999px; background:#eef2f7; }
+.sk.short{ width:60%; }
+
+.alert-text{ font-weight:900; }
+
+.btn{
+  border:1px solid transparent;
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:.2s;
+}
+
 .alert{
   padding:14px 16px;
   border-radius:12px;

@@ -240,6 +240,23 @@
   font-size: 48px;
 }
 
+.empty-cart .btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: white;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.empty-cart .btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
 /* Footer */
 .sidebar-footer {
   padding: 20px;

@@ -129,6 +129,22 @@ textarea{
   margin-bottom:10px;
 }
 
+.upload-error{
+  color:#d93025;
+  font-size:13px;
+  margin-top:8px;
+}
+
+.btn-outline.danger{
+  color:#dc2626;
+  border-color:#fecaca;
+}
+
+.btn-outline.danger:hover{
+  background:#fef2f2;
+  border-color:#dc2626;
+}
+
 .preview img{
   max-width:150px;
   border-radius:8px;
