@@ -25,23 +25,27 @@ export class WishlistService implements OnDestroy {
     private toastService: ToastService,
     private auth: AuthService
   ) {
-    const currentUser = this.auth.getUser();
-    this.previousUser = currentUser;
+    this.previousUser = this.activeUser(this.auth.getUser());
 
-    if (this.auth.isLoggedIn()) {
+    if (this.previousUser) {
       this.loadFromApi();
     } else {
       this.itemsSubject.next(this.loadGuestFromStorage());
     }
 
     this.authSub = this.auth.user$.subscribe(user => {
-      if (user && !this.previousUser) {
+      const activeUser = this.activeUser(user);
+      if (activeUser && !this.previousUser) {
         this.mergeGuestToApi();
-      } else if (!user && this.previousUser) {
+      } else if (!activeUser && this.previousUser) {
         this.itemsSubject.next(this.loadGuestFromStorage());
       }
-      this.previousUser = user;
+      this.previousUser = activeUser;
     });
+  }
+
+  private activeUser(user: AuthUser | null): AuthUser | null {
+    return user && this.auth.isLoggedIn() ? user : null;
   }
 
   ngOnDestroy(): void {
