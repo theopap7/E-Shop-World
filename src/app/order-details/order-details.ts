@@ -11,6 +11,7 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { CartService } from '../services/cart.service';
 import { statusLabel } from '../services/order-status.util';
+import { paymentMethodLabel, paymentStatusLabel, shippingMethodLabel } from '../services/order-labels.util';
 import { returnStatusLabel as returnStatusLabelUtil } from '../services/return-status.util';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { STORE_BANK_ACCOUNT, formatIban } from '../shared/store-bank';
@@ -198,30 +199,9 @@ export class OrderDetailsComponent implements OnInit {
   formatIban = formatIban;
   readonly storeBank = STORE_BANK_ACCOUNT;
 
-  shippingMethodLabel(method: string): string {
-    if (method === 'courier_standard') return 'Τυπική Αποστολή';
-    if (method === 'courier_express') return 'Γρήγορη Αποστολή';
-    if (method === 'pickup') return 'Παραλαβή από κατάστημα';
-    return method || '—';
-  }
-
-  paymentMethodLabel(method: string): string {
-    if (method === 'cod') return 'Αντικαταβολή';
-    if (method === 'card_mock') return 'Κάρτα';
-    if (method === 'bank_transfer') return 'Τραπεζική κατάθεση';
-    return method || '—';
-  }
-
-  paymentStatusLabel(status: string): string {
-    const x = (status || '').toUpperCase();
-    if (x === 'PAID') return 'Πληρωμένη';
-    if (x === 'PENDING') return 'Σε εκκρεμότητα';
-    if (x === 'REFUNDED') return 'Επιστροφή χρημάτων';
-    if (x === 'PARTIALLY_REFUNDED') return 'Μερική επιστροφή';
-    if (x === 'FAILED') return 'Αποτυχία';
-    if (x === 'CANCELLED') return 'Ακυρώθηκε';
-    return status || '—';
-  }
+  shippingMethodLabel = shippingMethodLabel;
+  paymentMethodLabel = paymentMethodLabel;
+  paymentStatusLabel = paymentStatusLabel;
 
   async cancelOrder(): Promise<void> {
     const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;', { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });

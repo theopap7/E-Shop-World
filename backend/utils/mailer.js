@@ -1,6 +1,12 @@
 const nodemailer = require('nodemailer');
 const { formatEur } = require('./format');
 const { STORE_BANK_ACCOUNT } = require('./storeBank');
+const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('./labels');
+
+const DELIVERY_ESTIMATES = {
+  courier_standard: '3-5 εργάσιμες',
+  courier_express: '1-2 εργάσιμες',
+};
 
 const useSendGrid = !!process.env.SENDGRID_API_KEY;
 if (useSendGrid) {
@@ -127,17 +133,11 @@ async function sendVerificationEmail(toEmail, verifyLink) {
 }
 
 async function sendOrderConfirmationEmail(toEmail, order) {
-  const shippingMethodLabel = {
-    courier_standard: 'Τυπική αποστολή (3-5 εργάσιμες)',
-    courier_express: 'Γρήγορη αποστολή (1-2 εργάσιμες)',
-    pickup: 'Παραλαβή από κατάστημα'
-  }[order.shippingMethod] || order.shippingMethod;
+  const shippingName = SHIPPING_METHOD_LABELS[order.shippingMethod] || order.shippingMethod;
+  const deliveryEstimate = DELIVERY_ESTIMATES[order.shippingMethod];
+  const shippingMethodLabel = deliveryEstimate ? `${shippingName} (${deliveryEstimate})` : shippingName;
 
-  const paymentMethodLabel = {
-    cod: 'Αντικαταβολή',
-    card_mock: 'Πληρωμή με κάρτα',
-    bank_transfer: 'Τραπεζική μεταφορά'
-  }[order.paymentMethod] || order.paymentMethod;
+  const paymentMethodLabel = PAYMENT_METHOD_LABELS[order.paymentMethod] || order.paymentMethod;
 
   const itemsHtml = order.items.map(item => `
     <tr>
@@ -150,7 +150,7 @@ async function sendOrderConfirmationEmail(toEmail, order) {
 
   const addressHtml = order.shippingMethod !== 'pickup'
     ? `<p style="margin:4px 0;">${order.address}</p>`
-    : `<p style="margin:4px 0;">Παραλαβή από κατάστημα</p>`;
+    : `<p style="margin:4px 0;">${SHIPPING_METHOD_LABELS.pickup}</p>`;
 
   const bankTransferHtml = order.paymentMethod === 'bank_transfer'
     ? `

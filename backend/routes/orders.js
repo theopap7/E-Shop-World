@@ -9,6 +9,7 @@ const { sendOrderConfirmationEmail } = require('../utils/mailer');
 const { restoreStock } = require('../utils/stock');
 const { isDiscountExpired } = require('../utils/discountRules');
 const { formatEur, formatDate } = require('../utils/format');
+const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../utils/labels');
 
 // Only rate-limit checkout attempts that carry a discount code, so a discount-code
 // brute-force can't bypass the /validate-discount limiter by going through /orders instead.
@@ -724,9 +725,6 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       WHERE oi.order_id = ?
     `, [orderId]);
 
-    const paymentMethodMap = { cod: 'Αντικαταβολή', card_mock: 'Κάρτα', bank_transfer: 'Τραπεζική Μεταφορά' };
-    const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };
-
     const doc = new PDFDocument({ margin: 50 });
     doc.registerFont('Roboto', path.join(__dirname, '..', 'fonts', 'Roboto-Regular.ttf'));
     doc.registerFont('RobotoBold', path.join(__dirname, '..', 'fonts', 'Roboto-Bold.ttf'));
@@ -735,8 +733,8 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename=order-${order.id}.pdf`);
     doc.pipe(res);
 
-    const paymentMethod = paymentMethodMap[order.payment_method] || order.payment_method;
-    const shippingMethod = shippingMethodMap[order.shipping_method] || order.shipping_method;
+    const paymentMethod = PAYMENT_METHOD_LABELS[order.payment_method] || order.payment_method;
+    const shippingMethod = SHIPPING_METHOD_LABELS[order.shipping_method] || order.shipping_method;
 
     doc.font('RobotoBold').fontSize(24).text('E-Shop', 50, 45);
     doc.font('Roboto').fontSize(10).text('support@e-shop.example', 50, 70).text('e-shop-world.vercel.app', 50, 85);
@@ -760,7 +758,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       .text(`Ονοματεπώνυμο: ${order.recipient_name}`, 300, 136);
 
     if (order.shipping_method === 'pickup') {
-      doc.text('Παραλαβή από το κατάστημα', 300, 151, { width: 230 });
+      doc.text(SHIPPING_METHOD_LABELS.pickup, 300, 151, { width: 230 });
       doc.text(`Τηλέφωνο: ${order.phone}`, 300, 166, { width: 230, lineBreak: false });
     } else if (order.floor) {
       doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });

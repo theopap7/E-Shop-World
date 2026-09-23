@@ -6,8 +6,7 @@ const { sendOrderStatusEmail } = require('../../utils/mailer');
 const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
 const { formatEur, formatDateTime, formatPhone, formatZip, formatFloor } = require('../../utils/format');
-
-const STATUS_LABELS = { pending: 'Σε αναμονή', processing: 'Σε επεξεργασία', shipped: 'Αποστολή', delivered: 'Παραδόθηκε', cancelled: 'Ακυρώθηκε' };
+const { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../../utils/labels');
 
 router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -131,7 +130,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
 
     if (!allowedTransitions[currentStatus].includes(status)) {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από «${STATUS_LABELS[currentStatus]}» σε «${STATUS_LABELS[status]}»` });
+      return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από «${ORDER_STATUS_LABELS[currentStatus]}» σε «${ORDER_STATUS_LABELS[status]}»` });
     }
 
     // COD auto-marks paid on delivery and card_mock is paid at checkout, but a
@@ -254,17 +253,6 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       WHERE oi.order_id = ?
     `, [orderId]);
 
-    const paymentMethodMap = { cod: 'Αντικαταβολή', card_mock: 'Πληρωμή με Κάρτα', bank_transfer: 'Τραπεζική Μεταφορά' };
-    const paymentStatusMap = {
-      paid: 'Πληρωμένη',
-      unpaid: 'Μη πληρωμένη',
-      pending: 'Σε εκκρεμότητα',
-      refunded: 'Επιστροφή χρημάτων',
-      partially_refunded: 'Μερική επιστροφή',
-      cancelled: 'Ακυρώθηκε'
-    };
-    const shippingMethodMap = { courier_standard: 'Τυπική Αποστολή', courier_express: 'Γρήγορη Αποστολή', pickup: 'Παραλαβή από το Κατάστημα' };
-
     const q = (val) => {
       let str = String(val ?? '');
       // Neutralize CSV/formula injection: spreadsheet apps treat a cell
@@ -278,14 +266,14 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     const csvRows = [
       ['Αριθμός', order.id],
       ['Ημερομηνία', date],
-      ['Κατάσταση', STATUS_LABELS[order.status] || order.status],
+      ['Κατάσταση', ORDER_STATUS_LABELS[order.status] || order.status],
       ['Πελάτης', order.recipient_name],
       ['Email', order.email],
       ['Τηλέφωνο', formatPhone(order.phone)],
       ['Δώρο', order.is_gift ? (order.gift_message || 'Ναι') : 'Όχι'],
-      ['Τρόπος Αποστολής', shippingMethodMap[order.shipping_method] || order.shipping_method],
-      ['Τρόπος Πληρωμής', paymentMethodMap[order.payment_method] || order.payment_method],
-      ['Κατάσταση Πληρωμής', paymentStatusMap[order.payment_status?.toLowerCase()] || order.payment_status],
+      ['Τρόπος Αποστολής', SHIPPING_METHOD_LABELS[order.shipping_method] || order.shipping_method],
+      ['Τρόπος Πληρωμής', PAYMENT_METHOD_LABELS[order.payment_method] || order.payment_method],
+      ['Κατάσταση Πληρωμής', PAYMENT_STATUS_LABELS[order.payment_status] || order.payment_status],
       ['Διεύθυνση', order.ship_address1],
       ['Πόλη', order.ship_city],
       ['ΤΚ', formatZip(order.ship_zip)],

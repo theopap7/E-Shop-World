@@ -230,7 +230,7 @@
                 : order.payment_status === 'partially_refunded' ? 'pill--partial'
                 : 'pill--pendingPay'"
             >
-              {{ paymentStatusLabel(order.payment_status) }}
+              {{ paymentStatusLabel(order.payment_status, order.status) }}
             </span>
 
           </div>
