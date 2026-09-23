@@ -98,7 +98,9 @@ router.get('/products/:id', async (req, res) => {
         p.created_at,
         p.category_id,
         p.sizes,
-        c.name AS category_name
+        c.name AS category_name,
+        (SELECT ROUND(AVG(r.rating), 1) FROM reviews r WHERE r.product_id = p.id) AS average_rating,
+        (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) AS review_count
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
       WHERE p.id = ?
