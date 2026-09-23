@@ -323,12 +323,20 @@
                     <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty > 1 ? item.selectedQty - 1 : 1">−</button>
                     <span class="qty-val">{{ item.selectedQty }}</span>
                     <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty < item.maxQty ? item.selectedQty + 1 : item.maxQty">+</button>
-                    <span class="return-item-price">{{ (item.selectedQty * item.unitPrice) | currency }}</span>
+                    <span class="return-item-price">{{ refundFor(item) | currency }}</span>
                   </div>
                   <div class="return-item-qty" *ngIf="!item.selected && !item.blockedStatus">
                     <span class="muted">{{ item.maxQty }} τεμ.</span>
                   </div>
                 </div>
+              </div>
+
+              <div class="return-total" *ngIf="selectedReturnItems.length > 0">
+                <span>
+                  Ποσό επιστροφής
+                  <small *ngIf="order.discount_code && discountRatio > 0">(μετά την έκπτωση {{ order.discount_code }})</small>
+                </span>
+                <strong>{{ returnTotal | currency }}</strong>
               </div>
 
               <label class="return-label" style="margin-top:12px">Λόγος επιστροφής <span style="color:#ef4444">*</span></label>
@@ -400,13 +408,17 @@
                 class="return-status-item-thumb"
                 (error)="$any($event.target).src='no-image.svg'"
               />
-              <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container></span>
+              <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container> × {{ it.quantity }}</span>
             </div>
           </div>
         </div>
         <div class="return-status-row">
           <span class="return-status-label">Λόγος</span>
           <span>{{ rr.reason }}</span>
+        </div>
+        <div class="return-status-row" *ngIf="rr.status !== 'rejected'">
+          <span class="return-status-label">{{ rr.status === 'approved' ? 'Επιστράφηκαν' : 'Ποσό επιστροφής' }}</span>
+          <strong>{{ rr.refund_amount | currency }}</strong>
         </div>
         <div class="return-status-row" *ngIf="rr.admin_note">
           <span class="return-status-label">Σχόλιο</span>

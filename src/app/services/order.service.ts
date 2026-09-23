@@ -108,6 +108,7 @@ export interface OrderDetailResponse {
     status: 'pending' | 'approved' | 'rejected';
     reason: string;
     admin_note?: string | null;
+    refund_amount: number;
     created_at: string;
     items: { product_id: number; product_name: string; quantity: number; unit_price: number; size?: string | null; image_url?: string | null }[];
   }[];

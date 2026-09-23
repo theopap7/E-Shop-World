@@ -441,7 +441,7 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
     );
 
     const [returnRows] = await db.query(
-      'SELECT id, status, reason, admin_note, created_at FROM return_requests WHERE order_id = ? ORDER BY created_at DESC',
+      'SELECT id, status, reason, admin_note, refund_amount, created_at FROM return_requests WHERE order_id = ? ORDER BY created_at DESC',
       [orderId]
     );
     const returnRequest = returnRows.length ? returnRows[0] : null;

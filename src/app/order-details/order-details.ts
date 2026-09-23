@@ -94,10 +94,21 @@ export class OrderDetailsComponent implements OnInit {
   returnResolvedByLine: Record<string, 'approved' | 'rejected'> = {};
   returnRequests: NonNullable<OrderDetailResponse['returnRequests']> = [];
 
+  get discountRatio(): number {
+    const subtotal = Number(this.order?.subtotal ?? 0);
+    const discount = Number(this.order?.discount_amount ?? 0);
+    return subtotal > 0 ? discount / subtotal : 0;
+  }
+
+  refundFor(item: { selectedQty: number; unitPrice: number }): number {
+    return item.selectedQty * Number(item.unitPrice) * (1 - this.discountRatio);
+  }
+
   get returnTotal(): number {
-    return this.returnItems
-      .filter(i => i.selected && i.selectedQty > 0)
-      .reduce((sum, i) => sum + i.selectedQty * i.unitPrice, 0);
+    const returnedSubtotal = this.selectedReturnItems
+      .reduce((sum, i) => sum + i.selectedQty * Number(i.unitPrice), 0);
+    const refund = Number((returnedSubtotal * (1 - this.discountRatio)).toFixed(2));
+    return Math.min(refund, Number(this.order?.total_amount ?? 0));
   }
 
   get selectedReturnItems() {

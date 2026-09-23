@@ -720,6 +720,32 @@
   font-weight: 600;
 }
 
+.return-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.return-total small {
+  display: block;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.return-total strong {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px;
+}
+
 .total-row {
   margin-top: 6px;
   padding-top: 14px;

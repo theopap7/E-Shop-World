@@ -71,8 +71,8 @@
                   </div>
                 </div>
               </div>
-              <div class="info-row" *ngIf="r.status === 'approved'">
-                <span class="info-label">Επιστροφή</span>
+              <div class="info-row" *ngIf="r.status !== 'rejected'">
+                <span class="info-label">{{ r.status === 'approved' ? 'Επιστράφηκαν' : 'Ποσό επιστροφής' }}</span>
                 <strong style="color:#059669">{{ r.refund_amount | currency }}</strong>
               </div>
               <div class="info-row" *ngIf="r.admin_note">
