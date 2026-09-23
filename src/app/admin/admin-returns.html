@@ -36,6 +36,7 @@
             [ngClass]="{
               'pill--pending': r.status === 'pending',
               'pill--approved': r.status === 'approved',
+              'pill--partial': r.status === 'partially_approved',
               'pill--rejected': r.status === 'rejected'
             }">
             {{ statusLabel(r.status) }}
@@ -51,7 +52,7 @@
             <span class="info-label">Αξία Παραγγελίας</span>
             <span>{{ r.total_amount | currency }}</span>
           </div>
-          <div class="info-row">
+          <div class="info-row" *ngIf="r.reason">
             <span class="info-label">Λόγος</span>
             <span class="return-reason">{{ r.reason }}</span>
           </div>
@@ -65,13 +66,32 @@
                   class="return-item-thumb"
                   (error)="$any($event.target).src='no-image.svg'"
                 />
-                <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
-                <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | currency }} = <strong>{{ (item.quantity * item.unit_price) | currency }}</strong></span>
+                <div class="return-item-main">
+                  <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
+                  <span class="return-item-reason" *ngIf="item.reason">Λόγος: {{ item.reason }}</span>
+                  <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | currency }} = <strong>{{ (item.quantity * item.unit_price) | currency }}</strong></span>
+                </div>
+                <div class="decision-toggle" *ngIf="r.status === 'pending'" role="group" [attr.aria-label]="'Απόφαση για ' + item.product_name">
+                  <button type="button" class="decision-btn decision-btn--approve"
+                    [class.active]="decisions[item.id] === 'approved'"
+                    [attr.aria-pressed]="decisions[item.id] === 'approved'"
+                    [disabled]="processingId === r.id"
+                    (click)="setDecision(item, 'approved')">✓ Έγκριση</button>
+                  <button type="button" class="decision-btn decision-btn--reject"
+                    [class.active]="decisions[item.id] === 'rejected'"
+                    [attr.aria-pressed]="decisions[item.id] === 'rejected'"
+                    [disabled]="processingId === r.id"
+                    (click)="setDecision(item, 'rejected')">✕ Απόρριψη</button>
+                </div>
+                <span class="pill pill--sm" *ngIf="r.status !== 'pending'"
+                  [ngClass]="{ 'pill--approved': item.status === 'approved', 'pill--rejected': item.status === 'rejected' }">
+                  {{ itemSymbol(item.status) }} {{ statusLabel(item.status) }}
+                </span>
               </div>
             </div>
           </div>
           <div class="info-row" *ngIf="r.status !== 'rejected'">
-            <span class="info-label">{{ r.status === 'approved' ? 'Επιστράφηκαν' : 'Ποσό επιστροφής' }}</span>
+            <span class="info-label">{{ r.status === 'pending' ? 'Ζητούμενο ποσό' : 'Επιστράφηκαν' }}</span>
             <strong style="color:#059669">{{ r.refund_amount | currency }}</strong>
           </div>
           <div class="info-row" *ngIf="r.admin_note">
@@ -81,6 +101,11 @@
         </div>
 
         <div class="return-actions" *ngIf="r.status === 'pending'">
+          <div class="bulk-decisions">
+            <button type="button" class="link-btn" [disabled]="processingId === r.id" (click)="setAllDecisions(r, 'approved')">Έγκριση όλων</button>
+            <span class="dot">•</span>
+            <button type="button" class="link-btn" [disabled]="processingId === r.id" (click)="setAllDecisions(r, 'rejected')">Απόρριψη όλων</button>
+          </div>
           <textarea
             class="admin-note-input"
             [(ngModel)]="adminNotes[r.id]"
@@ -89,15 +114,16 @@
             rows="2">
           </textarea>
           <div class="action-buttons">
-            <button class="btn btn-danger-outline"
-              (click)="updateStatus(r, 'rejected')"
-              [disabled]="processingId === r.id">
-              ✕ Απόρριψη
-            </button>
+            <span class="refund-preview" *ngIf="allDecided(r)">
+              Θα επιστραφούν: <strong>{{ decidedRefund(r) | currency }}</strong>
+            </span>
+            <span class="refund-preview muted" *ngIf="!allDecided(r)">
+              Διάλεξε έγκριση ή απόρριψη για κάθε προϊόν
+            </span>
             <button class="btn btn-success"
-              (click)="updateStatus(r, 'approved')"
-              [disabled]="processingId === r.id">
-              ✓ Έγκριση
+              (click)="submitDecisions(r)"
+              [disabled]="processingId === r.id || !allDecided(r)">
+              Ολοκλήρωση ελέγχου
             </button>
           </div>
         </div>

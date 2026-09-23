@@ -304,7 +304,7 @@
               <span class="return-icon">↩</span>
               <div>
                 <h3 class="h3" style="margin:0 0 4px 0">Επιστροφή Προϊόντος</h3>
-                <p class="return-hint">Έχεις πρόβλημα με την παραγγελία; Υπόβαλε αίτημα επιστροφής.</p>
+                <p class="return-hint">{{ returnHint }}</p>
               </div>
             </div>
             <div *ngIf="canReturn && !showReturnForm">
@@ -338,6 +338,15 @@
                   <div class="return-item-qty" *ngIf="!item.selected && !item.blockedStatus">
                     <span class="muted">{{ item.maxQty }} τεμ.</span>
                   </div>
+                  <input
+                    *ngIf="item.selected && !item.blockedStatus"
+                    class="return-item-reason"
+                    type="text"
+                    maxlength="500"
+                    [(ngModel)]="item.reason"
+                    [name]="'reason_' + item.productId + '_' + item.size"
+                    [attr.aria-label]="'Λόγος επιστροφής για ' + item.productName"
+                    placeholder="Λόγος επιστροφής * (π.χ. ελαττωματικό, λάθος μέγεθος)" />
                 </div>
               </div>
 
@@ -349,23 +358,15 @@
                 <strong>{{ returnTotal | currency }}</strong>
               </div>
 
-              <label class="return-label" style="margin-top:12px">Λόγος επιστροφής <span style="color:#ef4444">*</span></label>
-              <textarea
-                class="return-textarea"
-                [(ngModel)]="returnReason"
-                name="returnReason"
-                placeholder="π.χ. Ελαττωματικό προϊόν, λάθος μέγεθος..."
-                rows="3">
-              </textarea>
               <div class="return-actions">
                 <button class="btn btn-outline" type="button"
-                  (click)="showReturnForm = false; returnReason = ''"
+                  (click)="showReturnForm = false"
                   [disabled]="isSubmittingReturn">
                   Ακύρωση
                 </button>
                 <button class="btn btn-warning" type="button"
                   (click)="submitReturn()"
-                  [disabled]="isSubmittingReturn || !returnReason.trim() || selectedReturnItems.length === 0">
+                  [disabled]="isSubmittingReturn || missingReturnReason || selectedReturnItems.length === 0">
                   <span *ngIf="!isSubmittingReturn">Υποβολή Αιτήματος</span>
                   <span *ngIf="isSubmittingReturn">Υποβολή...</span>
                 </button>
@@ -403,6 +404,7 @@
             [ngClass]="{
               'pill--pending': rr.status === 'pending',
               'pill--delivered': rr.status === 'approved',
+              'pill--shipped': rr.status === 'partially_approved',
               'pill--cancelled': rr.status === 'rejected'
             }">
             {{ returnStatusLabel(rr.status) }}
@@ -411,23 +413,32 @@
         <div class="return-status-row return-status-items-row" *ngIf="rr.items && rr.items.length > 0">
           <span class="return-status-label">Προϊόντα</span>
           <div class="return-status-items">
-            <div class="return-status-item" *ngFor="let it of rr.items">
+            <div class="return-status-item"
+              *ngFor="let it of rr.items"
+              [class.return-status-item--approved]="it.status === 'approved'"
+              [class.return-status-item--rejected]="it.status === 'rejected'">
               <img
                 [src]="it.image_url | imageUrl"
                 [alt]="it.product_name"
                 class="return-status-item-thumb"
                 (error)="$any($event.target).src='no-image.svg'"
               />
-              <span>{{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container> × {{ it.quantity }}</span>
+              <div class="return-status-item-text">
+                <span>
+                  <span class="return-status-item-symbol" *ngIf="rr.status !== 'pending'" [attr.aria-label]="returnStatusLabel(it.status)">{{ returnItemSymbol(it.status) }}</span>
+                  {{ it.product_name }}<ng-container *ngIf="it.size"> ({{ it.size }})</ng-container> × {{ it.quantity }}
+                </span>
+                <small *ngIf="it.reason">{{ it.reason }}</small>
+              </div>
             </div>
           </div>
         </div>
-        <div class="return-status-row">
+        <div class="return-status-row" *ngIf="rr.reason">
           <span class="return-status-label">Λόγος</span>
           <span>{{ rr.reason }}</span>
         </div>
         <div class="return-status-row" *ngIf="rr.status !== 'rejected'">
-          <span class="return-status-label">{{ rr.status === 'approved' ? 'Επιστράφηκαν' : 'Ποσό επιστροφής' }}</span>
+          <span class="return-status-label">{{ rr.status === 'pending' ? 'Ποσό επιστροφής' : 'Επιστράφηκαν' }}</span>
           <strong>{{ rr.refund_amount | currency }}</strong>
         </div>
         <div class="return-status-row" *ngIf="rr.admin_note">

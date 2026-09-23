@@ -165,3 +165,51 @@ describe('POST /api/orders', () => {
     expect(orderInsertCall[1]).not.toContain('Should be ignored');
   });
 });
+
+describe('POST /api/orders/:id/return', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('requires a reason for every returned item', async () => {
+    const res = await request(app)
+      .post('/api/orders/10/return')
+      .set('Cookie', authCookie())
+      .send({ items: [{ productId: 5, quantity: 1, reason: 'Λάθος μέγεθος' }, { productId: 6, quantity: 1, reason: '  ' }] });
+
+    expect(res.status).toBe(400);
+    expect(db.getConnection).not.toHaveBeenCalled();
+  });
+
+  it('stores each item with its own reason and refunds after the discount', async () => {
+    const conn = {
+      query: jest.fn()
+        .mockResolvedValueOnce([[{ status: 'delivered', subtotal: 100, discount_amount: 10, total_amount: 95 }]])
+        .mockResolvedValueOnce([[]])
+        .mockResolvedValueOnce([[
+          { product_id: 5, size: 'M', quantity: 1, unit_price: 60, product_name: 'Μπλούζα' },
+          { product_id: 6, size: null, quantity: 2, unit_price: 20, product_name: 'Κάλτσες' }
+        ]])
+        .mockResolvedValueOnce([[]])
+        .mockResolvedValueOnce([{ insertId: 42 }])
+        .mockResolvedValue([{}]),
+      beginTransaction: jest.fn().mockResolvedValue(undefined),
+      commit: jest.fn().mockResolvedValue(undefined),
+      rollback: jest.fn().mockResolvedValue(undefined),
+      release: jest.fn()
+    };
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app)
+      .post('/api/orders/10/return')
+      .set('Cookie', authCookie())
+      .send({ items: [
+        { productId: 5, quantity: 1, size: 'm', reason: ' Λάθος μέγεθος ' },
+        { productId: 6, quantity: 2, reason: 'Ελαττωματικές' }
+      ] });
+
+    expect(res.status).toBe(200);
+    expect(conn.commit).toHaveBeenCalled();
+    expect(conn.query.mock.calls[4][1]).toEqual([10, 1, 90]);
+    expect(conn.query.mock.calls[5][1]).toEqual([42, 5, 'Μπλούζα', 1, 60, 'M', 'Λάθος μέγεθος']);
+    expect(conn.query.mock.calls[6][1]).toEqual([42, 6, 'Κάλτσες', 2, 20, null, 'Ελαττωματικές']);
+  });
+});

@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { OrderService, MyReturnRow } from '../services/order.service';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
-import { returnStatusLabel } from '../services/return-status.util';
+import { returnStatusLabel, returnItemSymbol } from '../services/return-status.util';
 
 interface OrderReturnGroup {
   orderId: number;
@@ -75,4 +75,5 @@ export class MyReturnsComponent implements OnInit {
   }
 
   statusLabel = returnStatusLabel;
+  itemSymbol = returnItemSymbol;
 }

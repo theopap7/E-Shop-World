@@ -9,7 +9,7 @@ router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
     const [rows] = await db.query(
       `SELECT rr.id, rr.order_id, rr.reason, rr.status, rr.admin_note, rr.refund_amount, rr.created_at,
               u.first_name, u.last_name, u.email,
-              o.total_amount, o.status AS order_status
+              o.total_amount, o.subtotal, o.discount_amount, o.status AS order_status
        FROM return_requests rr
        JOIN users u ON u.id = rr.user_id
        JOIN orders o ON o.id = rr.order_id
@@ -17,9 +17,10 @@ router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
     );
 
     const [itemRows] = await db.query(
-      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, p.image_url
+      `SELECT rri.id, rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, rri.status, rri.reason, p.image_url
        FROM return_request_items rri
-       LEFT JOIN products p ON p.id = rri.product_id`
+       LEFT JOIN products p ON p.id = rri.product_id
+       ORDER BY rri.id`
     );
 
     const itemsByRequest = {};
@@ -38,10 +39,11 @@ router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
 
 router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) => {
   const returnId = Number(req.params.id);
-  const { status, adminNote } = req.body;
+  const { items, adminNote } = req.body;
 
-  if (!['approved', 'rejected'].includes(status)) {
-    return res.status(400).json({ success: false, message: 'Μη έγκυρη κατάσταση' });
+  if (!Array.isArray(items) || items.length === 0 ||
+      items.some(item => !item || !Number.isInteger(Number(item.id)) || !['approved', 'rejected'].includes(item.status))) {
+    return res.status(400).json({ success: false, message: 'Μη έγκυρη απόφαση για τα προϊόντα' });
   }
 
   let conn;
@@ -50,7 +52,7 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
     await conn.beginTransaction();
 
     const [rows] = await conn.query(
-      `SELECT rr.id, rr.order_id, rr.status AS current_status, o.subtotal, o.discount_amount
+      `SELECT rr.id, rr.order_id, rr.status AS current_status, o.subtotal, o.discount_amount, o.total_amount
        FROM return_requests rr JOIN orders o ON o.id = rr.order_id
        WHERE rr.id = ? FOR UPDATE`,
       [returnId]
@@ -68,19 +70,50 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
       return res.status(400).json({ success: false, message: 'Το αίτημα έχει ήδη επεξεργαστεί' });
     }
 
-    await conn.query(
-      'UPDATE return_requests SET status = ?, admin_note = ? WHERE id = ?',
-      [status, adminNote?.trim() || null, returnId]
+    const [returnItems] = await conn.query(
+      'SELECT id, product_id, quantity, unit_price, size FROM return_request_items WHERE return_request_id = ?',
+      [returnId]
     );
 
-    if (status === 'approved') {
+    const decisionById = new Map(items.map(item => [Number(item.id), item.status]));
+    if (decisionById.size !== returnItems.length || returnItems.some(item => !decisionById.has(item.id))) {
+      await conn.rollback();
+      return res.status(400).json({ success: false, message: 'Πρέπει να αποφασίσεις για κάθε προϊόν του αιτήματος' });
+    }
+
+    const approvedItems = returnItems.filter(item => decisionById.get(item.id) === 'approved');
+    const status = approvedItems.length === returnItems.length
+      ? 'approved'
+      : approvedItems.length === 0 ? 'rejected' : 'partially_approved';
+
+    const subtotal = Number(returnReq.subtotal);
+    const discountRatio = subtotal > 0 ? Number(returnReq.discount_amount) / subtotal : 0;
+    const approvedSubtotal = approvedItems.reduce((sum, item) => sum + item.quantity * Number(item.unit_price), 0);
+    const refundAmount = Math.min(
+      Number((approvedSubtotal * (1 - discountRatio)).toFixed(2)),
+      Number(returnReq.total_amount)
+    );
+
+    for (const item of returnItems) {
+      await conn.query(
+        'UPDATE return_request_items SET status = ? WHERE id = ?',
+        [decisionById.get(item.id), item.id]
+      );
+    }
+
+    await conn.query(
+      'UPDATE return_requests SET status = ?, admin_note = ?, refund_amount = ? WHERE id = ?',
+      [status, adminNote?.trim() || null, refundAmount, returnId]
+    );
+
+    if (approvedItems.length > 0) {
       // Refunds never include shipping, so compare against the item total (subtotal minus
       // discount), not total_amount — otherwise a full-item return would still look "partial".
-      const itemsChargedTotal = Number(returnReq.subtotal) - Number(returnReq.discount_amount);
+      const itemsChargedTotal = subtotal - Number(returnReq.discount_amount);
 
       const [[{ totalRefunded }]] = await conn.query(
         `SELECT COALESCE(SUM(refund_amount), 0) AS totalRefunded
-         FROM return_requests WHERE order_id = ? AND status = 'approved'`,
+         FROM return_requests WHERE order_id = ? AND status IN ('approved', 'partially_approved')`,
         [returnReq.order_id]
       );
 
@@ -90,15 +123,16 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
         [isFullRefund ? 'refunded' : 'partially_refunded', returnReq.order_id]
       );
 
-      const [returnItems] = await conn.query(
-        'SELECT product_id, quantity, size FROM return_request_items WHERE return_request_id = ?',
-        [returnId]
-      );
-      await restoreStock(conn, returnItems);
+      await restoreStock(conn, approvedItems);
     }
 
     await conn.commit();
-    return res.json({ success: true, message: status === 'approved' ? 'Το αίτημα εγκρίθηκε — το απόθεμα και η επιστροφή χρημάτων ενημερώθηκαν' : 'Το αίτημα απορρίφθηκε' });
+    const messages = {
+      approved: 'Το αίτημα εγκρίθηκε — το απόθεμα και η επιστροφή χρημάτων ενημερώθηκαν',
+      partially_approved: 'Το αίτημα εγκρίθηκε μερικώς — το απόθεμα και η επιστροφή χρημάτων ενημερώθηκαν για τα εγκεκριμένα προϊόντα',
+      rejected: 'Το αίτημα απορρίφθηκε'
+    };
+    return res.json({ success: true, status, message: messages[status] });
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Update return error:', error);

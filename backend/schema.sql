@@ -116,8 +116,8 @@ CREATE TABLE return_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
   user_id INT NOT NULL,
-  reason TEXT NOT NULL,
-  status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  reason TEXT NULL,
+  status ENUM('pending', 'approved', 'rejected', 'partially_approved') DEFAULT 'pending',
   admin_note TEXT,
   refund_amount DECIMAL(10,2) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -133,6 +133,8 @@ CREATE TABLE return_request_items (
   quantity INT NOT NULL,
   unit_price DECIMAL(10,2) NOT NULL,
   size VARCHAR(20) NULL,
+  status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+  reason TEXT NULL,
   FOREIGN KEY (return_request_id) REFERENCES return_requests(id) ON DELETE CASCADE
 );
 

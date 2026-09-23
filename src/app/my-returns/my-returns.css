@@ -222,8 +222,22 @@
   flex-shrink: 0;
 }
 
-.return-item-name {
+.return-item-main {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.return-item-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.return-item-reason {
+  color: #374151;
+  overflow-wrap: anywhere;
 }
 
 .return-item {
@@ -251,3 +265,9 @@
 .pill--pending { background: #fef3c7; color: #92400e; }
 .pill--approved { background: #d1fae5; color: #065f46; }
 .pill--rejected { background: #fee2e2; color: #991b1b; }
+.pill--partial { background: #dbeafe; color: #1e40af; }
+
+.pill--sm {
+  padding: 2px 8px;
+  font-size: 11px;
+}

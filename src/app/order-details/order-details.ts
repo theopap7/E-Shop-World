@@ -5,14 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { Subject, EMPTY } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { OrderService, OrderDetailResponse } from '../services/order.service';
+import { OrderService, OrderDetailResponse, ReturnRequestStatus } from '../services/order.service';
 import { AdminService } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { CartService } from '../services/cart.service';
 import { statusLabel } from '../services/order-status.util';
 import { paymentMethodLabel, paymentStatusLabel, shippingMethodLabel } from '../services/order-labels.util';
-import { returnStatusLabel as returnStatusLabelUtil } from '../services/return-status.util';
+import { returnStatusLabel as returnStatusLabelUtil, returnItemSymbol } from '../services/return-status.util';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { STORE_BANK_ACCOUNT, formatIban } from '../shared/store-bank';
 
@@ -45,8 +45,8 @@ type OrderDto = {
   customer_phone?: string | null;
   return_request?: {
     id: number;
-    status: 'pending' | 'approved' | 'rejected';
-    reason: string;
+    status: ReturnRequestStatus;
+    reason: string | null;
     admin_note?: string | null;
     created_at: string;
   } | null;
@@ -90,9 +90,8 @@ export class OrderDetailsComponent implements OnInit {
   isReordering = false;
 
   showReturnForm = false;
-  returnReason = '';
   isSubmittingReturn = false;
-  returnItems: { productId: number; productName: string; size: string | null; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number; blockedStatus: 'approved' | 'rejected' | null }[] = [];
+  returnItems: { productId: number; productName: string; size: string | null; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number; reason: string; blockedStatus: 'approved' | 'rejected' | null }[] = [];
   returnResolvedByLine: Record<string, 'approved' | 'rejected'> = {};
   returnRequests: NonNullable<OrderDetailResponse['returnRequests']> = [];
 
@@ -117,6 +116,10 @@ export class OrderDetailsComponent implements OnInit {
     return this.returnItems.filter(i => i.selected && i.selectedQty > 0);
   }
 
+  get missingReturnReason(): boolean {
+    return this.selectedReturnItems.some(i => !i.reason.trim());
+  }
+
   get canCancel(): boolean {
     return !this.isAdminPage && this.order?.status === 'pending';
   }
@@ -125,6 +128,26 @@ export class OrderDetailsComponent implements OnInit {
     if (this.isAdminPage || this.order?.status !== 'delivered') return false;
     if (this.order?.return_request?.status === 'pending') return false;
     return this.items.some(i => !this.returnResolvedByLine[lineKey(i.product_id, i.size)]);
+  }
+
+  get returnHint(): string {
+    const pending = this.returnRequests.find(r => r.status === 'pending');
+    if (pending) {
+      const pendingLines = new Set(pending.items.map(i => lineKey(i.product_id, i.size)));
+      const othersLeft = this.items.some(i => {
+        const key = lineKey(i.product_id, i.size);
+        return !pendingLines.has(key) && !this.returnResolvedByLine[key];
+      });
+      return othersLeft
+        ? 'Το αίτημά σου ελέγχεται. Όταν ολοκληρωθεί ο έλεγχος, μπορείς να ζητήσεις επιστροφή και για τα υπόλοιπα προϊόντα.'
+        : 'Το αίτημά σου ελέγχεται. Θα δεις εδώ την απάντηση για κάθε προϊόν.';
+    }
+    if (!this.canReturn) {
+      return 'Όλα τα προϊόντα αυτής της παραγγελίας έχουν ήδη ελεγχθεί για επιστροφή.';
+    }
+    return this.returnRequests.length > 0
+      ? 'Μπορείς να ζητήσεις επιστροφή και για τα προϊόντα που δεν έχεις επιστρέψει ακόμα.'
+      : 'Έχεις πρόβλημα με την παραγγελία; Υπόβαλε αίτημα επιστροφής.';
   }
 
   private destroyRef = inject(DestroyRef);
@@ -231,6 +254,7 @@ export class OrderDetailsComponent implements OnInit {
       selectedQty: i.quantity,
       selected: false,
       unitPrice: i.unit_price,
+      reason: '',
       blockedStatus: this.returnResolvedByLine[lineKey(i.product_id, i.size)] ?? null
     }));
     this.showReturnForm = true;
@@ -241,21 +265,20 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   submitReturn(): void {
-    if (!this.returnReason.trim()) {
-      this.toastService.warning('Συμπλήρωσε τον λόγο επιστροφής');
-      return;
-    }
     if (this.selectedReturnItems.length === 0) {
       this.toastService.warning('Επίλεξε τουλάχιστον ένα προϊόν');
       return;
     }
+    if (this.missingReturnReason) {
+      this.toastService.warning('Συμπλήρωσε τον λόγο επιστροφής για κάθε προϊόν');
+      return;
+    }
     this.isSubmittingReturn = true;
-    const items = this.selectedReturnItems.map(i => ({ productId: i.productId, quantity: i.selectedQty, size: i.size }));
-    this.orderService.submitReturnRequest(this.orderId, this.returnReason, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const items = this.selectedReturnItems.map(i => ({ productId: i.productId, quantity: i.selectedQty, size: i.size, reason: i.reason.trim() }));
+    this.orderService.submitReturnRequest(this.orderId, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Το αίτημα επιστροφής υποβλήθηκε!');
         this.showReturnForm = false;
-        this.returnReason = '';
         this.adminService.invalidateStatsCache();
         this.loadDetails();
         this.isSubmittingReturn = false;
@@ -268,6 +291,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   returnStatusLabel = returnStatusLabelUtil;
+  returnItemSymbol = returnItemSymbol;
 
   reorderAll(): void {
     if (this.isReordering || this.items.length === 0) return;

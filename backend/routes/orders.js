@@ -337,10 +337,17 @@ router.get('/my-orders', authenticateToken, async (req, res) => {
          o.shipping_method, o.shipping_cost,
          o.payment_method, o.payment_status,
          (
-           SELECT GROUP_CONCAT(DISTINCT rr.status)
-           FROM return_requests rr
+           SELECT GROUP_CONCAT(DISTINCT rri.status)
+           FROM return_request_items rri
+           JOIN return_requests rr ON rr.id = rri.return_request_id
            WHERE rr.order_id = o.id
-         ) AS return_statuses
+         ) AS return_statuses,
+         (
+           SELECT GROUP_CONCAT(DISTINCT CONCAT(rri.status, '::', rri.product_name, IF(rri.size IS NULL, '', CONCAT(' (', rri.size, ')'))) SEPARATOR '||')
+           FROM return_request_items rri
+           JOIN return_requests rr ON rr.id = rri.return_request_id
+           WHERE rr.order_id = o.id
+         ) AS return_products
        FROM orders o
        WHERE o.user_id = ?
        ORDER BY o.created_at DESC`,
@@ -349,7 +356,13 @@ router.get('/my-orders', authenticateToken, async (req, res) => {
 
     const orders = rows.map(r => ({
       ...r,
-      return_statuses: r.return_statuses ? r.return_statuses.split(',') : []
+      return_statuses: r.return_statuses ? r.return_statuses.split(',') : [],
+      return_products: r.return_products
+        ? r.return_products.split('||').map(entry => {
+            const [status, ...name] = entry.split('::');
+            return { name: name.join('::'), status };
+          })
+        : []
     }));
 
     return res.json({ success: true, orders });
@@ -372,11 +385,12 @@ router.get('/my-returns', authenticateToken, async (req, res) => {
     );
 
     const [itemRows] = await db.query(
-      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, p.image_url
+      `SELECT rri.id, rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, rri.status, rri.reason, p.image_url
        FROM return_request_items rri
        JOIN return_requests rr ON rr.id = rri.return_request_id
        LEFT JOIN products p ON p.id = rri.product_id
-       WHERE rr.user_id = ?`,
+       WHERE rr.user_id = ?
+       ORDER BY rri.id`,
       [userId]
     );
 
@@ -448,11 +462,12 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
     const returnRequest = returnRows.length ? returnRows[0] : null;
 
     const [resolvedItemRows] = await db.query(
-      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, rr.status, p.image_url
+      `SELECT rri.id, rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, rri.status, rri.reason, p.image_url
        FROM return_request_items rri
        JOIN return_requests rr ON rr.id = rri.return_request_id
        LEFT JOIN products p ON p.id = rri.product_id
-       WHERE rr.order_id = ?`,
+       WHERE rr.order_id = ?
+       ORDER BY rri.id`,
       [orderId]
     );
 
@@ -480,14 +495,18 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
 router.post('/orders/:id/return', authenticateToken, async (req, res) => {
   const userId = req.user.id;
   const orderId = Number(req.params.id);
-  const { reason, items } = req.body;
-
-  if (!reason || !String(reason).trim()) {
-    return res.status(400).json({ success: false, message: 'Παρακαλώ συμπλήρωσε τον λόγο επιστροφής' });
-  }
+  const { items } = req.body;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ success: false, message: 'Επίλεξε τουλάχιστον ένα προϊόν για επιστροφή' });
+  }
+
+  if (items.some(item => !item || typeof item.reason !== 'string' || !item.reason.trim())) {
+    return res.status(400).json({ success: false, message: 'Συμπλήρωσε τον λόγο επιστροφής για κάθε προϊόν' });
+  }
+
+  if (items.some(item => item.reason.trim().length > 500)) {
+    return res.status(400).json({ success: false, message: 'Ο λόγος επιστροφής είναι πολύ μεγάλος (μέγιστο 500 χαρακτήρες)' });
   }
 
   let conn;
@@ -547,6 +566,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     // Aggregate requested quantity per (product, size) so duplicate/split lines
     // for the same line in one request can't each pass validation independently.
     const requestedByLine = {};
+    const reasonByLine = {};
     for (const item of items) {
       const productId = Number(item.productId);
       const qty = Number(item.quantity);
@@ -557,6 +577,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       }
       const key = lineKey(productId, size);
       requestedByLine[key] = (requestedByLine[key] || 0) + qty;
+      if (!reasonByLine[key]) reasonByLine[key] = item.reason.trim();
     }
 
     // Lines already resolved (approved or rejected) in a past return request
@@ -564,10 +585,10 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     // approved means it was already refunded, rejected means the admin already
     // decided against it for that specific product+size.
     const [resolvedRows] = await conn.query(
-      `SELECT rri.product_id, rri.size, rr.status
+      `SELECT rri.product_id, rri.size, rri.status
        FROM return_request_items rri
        JOIN return_requests rr ON rr.id = rri.return_request_id
-       WHERE rr.order_id = ? AND rr.status IN ('approved', 'rejected')`,
+       WHERE rr.order_id = ? AND rri.status IN ('approved', 'rejected')`,
       [orderId]
     );
     const resolvedStatusByLine = {};
@@ -601,7 +622,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       }
 
       returnedSubtotal += totalQty * purchased.unitPrice;
-      validatedItems.push({ productId: purchased.productId, productName: purchased.productName, size: purchased.size, quantity: totalQty, unitPrice: purchased.unitPrice });
+      validatedItems.push({ productId: purchased.productId, productName: purchased.productName, size: purchased.size, quantity: totalQty, unitPrice: purchased.unitPrice, reason: reasonByLine[key] });
     }
 
     // Apply discount proportionally to returned items
@@ -611,16 +632,16 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     refundAmount = Math.min(refundAmount, orderTotalAmount);
 
     const [result] = await conn.query(
-      'INSERT INTO return_requests (order_id, user_id, reason, refund_amount) VALUES (?, ?, ?, ?)',
-      [orderId, userId, String(reason).trim(), refundAmount]
+      'INSERT INTO return_requests (order_id, user_id, refund_amount) VALUES (?, ?, ?)',
+      [orderId, userId, refundAmount]
     );
 
     const returnRequestId = result.insertId;
 
     for (const item of validatedItems) {
       await conn.query(
-        'INSERT INTO return_request_items (return_request_id, product_id, product_name, quantity, unit_price, size) VALUES (?, ?, ?, ?, ?, ?)',
-        [returnRequestId, item.productId, item.productName, item.quantity, item.unitPrice, item.size]
+        'INSERT INTO return_request_items (return_request_id, product_id, product_name, quantity, unit_price, size, reason) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [returnRequestId, item.productId, item.productName, item.quantity, item.unitPrice, item.size, item.reason]
       );
     }
 

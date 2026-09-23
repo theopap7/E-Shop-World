@@ -511,38 +511,11 @@
   max-width: 38ch;
 }
 
-.return-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-
 .return-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 16px;
-}
-
-.return-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-  background: var(--surface);
-  color: var(--ink);
-}
-
-.return-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
 }
 
 .return-actions {
@@ -601,6 +574,39 @@
   padding: 4px 8px 4px 4px;
 }
 
+.return-status-item--approved {
+  border-color: var(--success-soft);
+}
+
+.return-status-item--rejected {
+  border-color: var(--danger-soft);
+}
+
+.return-status-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.return-status-item-text small {
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
+.return-status-item-symbol {
+  font-weight: 700;
+}
+
+.return-status-item--approved .return-status-item-symbol {
+  color: var(--success);
+}
+
+.return-status-item--rejected .return-status-item-symbol {
+  color: var(--danger);
+}
+
 .return-status-item-thumb {
   width: 22px;
   height: 22px;
@@ -627,6 +633,7 @@
 
 .return-item-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
@@ -663,6 +670,23 @@
   font-size: 14px;
   color: var(--ink);
   font-weight: 500;
+}
+
+.return-item-reason {
+  flex-basis: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+.return-item-reason:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .return-item-qty {

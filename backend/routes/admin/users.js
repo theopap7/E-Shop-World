@@ -16,7 +16,7 @@ router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
       LEFT JOIN orders o ON o.user_id = u.id
       LEFT JOIN (
         SELECT order_id, SUM(refund_amount) AS refunded
-        FROM return_requests WHERE status = 'approved'
+        FROM return_requests WHERE status IN ('approved', 'partially_approved')
         GROUP BY order_id
       ) ref ON ref.order_id = o.id
       GROUP BY u.id

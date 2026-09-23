@@ -16,7 +16,7 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
         FROM orders o
         LEFT JOIN (
           SELECT order_id, SUM(refund_amount) AS refunded
-          FROM return_requests WHERE status = 'approved'
+          FROM return_requests WHERE status IN ('approved', 'partially_approved')
           GROUP BY order_id
         ) ref ON ref.order_id = o.id
         WHERE o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded')
@@ -33,7 +33,7 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
         FROM orders o
         LEFT JOIN (
           SELECT order_id, SUM(refund_amount) AS refunded
-          FROM return_requests WHERE status = 'approved'
+          FROM return_requests WHERE status IN ('approved', 'partially_approved')
           GROUP BY order_id
         ) ref ON ref.order_id = o.id
         WHERE o.created_at >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
@@ -96,7 +96,7 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
         FROM orders o
         LEFT JOIN (
           SELECT order_id, SUM(refund_amount) AS refunded
-          FROM return_requests WHERE status = 'approved'
+          FROM return_requests WHERE status IN ('approved', 'partially_approved')
           GROUP BY order_id
         ) ref ON ref.order_id = o.id
         ${dateFilter}

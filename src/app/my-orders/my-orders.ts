@@ -2,18 +2,22 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { OrderService } from '../services/order.service';
+import { OrderService, ReturnItemStatus } from '../services/order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { statusLabel } from '../services/order-status.util';
+import { returnItemSymbol } from '../services/return-status.util';
+
+type ReturnProduct = { name: string; status: ReturnItemStatus };
 
 type OrderRow = {
   id: number;
   total_amount: number;
   status: string;
   created_at: string;
-  return_statuses?: ('pending' | 'approved' | 'rejected')[];
+  return_statuses?: ReturnItemStatus[];
+  return_products?: ReturnProduct[];
 };
 
 
@@ -68,6 +72,12 @@ export class MyOrdersComponent implements OnInit {
   }
 
   statusLabel = statusLabel;
+
+  returnItemSymbol = returnItemSymbol;
+
+  returnProductsTitle(products: ReturnProduct[]): string {
+    return products.map(p => `${returnItemSymbol(p.status)} ${p.name}`).join(', ');
+  }
 
 
   normalizeStatus(status: string): 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' {

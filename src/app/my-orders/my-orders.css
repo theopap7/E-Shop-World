@@ -218,6 +218,7 @@ section.page {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .order-top {
@@ -244,6 +245,18 @@ section.page {
   font-size: 13px;
   color: #6b7280;
 }
+
+.return-products {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.return-product--approved { color: #166534; }
+
+.return-product--rejected { color: #b91c1c; }
 
 .order-right {
   display: flex;

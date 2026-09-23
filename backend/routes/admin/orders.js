@@ -72,10 +72,11 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
     const returnRequest = returnRows[0] ?? null;
 
     const returnItemRows = returnRows.length ? (await db.query(
-      `SELECT rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, p.image_url
+      `SELECT rri.id, rri.return_request_id, rri.product_id, rri.product_name, rri.quantity, rri.unit_price, rri.size, rri.status, rri.reason, p.image_url
        FROM return_request_items rri
        LEFT JOIN products p ON p.id = rri.product_id
-       WHERE rri.return_request_id IN (${returnRows.map(() => '?').join(',')})`,
+       WHERE rri.return_request_id IN (${returnRows.map(() => '?').join(',')})
+       ORDER BY rri.id`,
       returnRows.map(r => r.id)
     ))[0] : [];
     const itemsByRequestId = {};

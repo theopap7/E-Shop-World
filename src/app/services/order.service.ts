@@ -46,12 +46,28 @@ export interface CreateOrderResponse {
   paymentStatus?: string;
 }
 
+export type ReturnRequestStatus = 'pending' | 'approved' | 'rejected' | 'partially_approved';
+export type ReturnItemStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ReturnItem {
+  id: number;
+  product_id: number;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  size?: string | null;
+  status: ReturnItemStatus;
+  reason?: string | null;
+  image_url?: string | null;
+}
+
 export interface OrderSummary {
   id: number;
   total_amount: number;
   status: string;
   created_at: string;
-  return_statuses?: ('pending' | 'approved' | 'rejected')[];
+  return_statuses?: ReturnItemStatus[];
+  return_products?: { name: string; status: ReturnItemStatus }[];
 }
 
 export interface OrderDetailItem {
@@ -97,32 +113,32 @@ export interface OrderDetailResponse {
   items: OrderDetailItem[];
   returnRequest?: {
     id: number;
-    status: 'pending' | 'approved' | 'rejected';
-    reason: string;
+    status: ReturnRequestStatus;
+    reason: string | null;
     admin_note?: string | null;
     created_at: string;
   } | null;
   returnResolvedItems?: { product_id: number; size: string | null; status: 'approved' | 'rejected' }[];
   returnRequests?: {
     id: number;
-    status: 'pending' | 'approved' | 'rejected';
-    reason: string;
+    status: ReturnRequestStatus;
+    reason: string | null;
     admin_note?: string | null;
     refund_amount: number;
     created_at: string;
-    items: { product_id: number; product_name: string; quantity: number; unit_price: number; size?: string | null; image_url?: string | null }[];
+    items: ReturnItem[];
   }[];
 }
 
 export interface MyReturnRow {
   id: number;
   order_id: number;
-  reason: string;
-  status: 'pending' | 'approved' | 'rejected';
+  reason: string | null;
+  status: ReturnRequestStatus;
   admin_note: string | null;
   refund_amount: number;
   created_at: string;
-  items: { product_id: number; product_name: string; quantity: number; unit_price: number; size?: string | null; image_url?: string | null }[];
+  items: ReturnItem[];
 }
 
 interface ApiResponse {
@@ -160,8 +176,8 @@ export class OrderService {
     return this.http.patch<ApiResponse>(`${this.baseUrl}/orders/${orderId}/cancel`, {});
   }
 
-  submitReturnRequest(orderId: number, reason: string, items: { productId: number; quantity: number; size?: string | null }[]): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/orders/${orderId}/return`, { reason, items });
+  submitReturnRequest(orderId: number, items: { productId: number; quantity: number; size?: string | null; reason: string }[]): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/orders/${orderId}/return`, { items });
   }
 
   downloadOrderPDF(orderId: number) {

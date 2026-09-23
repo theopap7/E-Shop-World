@@ -45,6 +45,7 @@
                 [ngClass]="{
                   'pill--pending': r.status === 'pending',
                   'pill--approved': r.status === 'approved',
+                  'pill--partial': r.status === 'partially_approved',
                   'pill--rejected': r.status === 'rejected'
                 }">
                 {{ statusLabel(r.status) }}
@@ -52,7 +53,7 @@
             </div>
 
             <div class="return-body">
-              <div class="info-row">
+              <div class="info-row" *ngIf="r.reason">
                 <span class="info-label">Λόγος</span>
                 <span class="return-reason">{{ r.reason }}</span>
               </div>
@@ -66,13 +67,20 @@
                       class="return-item-thumb"
                       (error)="$any($event.target).src='no-image.svg'"
                     />
-                    <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
-                    <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | currency }} = <strong>{{ (item.quantity * item.unit_price) | currency }}</strong></span>
+                    <div class="return-item-main">
+                      <span class="return-item-name">{{ item.product_name }}<ng-container *ngIf="item.size"> ({{ item.size }})</ng-container></span>
+                      <span class="return-item-reason" *ngIf="item.reason">Λόγος: {{ item.reason }}</span>
+                      <span class="item-detail">{{ item.quantity }} × {{ item.unit_price | currency }} = <strong>{{ (item.quantity * item.unit_price) | currency }}</strong></span>
+                    </div>
+                    <span class="pill pill--sm" *ngIf="r.status !== 'pending'"
+                      [ngClass]="{ 'pill--approved': item.status === 'approved', 'pill--rejected': item.status === 'rejected' }">
+                      {{ itemSymbol(item.status) }} {{ statusLabel(item.status) }}
+                    </span>
                   </div>
                 </div>
               </div>
               <div class="info-row" *ngIf="r.status !== 'rejected'">
-                <span class="info-label">{{ r.status === 'approved' ? 'Επιστράφηκαν' : 'Ποσό επιστροφής' }}</span>
+                <span class="info-label">{{ r.status === 'pending' ? 'Ποσό επιστροφής' : 'Επιστράφηκαν' }}</span>
                 <strong style="color:#059669">{{ r.refund_amount | currency }}</strong>
               </div>
               <div class="info-row" *ngIf="r.admin_note">

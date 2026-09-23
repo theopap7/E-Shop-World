@@ -76,6 +76,17 @@
             <div class="order-date">
               {{ o.created_at | date:'dd/MM/yyyy HH:mm' }}
             </div>
+
+            <div
+              *ngIf="o.return_products?.length"
+              class="return-products"
+              [title]="returnProductsTitle(o.return_products!)">
+              <span
+                *ngFor="let p of o.return_products!.slice(0, 2); let last = last"
+                class="return-product"
+                [ngClass]="'return-product--' + p.status">{{ returnItemSymbol(p.status) }} {{ p.name }}<ng-container *ngIf="!last">, </ng-container></span>
+              <ng-container *ngIf="o.return_products!.length > 2"> +{{ o.return_products!.length - 2 }}</ng-container>
+            </div>
           </div>
 
           <div class="order-right">
