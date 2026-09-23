@@ -25,6 +25,10 @@ export class ConfirmService {
     });
   }
 
+  get isOpen(): boolean {
+    return this.requestSubject.value !== null;
+  }
+
   respond(result: boolean): void {
     const current = this.requestSubject.value;
     if (!current) return;

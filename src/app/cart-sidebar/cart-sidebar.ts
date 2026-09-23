@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, DestroyRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, DestroyRef, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -44,6 +44,13 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
 
   close(): void {
     this.cartService.closeSidebar();
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: Event): void {
+    if (!this.isOpen || event.defaultPrevented || this.confirmService.isOpen) return;
+    event.preventDefault();
+    this.close();
   }
 
   increase(productId: number, size?: string): void {

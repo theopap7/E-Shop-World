@@ -22,9 +22,11 @@ export class ConfirmDialogComponent {
     });
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.request) this.confirmService.respond(false);
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: Event): void {
+    if (!this.request) return;
+    event.preventDefault();
+    this.confirmService.respond(false);
   }
 
   onConfirm(): void {

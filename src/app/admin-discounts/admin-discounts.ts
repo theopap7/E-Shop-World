@@ -1,4 +1,4 @@
-import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { Component, OnInit, DestroyRef, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, formatCurrency, formatNumber } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -117,6 +117,13 @@ export class AdminDiscountsComponent implements OnInit {
       expiresAt: '',
       active: true
     };
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: Event): void {
+    if (!this.showModal || event.defaultPrevented || this.confirmService.isOpen) return;
+    event.preventDefault();
+    this.closeModal();
   }
 
   closeModal(): void {
