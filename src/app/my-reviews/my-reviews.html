@@ -12,8 +12,11 @@
 
     <app-skeleton *ngIf="isLoading" type="card" [count]="3"></app-skeleton>
 
-    <div *ngIf="error" class="alert alert-error">
+    <div *ngIf="!isLoading && error" class="alert alert-error">
       {{ error }}
+      <button class="btn btn-primary" type="button" (click)="loadMyReviews(); loadEligibleProducts()">
+        Ξαναδοκίμασε
+      </button>
     </div>
 
     <div *ngIf="!isLoading && eligibleProducts.length > 0" class="eligible-section">
