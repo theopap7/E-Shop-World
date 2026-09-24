@@ -16,12 +16,14 @@ describe('CartService', () => {
   let service: CartService;
   let fakeAuth: any;
   let fakeToast: any;
+  let fakeProducts: any;
 
   beforeEach(() => {
     localStorage.clear();
     fakeAuth = { getUser: () => null, user$: of(null) };
-    fakeToast = { success: jasmine.createSpy('success'), error: jasmine.createSpy('error') };
-    service = new CartService(fakeAuth, fakeToast);
+    fakeToast = { success: jasmine.createSpy('success'), error: jasmine.createSpy('error'), info: jasmine.createSpy('info') };
+    fakeProducts = { getProduct: jasmine.createSpy('getProduct') };
+    service = new CartService(fakeAuth, fakeToast, fakeProducts);
   });
 
   afterEach(() => {
@@ -75,5 +77,26 @@ describe('CartService', () => {
     service.decrease(1);
 
     expect(service.getItems().length).toBe(0);
+  });
+
+  it('refreshFromServer() replaces a stale cart price with the current one', () => {
+    service.addToCart(makeProduct({ price: 10, stock: 5 }), 2);
+    fakeProducts.getProduct.and.returnValue(of({ success: true, product: makeProduct({ price: 15, stock: 5 }), galleryImages: [] }));
+
+    service.refreshFromServer();
+
+    expect(service.getItems()[0].price).toBe(15);
+    expect(service.getTotal()).toBe(30);
+    expect(fakeToast.info).toHaveBeenCalled();
+  });
+
+  it('refreshFromServer() lowers the quantity when the stock dropped below it', () => {
+    service.addToCart(makeProduct({ stock: 5 }), 4);
+    fakeProducts.getProduct.and.returnValue(of({ success: true, product: makeProduct({ stock: 2 }), galleryImages: [] }));
+
+    service.refreshFromServer();
+
+    expect(service.getItems()[0].quantity).toBe(2);
+    expect(fakeToast.info).not.toHaveBeenCalled();
   });
 });

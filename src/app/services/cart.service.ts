@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { ProductDto } from './product.service';
+import { BehaviorSubject, Subscription, forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { ProductDto, ProductService } from './product.service';
 import { AuthService, AuthUser } from './auth.service';
 import { ToastService } from './toast.service';
 
@@ -28,6 +29,7 @@ export class CartService implements OnDestroy {
 
   openSidebar(): void {
     this.sidebarSubject.next(true);
+    this.refreshFromServer();
   }
 
   closeSidebar(): void {
@@ -35,14 +37,19 @@ export class CartService implements OnDestroy {
   }
 
   toggleSidebar(): void {
-    this.sidebarSubject.next(!this.sidebarSubject.value);
+    if (this.sidebarSubject.value) {
+      this.closeSidebar();
+    } else {
+      this.openSidebar();
+    }
   }
 
   private authSub: Subscription;
 
   constructor(
     private auth: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private productService: ProductService
   ) {
     this.setStorageKeyFromUser(this.auth.getUser());
     this.itemsSubject.next(this.loadFromStorage(this.currentStorageKey));
@@ -183,6 +190,36 @@ export class CartService implements OnDestroy {
     this.setItems(cart);
     this.toastService.success('Τα προϊόντα προστέθηκαν στο καλάθι!');
     this.openSidebar();
+  }
+
+  refreshFromServer(): void {
+    const ids = [...new Set(this.itemsSubject.value.map(i => i.productId))];
+    if (ids.length === 0) return;
+
+    forkJoin(ids.map(id => this.productService.getProduct(id).pipe(
+      map(res => res.product),
+      catchError(() => of(null))
+    ))).subscribe(products => {
+      const byId = new Map(products.filter((p): p is ProductDto => !!p).map(p => [p.id, p]));
+      let priceChanged = false;
+
+      const items = this.itemsSubject.value.map(item => {
+        const product = byId.get(item.productId);
+        if (!product) return item;
+
+        const price = Number(product.price);
+        if (price !== Number(item.price)) priceChanged = true;
+
+        const stock = item.size ? (product.sizeStock?.[item.size] ?? 0) : product.stock;
+        const quantity = stock > 0 ? Math.min(item.quantity, stock) : item.quantity;
+        return { ...item, name: product.name, price, image_url: product.image_url, stock, quantity };
+      });
+
+      this.setItems(items);
+      if (priceChanged) {
+        this.toastService.info('Οι τιμές στο καλάθι ενημερώθηκαν με τις τρέχουσες');
+      }
+    });
   }
 
   clear(): void {

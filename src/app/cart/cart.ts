@@ -35,6 +35,7 @@ export class CartComponent implements OnInit {
       this.items = items;
       this.total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
     });
+    this.cartService.refreshFromServer();
   }
 
   setQty(productId: number, qty: number, size?: string): void {

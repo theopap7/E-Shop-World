@@ -161,7 +161,9 @@ export class CheckoutComponent implements OnInit {
 
     if (this.cart.getItems().length === 0) {
       this.router.navigate(['/cart']);
+      return;
     }
+    this.cart.refreshFromServer();
   }
 
   private applyMyDetails(): void {
