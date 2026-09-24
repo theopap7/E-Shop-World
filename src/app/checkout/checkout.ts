@@ -279,7 +279,7 @@ export class CheckoutComponent implements OnInit {
     if (method === 'card_mock') {
       cardNumber.setValidators([
         Validators.required,
-        Validators.pattern(/^\d{16}$/),
+        Validators.pattern(/^\s*(?:\d\s*){16}$/),
       ]);
 
       cardHolder.setValidators([
