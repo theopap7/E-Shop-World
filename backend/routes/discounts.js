@@ -68,7 +68,8 @@ router.post('/validate-discount', authenticateToken, discountLimiter, async (req
         code: discount.code,
         type: discount.type,
         value: discount.value,
-        amount: discountAmount
+        amount: discountAmount,
+        minOrderAmount: Number(discount.min_order_amount)
       }
     });
   } catch (error) {

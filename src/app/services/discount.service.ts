@@ -11,6 +11,7 @@ export interface DiscountValidationResponse {
     type: 'percentage' | 'fixed';
     value: number;
     amount: number;
+    minOrderAmount?: number;
   };
 }
 

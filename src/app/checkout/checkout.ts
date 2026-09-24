@@ -1,6 +1,6 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule, formatNumber } from '@angular/common';
+import { CommonModule, formatCurrency, formatNumber } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
   AbstractControl,
@@ -82,6 +82,7 @@ export class CheckoutComponent implements OnInit {
   error: string | null = null;
   success: string | null = null;
   discountExpiredPrompt = false;
+  discountPromptMessage = '';
   orderingForOther = false;
   resendingVerification = false;
   readonly storeBank = STORE_BANK_ACCOUNT;
@@ -141,7 +142,13 @@ export class CheckoutComponent implements OnInit {
     this.cart.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
       this.subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-      if (this.appliedDiscount) {
+      const minOrderAmount = Number(this.appliedDiscount?.minOrderAmount ?? 0);
+      if (this.appliedDiscount && this.subtotal < minOrderAmount) {
+        const code = this.appliedDiscount.code;
+        this.clearDiscount();
+        this.discountCode = code;
+        this.discountError = `Ελάχιστο ποσό παραγγελίας για τον κωδικό ${code}: ${formatCurrency(minOrderAmount, 'el', '€', 'EUR')}`;
+      } else if (this.appliedDiscount) {
         if (this.appliedDiscount.type === 'percentage') {
           this.discountAmount = +(this.subtotal * this.appliedDiscount.value / 100).toFixed(2);
         } else {
@@ -367,11 +374,15 @@ export class CheckoutComponent implements OnInit {
   }
 
   removeDiscount(): void {
+    this.clearDiscount();
+    this.toastService.info('Ο κωδικός έκπτωσης αφαιρέθηκε');
+  }
+
+  private clearDiscount(): void {
     this.discountCode = '';
     this.discountAmount = 0;
     this.appliedDiscount = null;
     this.discountError = '';
-    this.toastService.info('Ο κωδικός έκπτωσης αφαιρέθηκε');
   }
 
   private scrollToFirstInvalidField(): void {
@@ -484,6 +495,7 @@ export class CheckoutComponent implements OnInit {
           message.includes('Ελάχιστο ποσό παραγγελίας');
 
         if (isDiscountError && this.appliedDiscount) {
+          this.discountPromptMessage = message;
           this.discountExpiredPrompt = true;
         } else {
           this.error = message;
