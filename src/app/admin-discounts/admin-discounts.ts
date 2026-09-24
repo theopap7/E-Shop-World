@@ -134,7 +134,7 @@ export class AdminDiscountsComponent implements OnInit {
   }
 
   saveCode(): void {
-    if (!this.form.code || this.form.value == null) {
+    if (!this.form.code?.trim() || this.form.value == null) {
       this.toastService.warning('Συμπλήρωσε όλα τα υποχρεωτικά πεδία');
       return;
     }
@@ -154,7 +154,7 @@ export class AdminDiscountsComponent implements OnInit {
     this.isSaving = true;
 
     const payload = {
-      code: this.form.code.toUpperCase(),
+      code: this.form.code.trim().toUpperCase(),
       type: this.form.type,
       value: this.form.value,
       minOrderAmount: this.form.minOrderAmount || 0,

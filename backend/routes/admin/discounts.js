@@ -19,8 +19,9 @@ router.get('/admin/discount-codes', authenticateToken, isAdmin, async (req, res)
 router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { code, type, value, minOrderAmount, maxUses, expiresAt } = req.body;
+    const normalizedCode = code ? String(code).trim().toUpperCase() : '';
 
-    if (!code || !type || value == null) {
+    if (!normalizedCode || !type || value == null) {
       return res.status(400).json({ success: false, message: 'Κωδικός, τύπος και αξία είναι υποχρεωτικά' });
     }
 
@@ -39,7 +40,7 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
 
     const [existing] = await db.query(
       'SELECT id FROM discount_codes WHERE code = ?',
-      [String(code).toUpperCase()]
+      [normalizedCode]
     );
 
     if (existing.length > 0) {
@@ -50,7 +51,7 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
       `INSERT INTO discount_codes (code, type, value, min_order_amount, max_uses, expires_at, active)
        VALUES (?, ?, ?, ?, ?, ?, TRUE)`,
       [
-        String(code).toUpperCase(),
+        normalizedCode,
         type,
         valueNum,
         Number(minOrderAmount || 0),
@@ -70,8 +71,9 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
   try {
     const { id } = req.params;
     const { code, type, value, minOrderAmount, maxUses, expiresAt, active } = req.body;
+    const normalizedCode = code ? String(code).trim().toUpperCase() : '';
 
-    if (!code || !type || value == null) {
+    if (!normalizedCode || !type || value == null) {
       return res.status(400).json({ success: false, message: 'Κωδικός, τύπος και αξία είναι υποχρεωτικά' });
     }
 
@@ -90,7 +92,7 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
 
     const [existing] = await db.query(
       'SELECT id FROM discount_codes WHERE code = ? AND id != ?',
-      [String(code).toUpperCase(), id]
+      [normalizedCode, id]
     );
 
     if (existing.length > 0) {
@@ -102,7 +104,7 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
        SET code = ?, type = ?, value = ?, min_order_amount = ?, max_uses = ?, expires_at = ?, active = ?
        WHERE id = ?`,
       [
-        String(code).toUpperCase(),
+        normalizedCode,
         type,
         valueNum,
         Number(minOrderAmount || 0),
