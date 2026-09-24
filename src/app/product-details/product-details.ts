@@ -113,6 +113,8 @@ export class ProductDetailComponent implements OnInit {
 
         this.isLoading = true;
         this.error = '';
+        this.product = null;
+        this.galleryImages = [];
         this.selectedQty = 1;
         this.selectedSize = null;
         this.relatedProducts = [];
@@ -121,6 +123,9 @@ export class ProductDetailComponent implements OnInit {
 
         return this.productService.getProduct(id).pipe(
           catchError((err: { status: number }) => {
+            if (err?.status === 404) {
+              this.recentlyViewedService.remove(id);
+            }
             this.error = err?.status === 404
               ? 'Το προϊόν δεν βρέθηκε.'
               : 'Σφάλμα φόρτωσης προϊόντος.';

@@ -33,6 +33,12 @@ export class RecentlyViewedService {
     }
   }
 
+  remove(productId: number): void {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.getAll().filter(p => p.id !== productId)));
+    } catch {}
+  }
+
   getRecent(excludeId?: number): RecentlyViewedProduct[] {
     return this.getAll().filter(p => p.id !== excludeId);
   }
