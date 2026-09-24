@@ -65,7 +65,7 @@ export class ProductListComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Αποτυχία φόρτωσης προϊόντων. Δοκίμασε ξανά.';
+        this.errorMessage = 'Αποτυχία φόρτωσης προϊόντων.';
         this.isLoading = false;
       },
     });

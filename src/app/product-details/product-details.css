@@ -331,6 +331,13 @@
   color: #991b1b;
 }
 
+.retry-btn {
+  margin-top: 12px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .product-detail {

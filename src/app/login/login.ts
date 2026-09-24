@@ -47,7 +47,7 @@ export class LoginComponent {
         error: (error: { status: number; error?: { message?: string } }) => {
           this.isSubmitting = false;
           if (error.status === 429) {
-            this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 10 λεπτά.');
+            this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκίμασε ξανά σε 10 λεπτά.');
           } else {
             this.toastService.error('Λάθος email ή κωδικός πρόσβασης');
           }

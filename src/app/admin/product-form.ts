@@ -26,6 +26,7 @@ export class ProductFormComponent implements OnInit {
   productId: number | null = null;
 
   isLoading = false;
+  loadFailed = false;
   error: string | null = null;
 
   categories: Category[] = [];
@@ -150,6 +151,7 @@ export class ProductFormComponent implements OnInit {
 
   loadProduct(id: number): void {
     this.isLoading = true;
+    this.loadFailed = false;
 
     this.adminService.getProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
@@ -177,7 +179,7 @@ export class ProductFormComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.error = 'Σφάλμα φόρτωσης προϊόντος';
+        this.loadFailed = true;
         this.isLoading = false;
       }
     });

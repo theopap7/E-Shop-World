@@ -59,7 +59,7 @@ export class ResetPasswordComponent implements OnInit {
         setTimeout(() => this.router.navigate(['/login']), 3000);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Σφάλμα. Δοκιμάστε ξανά.';
+        this.errorMessage = err.error?.message || 'Σφάλμα. Δοκίμασε ξανά.';
         this.isSubmitting = false;
       }
     });

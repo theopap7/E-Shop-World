@@ -20,7 +20,14 @@
       {{ error }}
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="card">
+    <div *ngIf="loadFailed" class="alert alert-error">
+      Σφάλμα φόρτωσης προϊόντος
+      <button class="btn btn-primary" type="button" (click)="loadProduct(productId!)">
+        Ξαναδοκίμασε
+      </button>
+    </div>
+
+    <form *ngIf="!loadFailed" [formGroup]="form" (ngSubmit)="submit()" class="card">
 
       <div class="form-group">
         <label>Όνομα Προϊόντος *</label>

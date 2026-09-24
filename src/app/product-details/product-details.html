@@ -34,6 +34,9 @@
 
     <div *ngIf="!isLoading && error" class="error-card">
       <p>{{ error }}</p>
+      <button *ngIf="!notFound" class="btn btn-primary retry-btn" type="button" (click)="retry()">
+        Ξαναδοκίμασε
+      </button>
     </div>
 
     <div *ngIf="!isLoading && !error && product" class="product-detail">

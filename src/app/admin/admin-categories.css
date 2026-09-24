@@ -271,3 +271,20 @@
 .alert-error .btn {
   margin-top: 10px;
 }
+
+.empty-state .empty-icon {
+  font-size: 44px;
+  margin-bottom: 10px;
+}
+
+.empty-state h3 {
+  margin: 6px 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #6b7280;
+}

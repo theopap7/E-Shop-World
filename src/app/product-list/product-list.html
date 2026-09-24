@@ -119,7 +119,13 @@
     </button>
   </div>
 
-  <div *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0" class="empty-state">
+  <div *ngIf="!isLoading && !errorMessage && allProducts.length === 0" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h3>Δεν υπάρχουν διαθέσιμα προϊόντα</h3>
+    <p>Δοκίμασε ξανά αργότερα.</p>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && allProducts.length > 0 && filteredProducts.length === 0" class="empty-state">
     <div class="empty-icon">😕</div>
     <h3>Δεν βρέθηκαν προϊόντα</h3>
     <p>Δοκίμασε διαφορετικά φίλτρα ή καθάρισέ τα.</p>

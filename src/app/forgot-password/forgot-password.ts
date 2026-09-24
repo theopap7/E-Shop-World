@@ -34,7 +34,7 @@ export class ForgotPasswordComponent {
         this.isSubmitting = false;
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Σφάλμα. Δοκιμάστε ξανά.';
+        this.errorMessage = err.error?.message || 'Σφάλμα. Δοκίμασε ξανά.';
         this.isSubmitting = false;
       }
     });

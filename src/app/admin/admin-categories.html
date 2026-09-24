@@ -30,7 +30,9 @@
     <div *ngIf="!isLoading && !error" class="card table-wrap">
 
       <div *ngIf="categories.length === 0" class="empty-state">
-        Δεν υπάρχουν κατηγορίες
+        <div class="empty-icon">🏷️</div>
+        <h3>Δεν υπάρχουν κατηγορίες</h3>
+        <p>Πρόσθεσε την πρώτη κατηγορία με το «+ Νέα Κατηγορία».</p>
       </div>
 
       <table *ngIf="categories.length > 0" class="table">

@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { EMPTY, Subject } from 'rxjs';
-import { switchMap, catchError, takeUntil } from 'rxjs/operators';
+import { EMPTY, Subject, combineLatest } from 'rxjs';
+import { switchMap, catchError, takeUntil, startWith } from 'rxjs/operators';
 import { ProductService, ProductDto, ProductImage } from '../services/product.service';
 import { CartService } from '../services/cart.service';
 import { WishlistService } from '../services/wishlist.service';
@@ -35,7 +35,13 @@ export class ProductDetailComponent implements OnInit {
   addedToCart = false;
   selectedQty = 1;
   selectedSize: string | null = null;
+  notFound = false;
   private cancelRelated$ = new Subject<void>();
+  private retry$ = new Subject<void>();
+
+  retry(): void {
+    this.retry$.next();
+  }
 
   get availableStock(): number {
     if (!this.product) return 0;
@@ -102,8 +108,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(
-      switchMap(params => {
+    combineLatest([this.route.paramMap, this.retry$.pipe(startWith(undefined))]).pipe(
+      switchMap(([params]) => {
         const id = Number(params.get('id'));
 
         if (!Number.isFinite(id)) {
@@ -113,6 +119,7 @@ export class ProductDetailComponent implements OnInit {
 
         this.isLoading = true;
         this.error = '';
+        this.notFound = false;
         this.product = null;
         this.galleryImages = [];
         this.selectedQty = 1;
@@ -125,6 +132,7 @@ export class ProductDetailComponent implements OnInit {
           catchError((err: { status: number }) => {
             if (err?.status === 404) {
               this.recentlyViewedService.remove(id);
+              this.notFound = true;
             }
             this.error = err?.status === 404
               ? 'Το προϊόν δεν βρέθηκε.'

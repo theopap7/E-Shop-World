@@ -30,7 +30,9 @@
     <div *ngIf="!isLoading && !error" class="card table-wrap">
 
       <div *ngIf="codes.length === 0" class="empty-state">
-        Δεν υπάρχουν κωδικοί έκπτωσης
+        <div class="empty-icon">🎟️</div>
+        <h3>Δεν υπάρχουν κωδικοί έκπτωσης</h3>
+        <p>Πρόσθεσε τον πρώτο κωδικό με το «+ Νέος Κωδικός».</p>
       </div>
 
       <table *ngIf="codes.length > 0" class="table">

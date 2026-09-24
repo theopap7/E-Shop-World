@@ -25,7 +25,9 @@
     </div>
 
     <div *ngIf="!isLoading && !error && returns.length === 0" class="card empty-state">
-      <p>Δεν υπάρχουν αιτήματα επιστροφής.</p>
+      <div class="empty-icon">↩️</div>
+      <h3>Δεν υπάρχουν αιτήματα επιστροφής</h3>
+      <p>Όταν οι πελάτες ζητήσουν επιστροφή, θα εμφανιστούν εδώ.</p>
     </div>
 
     <div *ngIf="!isLoading && !error && returns.length > 0" class="returns-list">
