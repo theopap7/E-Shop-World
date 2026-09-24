@@ -76,6 +76,7 @@ export interface OrderDetailItem {
   quantity: number;
   unit_price: number;
   line_total: number;
+  current_price?: number;
   size?: string;
   stock?: number;
   image_url?: string;

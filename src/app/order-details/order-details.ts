@@ -63,6 +63,7 @@ type OrderItemDto = {
   quantity: number;
   unit_price: number;
   line_total: number;
+  current_price?: number;
   size?: string;
   stock?: number;
   image_url?: string;
@@ -319,7 +320,7 @@ export class OrderDetailsComponent implements OnInit {
     this.cartService.reorderItems(this.items.map(i => ({
       id: i.product_id,
       name: i.product_name,
-      price: i.unit_price,
+      price: Number(i.current_price ?? i.unit_price),
       quantity: i.quantity,
       stock: i.stock ?? 0,
       image_url: i.image_url,

@@ -445,6 +445,7 @@ router.get('/my-orders/:orderId', authenticateToken, async (req, res) => {
          oi.unit_price,
          oi.size,
          (oi.quantity * oi.unit_price) AS line_total,
+         p.price AS current_price,
          COALESCE(pss.stock, p.stock) AS stock,
          p.image_url
        FROM order_items oi
