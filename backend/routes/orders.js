@@ -581,20 +581,22 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
       if (!reasonByLine[key]) reasonByLine[key] = item.reason.trim();
     }
 
-    // Lines already resolved (approved or rejected) in a past return request
-    // for this order stay permanently blocked from being requested again —
-    // approved means it was already refunded, rejected means the admin already
-    // decided against it for that specific product+size.
+    // Units already approved or rejected in a past return request are subtracted
+    // per product+size, so only units the admin has not decided on yet can be requested.
     const [resolvedRows] = await conn.query(
-      `SELECT rri.product_id, rri.size, rri.status
+      `SELECT rri.product_id, rri.size, rri.status, rri.quantity
        FROM return_request_items rri
        JOIN return_requests rr ON rr.id = rri.return_request_id
-       WHERE rr.order_id = ? AND rri.status IN ('approved', 'rejected')`,
+       WHERE rr.order_id = ? AND rri.status IN ('approved', 'rejected')
+       ORDER BY rri.id`,
       [orderId]
     );
-    const resolvedStatusByLine = {};
+    const resolvedQtyByLine = {};
+    const lastResolvedStatusByLine = {};
     for (const r of resolvedRows) {
-      resolvedStatusByLine[lineKey(r.product_id, r.size)] = r.status;
+      const key = lineKey(r.product_id, r.size);
+      resolvedQtyByLine[key] = (resolvedQtyByLine[key] || 0) + r.quantity;
+      lastResolvedStatusByLine[key] = r.status;
     }
 
     let returnedSubtotal = 0;
@@ -608,16 +610,15 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Μία από τις γραμμές επιστροφής δεν ανήκει σε αυτή την παραγγελία' });
       }
       const sizeSuffix = purchased.size ? ` (${purchased.size})` : '';
-      const resolvedStatus = resolvedStatusByLine[key];
-      if (resolvedStatus === 'approved') {
+      const remainingQty = purchased.quantity - (resolvedQtyByLine[key] || 0);
+      if (remainingQty <= 0) {
         await conn.rollback();
-        return res.status(400).json({ success: false, message: `Το προϊόν "${purchased.productName}${sizeSuffix}" έχει ήδη επιστραφεί` });
+        const message = lastResolvedStatusByLine[key] === 'rejected'
+          ? `Το αίτημα επιστροφής για το προϊόν "${purchased.productName}${sizeSuffix}" έχει ήδη απορριφθεί`
+          : `Το προϊόν "${purchased.productName}${sizeSuffix}" έχει ήδη επιστραφεί`;
+        return res.status(400).json({ success: false, message });
       }
-      if (resolvedStatus === 'rejected') {
-        await conn.rollback();
-        return res.status(400).json({ success: false, message: `Το αίτημα επιστροφής για το προϊόν "${purchased.productName}${sizeSuffix}" έχει ήδη απορριφθεί` });
-      }
-      if (totalQty > purchased.quantity) {
+      if (totalQty > remainingQty) {
         await conn.rollback();
         return res.status(400).json({ success: false, message: `Μη έγκυρη ποσότητα για "${purchased.productName}${sizeSuffix}"` });
       }

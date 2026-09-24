@@ -119,7 +119,7 @@ export interface OrderDetailResponse {
     admin_note?: string | null;
     created_at: string;
   } | null;
-  returnResolvedItems?: { product_id: number; size: string | null; status: 'approved' | 'rejected' }[];
+  returnResolvedItems?: { product_id: number; size: string | null; status: 'approved' | 'rejected'; quantity: number }[];
   returnRequests?: {
     id: number;
     status: ReturnRequestStatus;

@@ -212,6 +212,83 @@ describe('POST /api/orders/:id/return', () => {
     expect(conn.query.mock.calls[5][1]).toEqual([42, 5, 'Μπλούζα', 1, 60, 'M', 'Λάθος μέγεθος']);
     expect(conn.query.mock.calls[6][1]).toEqual([42, 6, 'Κάλτσες', 2, 20, null, 'Ελαττωματικές']);
   });
+
+  function returnConn(resolvedRows) {
+    return {
+      query: jest.fn()
+        .mockResolvedValueOnce([[{ status: 'delivered', subtotal: 40, discount_amount: 0, total_amount: 40 }]])
+        .mockResolvedValueOnce([[]])
+        .mockResolvedValueOnce([[{ product_id: 6, size: null, quantity: 2, unit_price: 20, product_name: 'Κάλτσες' }]])
+        .mockResolvedValueOnce([resolvedRows])
+        .mockResolvedValueOnce([{ insertId: 43 }])
+        .mockResolvedValue([{}]),
+      beginTransaction: jest.fn().mockResolvedValue(undefined),
+      commit: jest.fn().mockResolvedValue(undefined),
+      rollback: jest.fn().mockResolvedValue(undefined),
+      release: jest.fn()
+    };
+  }
+
+  function requestReturn(quantity) {
+    return request(app)
+      .post('/api/orders/10/return')
+      .set('Cookie', authCookie())
+      .send({ items: [{ productId: 6, quantity, reason: 'Ελαττωματικές' }] });
+  }
+
+  it('lets the customer return the units left after a partly approved return', async () => {
+    const conn = returnConn([{ product_id: 6, size: null, status: 'approved', quantity: 1 }]);
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await requestReturn(1);
+
+    expect(res.status).toBe(200);
+    expect(conn.commit).toHaveBeenCalled();
+    expect(conn.query.mock.calls[4][1]).toEqual([10, 1, 20]);
+  });
+
+  it('refuses to return more units than are left after an approved return', async () => {
+    const conn = returnConn([{ product_id: 6, size: null, status: 'approved', quantity: 1 }]);
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await requestReturn(2);
+
+    expect(res.status).toBe(400);
+    expect(conn.rollback).toHaveBeenCalled();
+  });
+
+  it('lets the customer return the units left after a partly rejected return', async () => {
+    const conn = returnConn([{ product_id: 6, size: null, status: 'rejected', quantity: 1 }]);
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await requestReturn(1);
+
+    expect(res.status).toBe(200);
+    expect(conn.commit).toHaveBeenCalled();
+  });
+
+  it('refuses units that were already rejected', async () => {
+    const conn = returnConn([{ product_id: 6, size: null, status: 'rejected', quantity: 1 }]);
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await requestReturn(2);
+
+    expect(res.status).toBe(400);
+    expect(conn.rollback).toHaveBeenCalled();
+  });
+
+  it('blocks a line once all its units were decided, naming the latest decision', async () => {
+    const conn = returnConn([
+      { product_id: 6, size: null, status: 'approved', quantity: 1 },
+      { product_id: 6, size: null, status: 'rejected', quantity: 1 }
+    ]);
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await requestReturn(1);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toContain('έχει ήδη απορριφθεί');
+  });
 });
 
 describe('PATCH /api/orders/:id/cancel', () => {

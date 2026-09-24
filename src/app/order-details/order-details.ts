@@ -94,7 +94,8 @@ export class OrderDetailsComponent implements OnInit {
   showReturnForm = false;
   isSubmittingReturn = false;
   returnItems: { productId: number; productName: string; size: string | null; maxQty: number; selectedQty: number; selected: boolean; unitPrice: number; reason: string; blockedStatus: 'approved' | 'rejected' | null }[] = [];
-  returnResolvedByLine: Record<string, 'approved' | 'rejected'> = {};
+  resolvedReturnQtyByLine: Record<string, number> = {};
+  lastReturnStatusByLine: Record<string, 'approved' | 'rejected'> = {};
   returnRequests: NonNullable<OrderDetailResponse['returnRequests']> = [];
   reviewableProductIds: Set<number> | null = null;
 
@@ -130,7 +131,16 @@ export class OrderDetailsComponent implements OnInit {
   get canReturn(): boolean {
     if (this.isAdminPage || this.order?.status !== 'delivered') return false;
     if (this.order?.return_request?.status === 'pending') return false;
-    return this.items.some(i => !this.returnResolvedByLine[lineKey(i.product_id, i.size)]);
+    return this.items.some(i => !this.returnBlockedStatus(i));
+  }
+
+  private remainingReturnQty(item: OrderItemDto): number {
+    return item.quantity - (this.resolvedReturnQtyByLine[lineKey(item.product_id, item.size)] ?? 0);
+  }
+
+  private returnBlockedStatus(item: OrderItemDto): 'approved' | 'rejected' | null {
+    if (this.remainingReturnQty(item) > 0) return null;
+    return this.lastReturnStatusByLine[lineKey(item.product_id, item.size)] ?? 'approved';
   }
 
   get returnHint(): string {
@@ -139,7 +149,7 @@ export class OrderDetailsComponent implements OnInit {
       const pendingLines = new Set(pending.items.map(i => lineKey(i.product_id, i.size)));
       const othersLeft = this.items.some(i => {
         const key = lineKey(i.product_id, i.size);
-        return !pendingLines.has(key) && !this.returnResolvedByLine[key];
+        return !pendingLines.has(key) && !this.returnBlockedStatus(i);
       });
       return othersLeft
         ? 'Το αίτημά σου ελέγχεται. Όταν ολοκληρωθεί ο έλεγχος, μπορείς να ζητήσεις επιστροφή και για τα υπόλοιπα προϊόντα.'
@@ -196,9 +206,12 @@ export class OrderDetailsComponent implements OnInit {
       this.order = res?.order ?? null;
       if (this.order) this.order.return_request = res?.returnRequest ?? null;
       this.items = res?.items ?? [];
-      this.returnResolvedByLine = {};
+      this.resolvedReturnQtyByLine = {};
+      this.lastReturnStatusByLine = {};
       for (const r of res?.returnResolvedItems ?? []) {
-        this.returnResolvedByLine[lineKey(r.product_id, r.size)] = r.status;
+        const key = lineKey(r.product_id, r.size);
+        this.resolvedReturnQtyByLine[key] = (this.resolvedReturnQtyByLine[key] ?? 0) + Number(r.quantity);
+        this.lastReturnStatusByLine[key] = r.status;
       }
       this.returnRequests = res?.returnRequests ?? [];
       this.isLoading = false;
@@ -271,12 +284,12 @@ export class OrderDetailsComponent implements OnInit {
       productId: i.product_id,
       productName: i.product_name,
       size: i.size ?? null,
-      maxQty: i.quantity,
-      selectedQty: i.quantity,
+      maxQty: this.remainingReturnQty(i),
+      selectedQty: this.remainingReturnQty(i),
       selected: false,
       unitPrice: i.unit_price,
       reason: '',
-      blockedStatus: this.returnResolvedByLine[lineKey(i.product_id, i.size)] ?? null
+      blockedStatus: this.returnBlockedStatus(i)
     }));
     this.showReturnForm = true;
   }
