@@ -40,7 +40,8 @@
             placeholder="Από"
             min="0"
             [(ngModel)]="priceMin"
-            (ngModelChange)="onPriceMinChange()"
+            (ngModelChange)="onPriceChange()"
+            (change)="onPriceMinCommit()"
           />
           <span class="price-input-suffix">€</span>
         </div>
@@ -52,7 +53,8 @@
             placeholder="Έως"
             min="0"
             [(ngModel)]="priceMax"
-            (ngModelChange)="onPriceMaxChange()"
+            (ngModelChange)="onPriceChange()"
+            (change)="onPriceMaxCommit()"
           />
           <span class="price-input-suffix">€</span>
         </div>

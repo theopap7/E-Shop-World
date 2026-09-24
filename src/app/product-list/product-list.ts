@@ -84,24 +84,26 @@ export class ProductListComponent implements OnInit {
     return ((clamped - this.priceFloor) / (this.priceCeil - this.priceFloor)) * 100;
   }
 
-  onPriceMinChange(): void {
+  onPriceChange(): void {
+    this.currentPage = 1;
+  }
+
+  onPriceMinCommit(): void {
     if (this.priceMin != null && this.priceMin < 0) {
       this.priceMin = 0;
     }
     if (this.priceMin != null && this.priceMax != null && this.priceMin > this.priceMax) {
       this.priceMax = this.priceMin;
     }
-    this.currentPage = 1;
   }
 
-  onPriceMaxChange(): void {
+  onPriceMaxCommit(): void {
     if (this.priceMax != null && this.priceMax < 0) {
       this.priceMax = 0;
     }
     if (this.priceMin != null && this.priceMax != null && this.priceMax < this.priceMin) {
       this.priceMin = this.priceMax;
     }
-    this.currentPage = 1;
   }
 
   onSliderMinChange(value: number): void {
