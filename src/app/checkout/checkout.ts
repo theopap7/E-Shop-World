@@ -134,6 +134,10 @@ export class CheckoutComponent implements OnInit {
   ngOnInit(): void {
     this.applyMyDetails();
 
+    if (!this.isEmailVerified) {
+      this.authService.fetchCurrentUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => {} });
+    }
+
     this.cart.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
       this.subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
