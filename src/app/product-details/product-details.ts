@@ -149,6 +149,9 @@ export class ProductDetailComponent implements OnInit {
 
         this.recentlyViewedService.track(this.product);
         this.recentlyViewed = this.recentlyViewedService.getRecent(this.product.id);
+        this.recentlyViewedService.refreshRecent(this.product.id)
+          .pipe(takeUntil(this.cancelRelated$), takeUntilDestroyed(this.destroyRef))
+          .subscribe(list => this.recentlyViewed = list);
       } else {
         this.error = 'Το προϊόν δεν βρέθηκε.';
       }

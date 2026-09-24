@@ -19,6 +19,7 @@
   right: 0;
   width: 380px;
   height: 100vh;
+  height: 100dvh;
   background: white;
   z-index: 1000;
   display: flex;
