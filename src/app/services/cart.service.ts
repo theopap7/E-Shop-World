@@ -97,7 +97,7 @@ export class CartService implements OnDestroy {
     return this.itemsSubject.value.reduce((sum, i) => sum + i.quantity, 0);
   }
 
-  addToCart(product: ProductDto, qty = 1, size?: string): void {
+  addToCart(product: ProductDto, qty = 1, size?: string): boolean {
     const availableStock = size ? (product.sizeStock?.[size] ?? 0) : product.stock;
 
     const items = [...this.itemsSubject.value];
@@ -107,7 +107,7 @@ export class CartService implements OnDestroy {
       const canAdd = availableStock - existing.quantity;
       if (canAdd <= 0) {
         this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα για "${product.name}"`);
-        return;
+        return false;
       }
       existing.quantity = Math.min(existing.quantity + qty, availableStock);
     } else {
@@ -124,6 +124,7 @@ export class CartService implements OnDestroy {
 
     this.setItems(items);
     this.toastService.success(`${product.name}${size ? ` (${size})` : ''} προστέθηκε στο καλάθι!`);
+    return true;
   }
 
   increase(productId: number, size?: string): void {

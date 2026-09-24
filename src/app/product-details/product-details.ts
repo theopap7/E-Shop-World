@@ -183,7 +183,8 @@ export class ProductDetailComponent implements OnInit {
   addToCart(): void {
     if (!this.product || !this.canAddToCart) return;
 
-    this.cartService.addToCart(this.product, this.selectedQty, this.selectedSize ?? undefined);
+    const added = this.cartService.addToCart(this.product, this.selectedQty, this.selectedSize ?? undefined);
+    if (!added) return;
     this.addedToCart = true;
     this.cartService.openSidebar();
 

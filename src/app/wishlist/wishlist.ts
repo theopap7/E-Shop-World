@@ -72,8 +72,9 @@ export class WishlistComponent implements OnInit {
       this.router.navigate(['/products', product.id]);
       return;
     }
-    this.cartService.addToCart(product);
-    this.cartService.openSidebar();
+    if (this.cartService.addToCart(product)) {
+      this.cartService.openSidebar();
+    }
   }
 
   async clearAll(): Promise<void> {

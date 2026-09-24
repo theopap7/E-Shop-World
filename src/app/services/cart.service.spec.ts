@@ -43,8 +43,8 @@ describe('CartService', () => {
   });
 
   it('refuses to add more once the cart already holds all available stock', () => {
-    service.addToCart(makeProduct({ stock: 2 }), 2);
-    service.addToCart(makeProduct({ stock: 2 }), 1);
+    expect(service.addToCart(makeProduct({ stock: 2 }), 2)).toBeTrue();
+    expect(service.addToCart(makeProduct({ stock: 2 }), 1)).toBeFalse();
 
     expect(service.getItems()[0].quantity).toBe(2);
     expect(fakeToast.error).toHaveBeenCalled();
