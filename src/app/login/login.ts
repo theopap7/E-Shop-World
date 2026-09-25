@@ -48,8 +48,12 @@ export class LoginComponent {
           this.isSubmitting = false;
           if (error.status === 429) {
             this.toastService.error(error.error?.message || 'Πολλές αποτυχημένες προσπάθειες. Δοκίμασε ξανά σε 10 λεπτά.');
-          } else {
+          } else if (error.status === 401) {
             this.toastService.error('Λάθος email ή κωδικός πρόσβασης');
+          } else if (error.status === 0 || error.status >= 500) {
+            this.toastService.error('Ο διακομιστής δεν απαντά. Δοκίμασε ξανά σε λίγο.');
+          } else {
+            this.toastService.error(error.error?.message || 'Η σύνδεση απέτυχε. Δοκίμασε ξανά.');
           }
         }
       });
