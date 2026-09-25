@@ -2,7 +2,7 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 import { EMPTY, Subject, combineLatest } from 'rxjs';
 import { switchMap, catchError, takeUntil, startWith } from 'rxjs/operators';
 import { ProductService, ProductDto, ProductImage } from '../services/product.service';
@@ -14,6 +14,7 @@ import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RecentlyViewedService, RecentlyViewedProduct } from '../services/recently-viewed.service';
 import { sortSizes } from '../services/size-order.util';
+import { ProductListStateService } from '../services/product-list-state.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -96,8 +97,13 @@ export class ProductDetailComponent implements OnInit {
     private wishlistService: WishlistService,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
-    private recentlyViewedService: RecentlyViewedService
+    private recentlyViewedService: RecentlyViewedService,
+    private listState: ProductListStateService
   ) {}
+
+  get listQueryParams(): Params {
+    return this.listState.lastQueryParams;
+  }
 
   isInWishlist(): boolean {
     return this.product ? this.wishlistService.isInWishlist(this.product.id) : false;

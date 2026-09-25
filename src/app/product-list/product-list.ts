@@ -2,9 +2,12 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { ProductService, ProductDto, Category } from '../services/product.service';
 import { CartService } from '../services/cart.service';
-import { Router, RouterModule } from '@angular/router';
+import { ProductListStateService } from '../services/product-list-state.service';
+import { ActivatedRoute, ParamMap, Params, Router, RouterModule } from '@angular/router';
 import { WishlistService } from '../services/wishlist.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
@@ -44,17 +47,84 @@ export class ProductListComponent implements OnInit {
   readonly pageSize = 20;
 
   private destroyRef = inject(DestroyRef);
+  private urlSync$ = new Subject<void>();
+  private lastQuery = '';
 
   constructor(
     private productService: ProductService,
     private cartService: CartService,
     private wishlistService: WishlistService,
+    private listState: ProductListStateService,
+    private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const incoming = JSON.stringify(this.queryFromParamMap(params));
+      if (incoming === this.lastQuery) return;
+      this.applyQuery(params);
+      this.lastQuery = JSON.stringify(this.buildQueryParams());
+      this.listState.lastQueryParams = this.buildQueryParams();
+    });
+
+    this.urlSync$.pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef)).subscribe(() => this.writeUrl());
+
     this.fetchProducts();
     this.fetchCategories();
+  }
+
+  private queryFromParamMap(params: ParamMap): Params {
+    const query: Params = {};
+    for (const key of ['q', 'category', 'min', 'max', 'sort', 'page']) {
+      const value = params.get(key);
+      if (value !== null) query[key] = value;
+    }
+    return query;
+  }
+
+  private applyQuery(params: ParamMap): void {
+    const toPrice = (value: string | null): number | null => {
+      if (value === null || value.trim() === '') return null;
+      const n = Number(value);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    };
+    const page = Number(params.get('page'));
+
+    this.searchTerm = params.get('q') ?? '';
+    this.selectedCategory = params.get('category') ?? 'all';
+    this.priceMin = toPrice(params.get('min'));
+    this.priceMax = toPrice(params.get('max'));
+    this.sortBy = params.get('sort') ?? 'newest';
+    this.currentPage = Number.isInteger(page) && page > 1 ? page : 1;
+  }
+
+  private buildQueryParams(): Params {
+    const query: Params = {};
+    if (this.searchTerm.trim()) query['q'] = this.searchTerm.trim();
+    if (this.selectedCategory !== 'all') query['category'] = this.selectedCategory;
+    if (this.priceMin != null) query['min'] = String(this.priceMin);
+    if (this.priceMax != null) query['max'] = String(this.priceMax);
+    if (this.sortBy !== 'newest') query['sort'] = this.sortBy;
+    if (this.currentPage > 1) query['page'] = String(this.currentPage);
+    return query;
+  }
+
+  private syncUrl(immediate = false): void {
+    this.listState.lastQueryParams = this.buildQueryParams();
+    if (immediate) {
+      this.writeUrl();
+    } else {
+      this.urlSync$.next();
+    }
+  }
+
+  private writeUrl(): void {
+    const query = this.buildQueryParams();
+    const serialized = JSON.stringify(query);
+    if (serialized === this.lastQuery) return;
+    this.lastQuery = serialized;
+    this.router.navigate([], { relativeTo: this.route, queryParams: query, replaceUrl: true });
   }
 
   fetchProducts(): void {
@@ -63,6 +133,11 @@ export class ProductListComponent implements OnInit {
       next: (res) => {
         this.allProducts = res.products ?? [];
         this.isLoading = false;
+        const maxPage = Math.max(1, Math.ceil(this.filteredProducts.length / this.pageSize));
+        if (this.currentPage > maxPage) {
+          this.currentPage = 1;
+          this.syncUrl(true);
+        }
       },
       error: () => {
         this.errorMessage = 'Αποτυχία φόρτωσης προϊόντων.';
@@ -86,6 +161,7 @@ export class ProductListComponent implements OnInit {
 
   onPriceChange(): void {
     this.currentPage = 1;
+    this.syncUrl();
   }
 
   onPriceMinCommit(): void {
@@ -95,6 +171,7 @@ export class ProductListComponent implements OnInit {
     if (this.priceMin != null && this.priceMax != null && this.priceMin > this.priceMax) {
       this.priceMax = this.priceMin;
     }
+    this.syncUrl();
   }
 
   onPriceMaxCommit(): void {
@@ -104,16 +181,19 @@ export class ProductListComponent implements OnInit {
     if (this.priceMin != null && this.priceMax != null && this.priceMax < this.priceMin) {
       this.priceMin = this.priceMax;
     }
+    this.syncUrl();
   }
 
   onSliderMinChange(value: number): void {
     this.priceMin = value > (this.priceMax ?? this.priceCeil) ? (this.priceMax ?? this.priceCeil) : value;
     this.currentPage = 1;
+    this.syncUrl();
   }
 
   onSliderMaxChange(value: number): void {
     this.priceMax = value < (this.priceMin ?? this.priceFloor) ? (this.priceMin ?? this.priceFloor) : value;
     this.currentPage = 1;
+    this.syncUrl();
   }
 
   fetchCategories(): void {
@@ -176,14 +256,28 @@ export class ProductListComponent implements OnInit {
 
   onSearchChange(): void {
     this.currentPage = 1;
+    this.syncUrl();
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.currentPage = 1;
+    this.syncUrl(true);
   }
 
   onCategoryChange(): void {
     this.currentPage = 1;
+    this.syncUrl(true);
   }
 
   onSortChange(): void {
     this.currentPage = 1;
+    this.syncUrl(true);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.syncUrl(true);
   }
 
   resetFilters(): void {
@@ -193,6 +287,7 @@ export class ProductListComponent implements OnInit {
     this.priceMax = null;
     this.sortBy = 'newest';
     this.currentPage = 1;
+    this.syncUrl(true);
   }
 
   addToCart(product: ProductDto): void {

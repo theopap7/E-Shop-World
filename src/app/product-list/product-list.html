@@ -18,7 +18,7 @@
         *ngIf="searchTerm"
         class="clear-btn"
         type="button"
-        (click)="searchTerm = ''"
+        (click)="clearSearch()"
         aria-label="Καθαρισμός αναζήτησης">
         ✕
       </button>
@@ -216,6 +216,6 @@
     [total]="filteredProducts.length"
     [pageSize]="pageSize"
     [currentPage]="currentPage"
-    (pageChange)="currentPage = $event"
+    (pageChange)="onPageChange($event)"
   ></app-pagination>
 </section>
