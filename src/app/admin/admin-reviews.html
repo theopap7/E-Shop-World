@@ -3,7 +3,7 @@
 
     <header class="admin-header">
       <div class="header-left">
-  
+
         <h1 class="page-title">Κριτικές</h1>
        
       </div>
@@ -37,89 +37,120 @@
       <p>Όταν οι χρήστες αφήσουν κριτικές, θα εμφανιστούν εδώ.</p>
     </div>
 
-    <div *ngIf="!isLoading && !error && reviews.length > 0" class="panel table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ΠΡΟΪΟΝ</th>
-            <th>ΧΡΗΣΤΗΣ</th>
-            <th>ΒΑΘΜΟΛΟΓΙΑ</th>
-            <th>ΣΧΟΛΙΟ</th>
-            <th>ΗΜΕΡΟΜΗΝΙΑ</th>
-            <th class="right">ΕΝΕΡΓΕΙΕΣ</th>
-          </tr>
-        </thead>
+    <div *ngIf="!isLoading && !error && reviews.length > 0" class="panel">
+      <div class="filters">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Αναζήτηση με προϊόν, χρήστη, email ή σχόλιο..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onFilterChange()"
+          />
+          <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''; onFilterChange()" aria-label="Καθαρισμός αναζήτησης">✕</button>
+        </div>
 
-        <tbody>
-          <tr *ngFor="let review of pagedReviews">
+        <select class="rating-select" [(ngModel)]="ratingFilter" (ngModelChange)="onFilterChange()" aria-label="Φίλτρο βαθμολογίας">
+          <option value="all">Όλες οι βαθμολογίες</option>
+          <option *ngFor="let r of ratingOptions" [value]="r">{{ r }} ★</option>
+        </select>
 
-            <td>
-              <div class="product-cell">
-                <div class="thumb">
-                  <img
-                    *ngIf="review.product_image; else noImg"
-                    [src]="review.product_image | imageUrl"
-                    [alt]="review.product_name"
-                  />
-                  <ng-template #noImg>
-                    <div class="noimg">Χωρίς εικόνα</div>
-                  </ng-template>
-                </div>
+        <div class="count-info">{{ filteredReviews.length }} κριτικές</div>
+      </div>
 
-                <div class="product-meta">
-                  <div class="product-name">{{ review.product_name }}</div>
-                  <div class="muted small">ID: {{ review.product_id }}</div>
-                </div>
-              </div>
-            </td>
+      <div *ngIf="filteredReviews.length === 0" class="empty">
+        <div class="empty-icon">🔍</div>
+        <h3>Δεν βρέθηκαν κριτικές</h3>
+        <p>Δοκίμασε διαφορετικά κριτήρια αναζήτησης.</p>
+      </div>
 
-            <td>
-              <div class="user-cell">
-                <div class="user-name">{{ review.first_name }} {{ review.last_name }}</div>
-                <div class="muted small">{{ review.email }}</div>
-              </div>
-            </td>
-
-            <td>
-              <div class="rating-cell">
-                <app-rating-stars class="stars" [rating]="review.rating"></app-rating-stars>
-                <span class="muted small">{{ review.rating }}/5</span>
-              </div>
-            </td>
-
-            <td>
-              <div class="comment-cell" [class.is-empty]="!review.comment">
-                {{ review.comment || '—' }}
-              </div>
-            </td>
-
-            <td>
-              <div class="date-cell">
-                <div>{{ review.created_at | date:'dd/MM/yyyy' }}</div>
-                <div class="muted small">{{ review.created_at | date:'HH:mm' }}</div>
-              </div>
-            </td>
-
-            <td class="right">
-              <button
-                class="icon-btn danger"
-                type="button"
-                (click)="deleteReview(review.id, review.product_name)"
-                title="Διαγραφή">
-                🗑️
-              </button>
-             
-            </td>
-
-          </tr>
-        </tbody>
-      </table>
-      <app-pagination
-        [total]="reviews.length"
-        [pageSize]="pageSize"
-        [currentPage]="currentPage"
-        (pageChange)="currentPage = $event"
-      ></app-pagination>
+      <ng-container *ngIf="filteredReviews.length > 0">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ΠΡΟΪΟΝ</th>
+                <th>ΧΡΗΣΤΗΣ</th>
+                <th>ΒΑΘΜΟΛΟΓΙΑ</th>
+                <th>ΣΧΟΛΙΟ</th>
+                <th>ΗΜΕΡΟΜΗΝΙΑ</th>
+                <th class="right">ΕΝΕΡΓΕΙΕΣ</th>
+              </tr>
+            </thead>
+  
+            <tbody>
+              <tr *ngFor="let review of pagedReviews">
+  
+                <td>
+                  <div class="product-cell">
+                    <div class="thumb">
+                      <img
+                        *ngIf="review.product_image; else noImg"
+                        [src]="review.product_image | imageUrl"
+                        [alt]="review.product_name"
+                      />
+                      <ng-template #noImg>
+                        <div class="noimg">Χωρίς εικόνα</div>
+                      </ng-template>
+                    </div>
+  
+                    <div class="product-meta">
+                      <a class="product-name" [routerLink]="['/products', review.product_id]">{{ review.product_name }}</a>
+                      <div class="muted small">ID: {{ review.product_id }}</div>
+                    </div>
+                  </div>
+                </td>
+  
+                <td>
+                  <div class="user-cell">
+                    <div class="user-name">{{ review.first_name }} {{ review.last_name }}</div>
+                    <div class="muted small">{{ review.email }}</div>
+                  </div>
+                </td>
+  
+                <td>
+                  <div class="rating-cell">
+                    <app-rating-stars class="stars" [rating]="review.rating"></app-rating-stars>
+                    <span class="muted small">{{ review.rating }}/5</span>
+                  </div>
+                </td>
+  
+                <td>
+                  <div class="comment-cell" [class.is-empty]="!review.comment">
+                    {{ review.comment || '—' }}
+                  </div>
+                </td>
+  
+                <td>
+                  <div class="date-cell">
+                    <div>{{ review.created_at | date:'dd/MM/yyyy' }}</div>
+                    <div class="muted small">{{ review.created_at | date:'HH:mm' }}</div>
+                  </div>
+                </td>
+  
+                <td class="right">
+                  <button
+                    class="icon-btn danger"
+                    type="button"
+                    (click)="deleteReview(review.id, review.product_name)"
+                    title="Διαγραφή">
+                    🗑️
+                  </button>
+                 
+                </td>
+  
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <app-pagination
+          [total]="filteredReviews.length"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="currentPage = $event"
+        ></app-pagination>
+      </ng-container>
     </div>
 
   </div>

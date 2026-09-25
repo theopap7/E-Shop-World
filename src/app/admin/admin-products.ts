@@ -1,6 +1,7 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AdminService, Product } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
@@ -11,7 +12,7 @@ import { PaginationComponent } from '../shared/pagination/pagination.component';
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [CommonModule, RouterModule, ImageUrlPipe, PaginationComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ImageUrlPipe, PaginationComponent],
   templateUrl: './admin-products.html',
   styleUrl: './admin-products.css',
 })
@@ -20,12 +21,27 @@ export class AdminProductsComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   deletingId: number | null = null;
+  searchTerm = '';
   currentPage = 1;
   readonly pageSize = 20;
 
+  get filteredProducts(): Product[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.products;
+    return this.products.filter(p =>
+      `#${p.id}`.includes(term) ||
+      p.name?.toLowerCase().includes(term) ||
+      p.category_name?.toLowerCase().includes(term)
+    );
+  }
+
   get pagedProducts(): Product[] {
     const start = (this.currentPage - 1) * this.pageSize;
-    return this.products.slice(start, start + this.pageSize);
+    return this.filteredProducts.slice(start, start + this.pageSize);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
   }
 
   private destroyRef = inject(DestroyRef);
@@ -71,7 +87,7 @@ export class AdminProductsComponent implements OnInit {
         this.deletingId = null;
         if (res.success) {
           this.products = this.products.filter((p) => p.id !== id);
-          const maxPage = Math.max(1, Math.ceil(this.products.length / this.pageSize));
+          const maxPage = Math.max(1, Math.ceil(this.filteredProducts.length / this.pageSize));
           if (this.currentPage > maxPage) this.currentPage = maxPage;
           this.adminService.invalidateStatsCache();
           this.toastService.success(res.message || 'Το προϊόν διαγράφηκε!');

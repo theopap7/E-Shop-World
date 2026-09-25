@@ -1,6 +1,7 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminService, AdminReviewDto } from '../services/admin.service';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../services/toast.service';
@@ -12,7 +13,7 @@ import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.compon
 @Component({
   selector: 'app-admin-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, PaginationComponent, ImageUrlPipe, RatingStarsComponent],
+  imports: [CommonModule, FormsModule, RouterModule, PaginationComponent, ImageUrlPipe, RatingStarsComponent],
   templateUrl: './admin-reviews.html',
   styleUrl: './admin-reviews.css'
 })
@@ -21,6 +22,9 @@ export class AdminReviewsComponent implements OnInit {
   reviews: AdminReviewDto[] = [];
   isLoading = false;
   error = '';
+  searchTerm = '';
+  ratingFilter = 'all';
+  readonly ratingOptions = [5, 4, 3, 2, 1];
   currentPage = 1;
   readonly pageSize = 15;
 
@@ -60,7 +64,7 @@ export class AdminReviewsComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.reviews = this.reviews.filter(r => r.id !== reviewId);
-          const maxPage = Math.max(1, Math.ceil(this.reviews.length / this.pageSize));
+          const maxPage = Math.max(1, Math.ceil(this.filteredReviews.length / this.pageSize));
           if (this.currentPage > maxPage) this.currentPage = maxPage;
           this.toastService.success('Η κριτική διαγράφηκε επιτυχώς!');
         }
@@ -71,9 +75,25 @@ export class AdminReviewsComponent implements OnInit {
     });
   }
 
+  get filteredReviews(): AdminReviewDto[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.reviews.filter(r =>
+      (this.ratingFilter === 'all' || r.rating === Number(this.ratingFilter)) &&
+      (!term ||
+        r.product_name?.toLowerCase().includes(term) ||
+        `${r.first_name} ${r.last_name}`.toLowerCase().includes(term) ||
+        r.email?.toLowerCase().includes(term) ||
+        r.comment?.toLowerCase().includes(term))
+    );
+  }
+
   get pagedReviews(): AdminReviewDto[] {
     const start = (this.currentPage - 1) * this.pageSize;
-    return this.reviews.slice(start, start + this.pageSize);
+    return this.filteredReviews.slice(start, start + this.pageSize);
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
   }
 
 }

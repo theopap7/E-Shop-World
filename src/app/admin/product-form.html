@@ -253,20 +253,26 @@
 
       </div>
 
-      <div class="image-block" *ngIf="isEditMode">
+      <div class="image-block">
         <div class="image-block-head">
           <label class="image-title">Συλλογή εικόνων</label>
-          <small class="image-hint">Επιπλέον εικόνες προϊόντος</small>
+          <small class="image-hint">
+            {{ isEditMode ? 'Επιπλέον εικόνες προϊόντος' : 'Θα ανέβουν μόλις δημιουργηθεί το προϊόν' }}
+          </small>
         </div>
 
-        <div class="gallery-grid" *ngIf="galleryImages.length > 0">
+        <div class="gallery-grid" *ngIf="galleryImages.length > 0 || pendingGalleryFiles.length > 0">
           <div class="gallery-item" *ngFor="let img of galleryImages">
             <img [src]="img.image_url | imageUrl" alt="Gallery" (error)="onImgError($event)" />
             <button type="button" class="gallery-delete-btn" (click)="deleteGalleryImage(img.id)" title="Διαγραφή" aria-label="Διαγραφή εικόνας">✕</button>
           </div>
+          <div class="gallery-item" *ngFor="let pending of pendingGalleryFiles; let i = index">
+            <img [src]="pending.preview" alt="Gallery" />
+            <button type="button" class="gallery-delete-btn" (click)="removePendingGalleryFile(i)" [disabled]="isLoading" title="Αφαίρεση" aria-label="Αφαίρεση εικόνας">✕</button>
+          </div>
         </div>
 
-        <p class="muted-text" *ngIf="galleryImages.length === 0">Δεν υπάρχουν εικόνες στη συλλογή.</p>
+        <p class="muted-text" *ngIf="galleryImages.length === 0 && pendingGalleryFiles.length === 0">Δεν υπάρχουν εικόνες στη συλλογή.</p>
 
         <input type="file" #galleryInput accept="image/*" (change)="onGalleryFileSelected($event)" class="file-hidden" />
 
@@ -274,7 +280,7 @@
           type="button"
           class="btn btn-outline"
           style="margin-top:10px"
-          [disabled]="uploadingGallery"
+          [disabled]="uploadingGallery || isLoading"
           (click)="galleryInput.click()">
           {{ uploadingGallery ? 'Ανέβασμα...' : '+ Προσθήκη εικόνας στη συλλογή' }}
         </button>

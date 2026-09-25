@@ -107,7 +107,44 @@
 
 .export-buttons {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: 10px;
+}
+
+.status-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.status-select {
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.status-select:disabled {
+  opacity: .6;
+  cursor: not-allowed;
 }
 
 /* ===============================

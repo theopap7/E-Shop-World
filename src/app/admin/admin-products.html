@@ -46,7 +46,29 @@
         </a>
       </div>
 
-      <div *ngIf="products.length > 0" class="table-wrap">
+      <ng-container *ngIf="products.length > 0">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Αναζήτηση με όνομα, κατηγορία ή #αριθμό..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+          />
+          <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''; onSearchChange()" aria-label="Καθαρισμός αναζήτησης">✕</button>
+        </div>
+
+        <div class="count-info">{{ filteredProducts.length }} προϊόντα</div>
+
+        <div *ngIf="filteredProducts.length === 0" class="empty">
+          <div class="empty-icon">🔍</div>
+          <h3>Δεν βρέθηκαν προϊόντα</h3>
+          <p>Δοκίμασε διαφορετικά κριτήρια αναζήτησης.</p>
+        </div>
+      </ng-container>
+
+      <div *ngIf="filteredProducts.length > 0" class="table-wrap">
         <table class="table">
           <thead>
             <tr>
@@ -127,7 +149,7 @@
         </table>
 
         <app-pagination
-          [total]="products.length"
+          [total]="filteredProducts.length"
           [pageSize]="pageSize"
           [currentPage]="currentPage"
           (pageChange)="currentPage = $event"

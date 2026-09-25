@@ -99,6 +99,7 @@ export interface AdminReviewDto {
 interface ApiResponse {
   success: boolean;
   message?: string;
+  productId?: number;
 }
 
 @Injectable({ providedIn: 'root' })

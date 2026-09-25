@@ -89,6 +89,7 @@ export class OrderDetailsComponent implements OnInit {
   isAdminPage = false;
   isCancelling = false;
   isConfirmingPayment = false;
+  isUpdatingStatus = false;
   isReordering = false;
 
   showReturnForm = false;
@@ -355,6 +356,35 @@ export class OrderDetailsComponent implements OnInit {
     this.adminService.downloadOrderCSV(orderId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: blob => this.triggerDownload(blob, `order-${orderId}.csv`),
       error: () => this.toastService.error('Αποτυχία λήψης CSV')
+    });
+  }
+
+  async updateStatus(select: HTMLSelectElement): Promise<void> {
+    if (!this.order || this.isUpdatingStatus) return;
+    const newStatus = select.value;
+    const currentStatus = this.order.status;
+
+    if (newStatus === 'cancelled') {
+      const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${this.orderId}; Αυτή η ενέργεια δεν αναιρείται.`, { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
+      if (!ok) {
+        select.value = currentStatus;
+        return;
+      }
+    }
+
+    this.isUpdatingStatus = true;
+    this.adminService.updateOrderStatus(this.orderId, newStatus).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.toastService.success('Κατάσταση παραγγελίας ενημερώθηκε!');
+        this.adminService.invalidateStatsCache();
+        this.isUpdatingStatus = false;
+        this.loadDetails();
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message || 'Αποτυχία ενημέρωσης κατάστασης');
+        select.value = currentStatus;
+        this.isUpdatingStatus = false;
+      }
     });
   }
 

@@ -3,6 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { concat, of } from 'rxjs';
+import { catchError, map, toArray } from 'rxjs/operators';
 import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
@@ -42,6 +44,7 @@ export class ProductFormComponent implements OnInit {
 
   // gallery
   galleryImages: ProductImage[] = [];
+  pendingGalleryFiles: { file: File; preview: string }[] = [];
   uploadingGallery = false;
 
   // sizes
@@ -134,6 +137,8 @@ export class ProductFormComponent implements OnInit {
         this.form.reset({ name: '', description: '', price: 0, stock: 0, category_id: null, image_url: '' });
         this.selectedSizes = [];
         this.sizeStock = {};
+        this.galleryImages = [];
+        this.pendingGalleryFiles = [];
       }
     });
   }
@@ -220,13 +225,29 @@ export class ProductFormComponent implements OnInit {
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
-        if (res.success) {
-          this.adminService.invalidateStatsCache();
-          this.toastService.success(this.isEditMode ? 'Προϊόν ενημερώθηκε!' : 'Προϊόν δημιουργήθηκε!');
-          this.router.navigate(['/admin/products']);
+        if (!res.success) {
+          this.isLoading = false;
+          return;
         }
 
-        this.isLoading = false;
+        this.adminService.invalidateStatsCache();
+        this.toastService.success(this.isEditMode ? 'Προϊόν ενημερώθηκε!' : 'Προϊόν δημιουργήθηκε!');
+
+        const newProductId = res.productId;
+        if (this.isEditMode || !newProductId || this.pendingGalleryFiles.length === 0) {
+          this.isLoading = false;
+          this.router.navigate(['/admin/products']);
+          return;
+        }
+
+        this.uploadPendingGallery(newProductId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(results => {
+          const failed = results.filter(ok => !ok).length;
+          if (failed > 0) {
+            this.toastService.warning(`${failed} από τις εικόνες της συλλογής δεν ανέβηκαν. Μπορείς να τις προσθέσεις από την επεξεργασία.`);
+          }
+          this.isLoading = false;
+          this.router.navigate(['/admin/products']);
+        });
       },
       error: (err) => {
         this.error = err?.error?.message || 'Σφάλμα αποθήκευσης προϊόντος';
@@ -330,31 +351,60 @@ export class ProductFormComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
-    if (!file) return;
-    this.uploadGalleryImage(file);
+    if (!file || !this.isValidGalleryFile(file)) return;
+
+    if (this.productId) {
+      this.uploadGalleryImage(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.pendingGalleryFiles = [...this.pendingGalleryFiles, { file, preview: String(reader.result || '') }];
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removePendingGalleryFile(index: number): void {
+    this.pendingGalleryFiles = this.pendingGalleryFiles.filter((_, i) => i !== index);
+  }
+
+  private isValidGalleryFile(file: File): boolean {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.toastService.error('Μόνο εικόνες επιτρέπονται (JPG, PNG, GIF, WEBP)');
+      return false;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.toastService.error('Η εικόνα πρέπει να είναι μικρότερη από 5MB');
+      return false;
+    }
+    return true;
+  }
+
+  private postGalleryImage(productId: number, file: File) {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.http.post<{ success: boolean; image: ProductImage }>(
+      `${environment.apiUrl}/admin/products/${productId}/images`,
+      formData
+    );
+  }
+
+  private uploadPendingGallery(productId: number) {
+    return concat(...this.pendingGalleryFiles.map(({ file }) =>
+      this.postGalleryImage(productId, file).pipe(
+        map(() => true),
+        catchError(() => of(false))
+      )
+    )).pipe(toArray());
   }
 
   uploadGalleryImage(file: File): void {
     if (!this.productId) return;
 
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      this.toastService.error('Μόνο εικόνες επιτρέπονται (JPG, PNG, GIF, WEBP)');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      this.toastService.error('Η εικόνα πρέπει να είναι μικρότερη από 5MB');
-      return;
-    }
-
     this.uploadingGallery = true;
-    const formData = new FormData();
-    formData.append('image', file);
-
-    this.http.post<{ success: boolean; image: ProductImage }>(
-      `${environment.apiUrl}/admin/products/${this.productId}/images`,
-      formData
-    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.postGalleryImage(this.productId, file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
           this.galleryImages = [...this.galleryImages, res.image];

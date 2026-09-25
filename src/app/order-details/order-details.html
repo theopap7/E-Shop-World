@@ -34,6 +34,22 @@
 
         <div class="export-buttons" *ngIf="!isLoading && order">
 
+          <label *ngIf="isAdminPage" class="status-control">
+            <span>Κατάσταση</span>
+            <select
+              #statusSelect
+              class="status-select"
+              [value]="order.status"
+              (change)="updateStatus(statusSelect)"
+              [disabled]="order.status === 'delivered' || order.status === 'cancelled' || isUpdatingStatus">
+              <option value="pending" [disabled]="order.status !== 'pending'">{{ statusLabel('pending') }}</option>
+              <option value="processing" [disabled]="order.status !== 'pending'">{{ statusLabel('processing') }}</option>
+              <option value="shipped" [disabled]="order.status !== 'processing'">{{ statusLabel('shipped') }}</option>
+              <option value="delivered" [disabled]="order.status !== 'shipped'">{{ statusLabel('delivered') }}</option>
+              <option value="cancelled" [disabled]="order.status !== 'pending' && order.status !== 'processing'">{{ statusLabel('cancelled') }}</option>
+            </select>
+          </label>
+
           <button class="btn btn-primary" (click)="downloadPDF(orderId)">
             📄 Κατέβασμα PDF
           </button>

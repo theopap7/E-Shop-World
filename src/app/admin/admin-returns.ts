@@ -47,12 +47,36 @@ export class AdminReturnsComponent implements OnInit {
   error = false;
   adminNotes: Record<number, string> = {};
   decisions: Record<number, Decision> = {};
+  activeFilter: 'all' | ReturnRequestStatus = 'all';
   currentPage = 1;
   readonly pageSize = 15;
 
+  readonly filters = [
+    { key: 'all' as const, label: 'Όλα' },
+    ...(['pending', 'approved', 'partially_approved', 'rejected'] as const).map(key => ({
+      key,
+      label: returnStatusLabel(key),
+    })),
+  ];
+
+  get filteredReturns(): ReturnRequest[] {
+    if (this.activeFilter === 'all') return this.returns;
+    return this.returns.filter(r => r.status === this.activeFilter);
+  }
+
   get pagedReturns(): ReturnRequest[] {
     const start = (this.currentPage - 1) * this.pageSize;
-    return this.returns.slice(start, start + this.pageSize);
+    return this.filteredReturns.slice(start, start + this.pageSize);
+  }
+
+  count(key: 'all' | ReturnRequestStatus): number {
+    if (key === 'all') return this.returns.length;
+    return this.returns.filter(r => r.status === key).length;
+  }
+
+  onFilterChange(key: 'all' | ReturnRequestStatus): void {
+    this.activeFilter = key;
+    this.currentPage = 1;
   }
 
   private readonly apiUrl = `${environment.apiUrl}/admin/returns`;
@@ -70,7 +94,10 @@ export class AdminReturnsComponent implements OnInit {
     this.error = false;
     this.http.get<{ success: boolean; returns: ReturnRequest[] }>(this.apiUrl).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
-        this.returns = res.returns || [];
+        this.returns = (res.returns || []).sort((a, b) =>
+          a.status === 'pending' && b.status !== 'pending' ? -1 :
+          a.status !== 'pending' && b.status === 'pending' ? 1 : 0
+        );
         this.decisions = {};
         this.currentPage = 1;
         this.isLoading = false;

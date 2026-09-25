@@ -56,6 +56,57 @@
   padding: 48px;
 }
 
+.status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.status-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.status-tab:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.status-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.status-tab.tab--pending {
+  border-color: #f59e0b;
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.tab-count {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-tab.active .tab-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .returns-list {
   display: flex;
   flex-direction: column;
