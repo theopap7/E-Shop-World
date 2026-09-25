@@ -210,6 +210,7 @@ section.page {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 16px 18px;
   border-bottom: 1px solid #f3f4f6;
 }
@@ -223,8 +224,9 @@ section.page {
 
 .order-top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 6px 10px;
 }
 
 .order-label {
@@ -262,6 +264,7 @@ section.page {
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-shrink: 0;
 }
 
 .order-total {
