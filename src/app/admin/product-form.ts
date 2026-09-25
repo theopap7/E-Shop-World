@@ -28,6 +28,7 @@ export class ProductFormComponent implements OnInit {
   productId: number | null = null;
 
   isLoading = false;
+  isLoadingProduct = false;
   loadFailed = false;
   error: string | null = null;
 
@@ -155,7 +156,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   loadProduct(id: number): void {
-    this.isLoading = true;
+    this.isLoadingProduct = true;
     this.loadFailed = false;
 
     this.adminService.getProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -181,16 +182,18 @@ export class ProductFormComponent implements OnInit {
           this.loadGalleryImages(id);
         }
 
-        this.isLoading = false;
+        this.isLoadingProduct = false;
       },
       error: () => {
         this.loadFailed = true;
-        this.isLoading = false;
+        this.isLoadingProduct = false;
       }
     });
   }
 
   submit(): void {
+    if (this.isLoadingProduct || this.isLoading || this.uploading) return;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -279,6 +282,7 @@ export class ProductFormComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    input.value = '';
     if (!file) return;
 
     this.handleFile(file);
@@ -302,11 +306,18 @@ export class ProductFormComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = () => {
-      this.imagePreview = String(reader.result || '');
+      if (this.selectedFile === file) {
+        this.imagePreview = String(reader.result || '');
+      }
     };
     reader.readAsDataURL(file);
 
     this.uploadImage();
+  }
+
+  private revertImagePreview(): void {
+    this.selectedFile = null;
+    this.imagePreview = this.form.get('image_url')?.value || '';
   }
 
   uploadImage(): void {
@@ -327,12 +338,14 @@ export class ProductFormComponent implements OnInit {
           this.form.get('image_url')?.setValue(res.imageUrl);
         } else {
           this.uploadError = res?.message || 'Ανέβασμα απέτυχε';
+          this.revertImagePreview();
         }
 
         this.uploading = false;
       },
       error: (err) => {
         this.uploadError = err?.error?.message || 'Σφάλμα ανεβάσματος εικόνας';
+        this.revertImagePreview();
         this.uploading = false;
       }
     });

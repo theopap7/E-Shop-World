@@ -210,7 +210,7 @@
             <button
               type="button"
               class="btn btn-outline"
-              [disabled]="uploading || isLoading">
+              [disabled]="uploading || isLoading || isLoadingProduct">
 
               Επιλογή εικόνας
 
@@ -280,7 +280,7 @@
           type="button"
           class="btn btn-outline"
           style="margin-top:10px"
-          [disabled]="uploadingGallery || isLoading"
+          [disabled]="uploadingGallery || isLoading || isLoadingProduct"
           (click)="galleryInput.click()">
           {{ uploadingGallery ? 'Ανέβασμα...' : '+ Προσθήκη εικόνας στη συλλογή' }}
         </button>
@@ -292,7 +292,7 @@
           type="button"
           class="btn btn-outline"
           routerLink="/admin/products"
-          [disabled]="isLoading || uploading">
+          [disabled]="isLoading || isLoadingProduct || uploading">
 
           Ακύρωση
 
@@ -301,7 +301,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="isLoading || uploading">
+          [disabled]="isLoading || isLoadingProduct || uploading">
 
           {{
             isLoading
