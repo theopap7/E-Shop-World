@@ -15,6 +15,8 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RecentlyViewedService, RecentlyViewedProduct } from '../services/recently-viewed.service';
 import { sortSizes } from '../services/size-order.util';
 import { ProductListStateService } from '../services/product-list-state.service';
+import { Title } from '@angular/platform-browser';
+import { pageTitle } from '../services/app-title.strategy';
 
 @Component({
   selector: 'app-product-detail',
@@ -98,7 +100,8 @@ export class ProductDetailComponent implements OnInit {
     private router: Router,
     private breadcrumbService: BreadcrumbService,
     private recentlyViewedService: RecentlyViewedService,
-    private listState: ProductListStateService
+    private listState: ProductListStateService,
+    private title: Title
   ) {}
 
   get listQueryParams(): Params {
@@ -139,6 +142,7 @@ export class ProductDetailComponent implements OnInit {
             if (err?.status === 404) {
               this.recentlyViewedService.remove(id);
               this.notFound = true;
+              this.title.setTitle(pageTitle('Το προϊόν δεν βρέθηκε'));
             }
             this.error = err?.status === 404
               ? 'Το προϊόν δεν βρέθηκε.'
@@ -157,6 +161,7 @@ export class ProductDetailComponent implements OnInit {
 
         if (this.product?.name) {
           this.breadcrumbService.updateLastBreadcrumb(this.product.name);
+          this.title.setTitle(pageTitle(this.product.name));
         }
 
         this.loadRelatedProducts();
