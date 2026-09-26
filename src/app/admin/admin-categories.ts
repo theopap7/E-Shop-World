@@ -123,7 +123,7 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   async deleteCategory(id: number, name: string): Promise<void> {
-    const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις την κατηγορία "${name}";`, { danger: true, confirmText: 'Διαγραφή' });
+    const ok = await this.confirmService.confirm(`Σίγουρα θέλεις να διαγράψεις την κατηγορία "${name}";`, { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) return;
 
     this.adminService.deleteCategory(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({

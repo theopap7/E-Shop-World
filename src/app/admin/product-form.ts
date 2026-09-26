@@ -434,7 +434,7 @@ export class ProductFormComponent implements OnInit {
 
   async deleteGalleryImage(imageId: number): Promise<void> {
     if (!this.productId) return;
-    const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να διαγράψεις αυτή την εικόνα;', { danger: true, confirmText: 'Διαγραφή' });
+    const ok = await this.confirmService.confirm('Σίγουρα θέλεις να διαγράψεις αυτή την εικόνα;', { danger: true, confirmText: 'Διαγραφή' });
     if (!ok) return;
 
     this.http.delete<{ success: boolean }>(

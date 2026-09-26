@@ -264,7 +264,7 @@ export class OrderDetailsComponent implements OnInit {
   paymentStatusLabel = paymentStatusLabel;
 
   async cancelOrder(): Promise<void> {
-    const ok = await this.confirmService.confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία;', { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
+    const ok = await this.confirmService.confirm('Σίγουρα θέλεις να ακυρώσεις την παραγγελία;', { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
     if (!ok) return;
 
     this.isCancelling = true;
@@ -367,7 +367,7 @@ export class OrderDetailsComponent implements OnInit {
     const currentStatus = this.order.status;
 
     if (newStatus === 'cancelled') {
-      const ok = await this.confirmService.confirm(`Είσαι σίγουρος ότι θέλεις να ακυρώσεις την παραγγελία #${this.orderId}; Αυτή η ενέργεια δεν αναιρείται.`, { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
+      const ok = await this.confirmService.confirm(`Σίγουρα θέλεις να ακυρώσεις την παραγγελία #${this.orderId}; Αυτή η ενέργεια δεν αναιρείται.`, { danger: true, title: 'Ακύρωση παραγγελίας', confirmText: 'Ακύρωση παραγγελίας', cancelText: 'Πίσω' });
       if (!ok) {
         select.value = currentStatus;
         return;
