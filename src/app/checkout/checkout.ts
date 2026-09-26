@@ -21,6 +21,7 @@ import { AddressMapComponent } from '../address-map/address-map';
 import { AuthService } from '../services/auth.service';
 import { AdminService } from '../services/admin.service';
 import { STORE_BANK_ACCOUNT } from '../shared/store-bank';
+import { STORE_PICKUP_LOCATION } from '../shared/store-location';
 
 /** Rejects a MM/YY expiry that has already passed (format is checked separately). */
 function cardNotExpiredValidator(): ValidatorFn {
@@ -87,6 +88,7 @@ export class CheckoutComponent implements OnInit {
   orderingForOther = false;
   resendingVerification = false;
   readonly storeBank = STORE_BANK_ACCOUNT;
+  readonly storeLocation = STORE_PICKUP_LOCATION;
 
   private destroyRef = inject(DestroyRef);
 

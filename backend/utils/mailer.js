@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const { formatEur } = require('./format');
 const { STORE_BANK_ACCOUNT } = require('./storeBank');
+const { STORE_PICKUP_LOCATION } = require('./storeLocation');
 const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('./labels');
 
 const DELIVERY_ESTIMATES = {
@@ -15,8 +16,6 @@ if (useSendGrid) {
 
 let transporter = null;
 
-// SMTP is only used as a dev fallback now — most hosts (Render included)
-// block outbound SMTP on their free tier, so production always uses SendGrid's HTTP API.
 async function getTransporter() {
   if (transporter) return transporter;
 
@@ -51,8 +50,6 @@ async function getTransporter() {
   return transporter;
 }
 
-// Sends over SendGrid's HTTP API when configured, otherwise falls back to SMTP
-// (real or Ethereal). Returns { info, previewUrl } like the old SMTP-only code did.
 async function send({ to, subject, html }) {
   if (useSendGrid) {
     const sgMail = require('@sendgrid/mail');
@@ -150,7 +147,8 @@ async function sendOrderConfirmationEmail(toEmail, order) {
 
   const addressHtml = order.shippingMethod !== 'pickup'
     ? `<p style="margin:4px 0;">${order.address}</p>`
-    : `<p style="margin:4px 0;">${SHIPPING_METHOD_LABELS.pickup}</p>`;
+    : `<p style="margin:4px 0;">${STORE_PICKUP_LOCATION.street}, ${STORE_PICKUP_LOCATION.city}</p>
+              <p style="margin:4px 0;color:#555;font-size:13px;">Ωράριο: ${STORE_PICKUP_LOCATION.hours}</p>`;
 
   const bankTransferHtml = order.paymentMethod === 'bank_transfer'
     ? `

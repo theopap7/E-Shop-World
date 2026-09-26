@@ -16,6 +16,7 @@ import { paymentMethodLabel, paymentStatusLabel, shippingMethodLabel } from '../
 import { returnStatusLabel as returnStatusLabelUtil, returnItemSymbol } from '../services/return-status.util';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { STORE_BANK_ACCOUNT, formatIban } from '../shared/store-bank';
+import { STORE_PICKUP_LOCATION } from '../shared/store-location';
 
 type OrderDto = {
   id: number;
@@ -256,6 +257,7 @@ export class OrderDetailsComponent implements OnInit {
   statusLabel = statusLabel;
   formatIban = formatIban;
   readonly storeBank = STORE_BANK_ACCOUNT;
+  readonly storeLocation = STORE_PICKUP_LOCATION;
 
   shippingMethodLabel = shippingMethodLabel;
   paymentMethodLabel = paymentMethodLabel;

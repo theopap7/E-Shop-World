@@ -181,6 +181,22 @@
 
         </div>
 
+        <div class="card" *ngIf="order.shipping_method === 'pickup'">
+
+          <h3 class="h3">Σημείο Παραλαβής</h3>
+
+          <div class="row">
+            <span>Διεύθυνση</span>
+            <strong>{{ storeLocation.street }}, {{ storeLocation.city }}</strong>
+          </div>
+
+          <div class="row">
+            <span>Ωράριο</span>
+            <strong>{{ storeLocation.hours }}</strong>
+          </div>
+
+        </div>
+
         <div class="card" *ngIf="order.shipping_method !== 'pickup'">
 
           <h3 class="h3">Διεύθυνση Αποστολής</h3>

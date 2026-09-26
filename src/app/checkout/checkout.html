@@ -146,6 +146,11 @@
           Παραλαβή από κατάστημα (Δωρεάν)
         </label>
 
+        <div *ngIf="form.get('shippingMethod')?.value === 'pickup'" class="alert alert-info">
+          <p><strong>Σημείο παραλαβής:</strong> {{ storeLocation.street }}, {{ storeLocation.city }}</p>
+          <p>Ωράριο: {{ storeLocation.hours }}</p>
+        </div>
+
         <hr />
 
         <h3>Πληρωμή</h3>
