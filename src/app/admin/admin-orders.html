@@ -95,7 +95,7 @@
                   <div class="customer-name">
                     {{ order.first_name }} {{ order.last_name }}
                   </div>
-                  <div class="customer-email">
+                  <div class="customer-email" [title]="order.user_email">
                     {{ order.user_email }}
                   </div>
                 </div>
