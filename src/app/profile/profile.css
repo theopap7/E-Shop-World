@@ -382,6 +382,11 @@
   color: #6b7280;
 }
 
+.email-change-hint {
+  margin-top: 6px;
+  color: #92400e;
+}
+
 /* ===== Edit Profile Section ===== */
 .edit-profile-section {
   background: white;

@@ -63,6 +63,10 @@ export class ProfileComponent {
     this.editMode = false;
   }
 
+  get emailChanged(): boolean {
+    return !!this.user && this.editForm.email.toLowerCase().trim() !== this.user.email.toLowerCase().trim();
+  }
+
   updateProfile(): void {
     const { firstName, lastName, email, phone, address } = this.editForm;
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
@@ -76,6 +80,7 @@ export class ProfileComponent {
       return;
     }
 
+    const emailChanged = this.emailChanged;
     this.isUpdating = true;
     this.http.put<{ success: boolean; user: AuthUser }>(`${environment.apiUrl}/me`, { firstName, lastName, email, phone, address }).subscribe({
       next: (res) => {
@@ -83,7 +88,11 @@ export class ProfileComponent {
           this.auth.updateUser(res.user);
           this.user = res.user;
           this.editMode = false;
-          this.toastService.success('Το προφίλ ενημερώθηκε επιτυχώς!');
+          if (emailChanged) {
+            this.toastService.success(`Το προφίλ ενημερώθηκε. Στείλαμε σύνδεσμο επιβεβαίωσης στο ${res.user.email}`);
+          } else {
+            this.toastService.success('Το προφίλ ενημερώθηκε επιτυχώς!');
+          }
         }
         this.isUpdating = false;
       },
