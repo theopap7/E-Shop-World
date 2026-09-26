@@ -34,6 +34,8 @@ export class ProductDetailComponent implements OnInit {
   error = '';
   relatedProducts: ProductDto[] = [];
   isLoadingRelated = false;
+  isLoadingRecent = false;
+  private pendingReviewsScroll = false;
   recentlyViewed: RecentlyViewedProduct[] = [];
   addedToCart = false;
   selectedQty = 1;
@@ -168,20 +170,23 @@ export class ProductDetailComponent implements OnInit {
 
         this.recentlyViewedService.track(this.product);
         this.recentlyViewed = this.recentlyViewedService.getRecent(this.product.id);
+        this.isLoadingRecent = true;
         this.recentlyViewedService.refreshRecent(this.product.id)
           .pipe(takeUntil(this.cancelRelated$), takeUntilDestroyed(this.destroyRef))
-          .subscribe(list => this.recentlyViewed = list);
+          .subscribe({
+            next: list => this.recentlyViewed = list,
+            complete: () => {
+              this.isLoadingRecent = false;
+              this.scrollToReviewsWhenReady();
+            }
+          });
       } else {
         this.error = 'Το προϊόν δεν βρέθηκε.';
       }
 
       this.isLoading = false;
-
-      if (this.route.snapshot.fragment === 'reviews') {
-        setTimeout(() => {
-          document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      }
+      this.pendingReviewsScroll = this.route.snapshot.fragment === 'reviews';
+      this.scrollToReviewsWhenReady();
     });
   }
 
@@ -199,12 +204,22 @@ export class ProductDetailComponent implements OnInit {
         next: (res) => {
           this.relatedProducts = res?.success ? res.products : [];
           this.isLoadingRelated = false;
+          this.scrollToReviewsWhenReady();
         },
         error: () => {
           this.relatedProducts = [];
           this.isLoadingRelated = false;
+          this.scrollToReviewsWhenReady();
         }
       });
+  }
+
+  private scrollToReviewsWhenReady(): void {
+    if (!this.pendingReviewsScroll || this.isLoading || this.isLoadingRelated || this.isLoadingRecent) return;
+    this.pendingReviewsScroll = false;
+    setTimeout(() => {
+      document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   addToCart(): void {
