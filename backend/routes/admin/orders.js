@@ -291,7 +291,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       ...items.map(({ name, quantity, unit_price, size }, i) =>
         [`Προϊόν ${i + 1}`, `${name}${size ? ` (${size})` : ''} x${quantity} (${eur(unit_price)})`]
       ),
-      ['Κόστος Προϊόντων', eur(order.subtotal)],
+      ['Υποσύνολο', eur(order.subtotal)],
       ['Μεταφορικά', eur(order.shipping_cost)],
       ...(Number(order.discount_amount) > 0
         ? [['Κωδικός Έκπτωσης', order.discount_code], ['Έκπτωση', `−${eur(order.discount_amount)}`]]

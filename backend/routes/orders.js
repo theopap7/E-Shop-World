@@ -837,7 +837,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       doc.fontSize(12).text(label, 330, y).text(value, 450, y, { width: 100, align: 'right' });
     };
 
-    summaryRow('Προϊόντα', formatEur(order.subtotal), tableY);
+    summaryRow('Υποσύνολο', formatEur(order.subtotal), tableY);
     tableY += 20;
     summaryRow('Μεταφορικά', formatEur(order.shipping_cost), tableY);
     tableY += 20;
