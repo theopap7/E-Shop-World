@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription, EMPTY, forkJoin } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { BehaviorSubject, Subscription, EMPTY, forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { ProductDto } from './product.service';
 import { ToastService } from './toast.service';
@@ -54,6 +54,31 @@ export class WishlistService implements OnDestroy {
 
   reload(): void {
     this.loadFromApi();
+  }
+
+  refreshGuestItems(): void {
+    if (this.auth.isLoggedIn()) return;
+    const ids = this.itemsSubject.value.map(p => p.id);
+    if (ids.length === 0) return;
+
+    const deletedIds = new Set<number>();
+
+    forkJoin(ids.map(id =>
+      this.http.get<{ success: boolean; product: ProductDto }>(`${this.apiUrl}/products/${id}`).pipe(
+        map(res => res.product),
+        catchError(err => {
+          if (err?.status === 404) deletedIds.add(id);
+          return of(null);
+        })
+      )
+    )).subscribe(products => {
+      if (this.auth.isLoggedIn()) return;
+      const byId = new Map(products.filter((p): p is ProductDto => !!p).map(p => [p.id, p]));
+      const items = this.itemsSubject.value
+        .filter(p => !deletedIds.has(p.id))
+        .map(p => byId.get(p.id) ?? p);
+      this.setGuestItems(items);
+    });
   }
 
   private loadFromApi(): void {

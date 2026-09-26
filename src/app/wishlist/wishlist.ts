@@ -52,6 +52,8 @@ export class WishlistComponent implements OnInit {
       this.error = hasError;
       if (hasError) this.isLoading = false;
     });
+
+    this.wishlistService.refreshGuestItems();
   }
 
   starClass(star: number, rating: number | string | null): string {
