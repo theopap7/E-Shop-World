@@ -54,7 +54,9 @@ export class ProductFormComponent implements OnInit {
   selectedSizes: string[] = [];
   sizeStock: Record<string, number> = {};
 
-  get sizeMode(): 'clothing' | 'shoes' | 'none' {
+  sizeMode: 'clothing' | 'shoes' | 'none' = 'none';
+
+  private suggestSizeMode(): 'clothing' | 'shoes' | 'none' {
     const catId = this.form.get('category_id')?.value;
     const cat = this.categories.find(c => c.id === catId);
     if (!cat) return 'none';
@@ -67,7 +69,20 @@ export class ProductFormComponent implements OnInit {
   onCategoryChange(): void {
     this.selectedSizes = [];
     this.sizeStock = {};
+  private sizeModeFor(sizes: string[]): 'clothing' | 'shoes' | 'none' {
+    if (sizes.length === 0) return 'none';
+    return sizes.some(s => this.SHOE_SIZES.includes(s)) ? 'shoes' : 'clothing';
   }
+
+  }
+    if (!this.isEditMode && this.selectedSizes.length === 0) {
+      this.sizeMode = this.suggestSizeMode();
+    }
+  }
+
+  setSizeMode(mode: 'clothing' | 'shoes' | 'none'): void {
+    if (mode === this.sizeMode) return;
+    this.sizeMode = mode;
 
   isSizeSelected(s: string): boolean {
     return this.selectedSizes.includes(s);
@@ -140,6 +155,7 @@ export class ProductFormComponent implements OnInit {
         this.sizeStock = {};
         this.galleryImages = [];
         this.pendingGalleryFiles = [];
+        this.sizeMode = 'none';
       }
     });
   }
@@ -182,6 +198,7 @@ export class ProductFormComponent implements OnInit {
           this.loadGalleryImages(id);
         }
 
+          this.sizeMode = this.sizeModeFor(this.selectedSizes);
         this.isLoadingProduct = false;
       },
       error: () => {

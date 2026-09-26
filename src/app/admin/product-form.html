@@ -119,10 +119,18 @@
 
       </div>
 
-      <!-- ΜΕΓΕΘΗ — εμφανίζεται μόνο για Ρούχα / Παπούτσια -->
+      <div class="form-group">
+        <label>Μεγέθη</label>
+        <select [value]="sizeMode" (change)="setSizeMode($any($event.target).value)">
+          <option value="none">Χωρίς μεγέθη</option>
+          <option value="clothing">Ρούχα (XS–XXL)</option>
+          <option value="shoes">Παπούτσια (36–45)</option>
+        </select>
+      </div>
+
       <div class="form-group" *ngIf="sizeMode !== 'none'">
         <div class="sizes-head">
-          <label>Μεγέθη</label>
+          <label>Διαθέσιμα μεγέθη</label>
         </div>
 
         <ng-container *ngIf="sizeMode === 'clothing'">
