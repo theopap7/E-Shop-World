@@ -8,7 +8,7 @@ const { discountLimiter } = require('../middleware/rateLimiters');
 const { sendOrderConfirmationEmail } = require('../utils/mailer');
 const { restoreStock } = require('../utils/stock');
 const { isDiscountExpired } = require('../utils/discountRules');
-const { formatEur, formatDate } = require('../utils/format');
+const { formatEur, formatDate, formatFloor } = require('../utils/format');
 const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../utils/labels');
 const { STORE_PICKUP_LOCATION } = require('../utils/storeLocation');
 
@@ -18,6 +18,12 @@ const discountCodeGate = (req, res, next) => {
   if (req.body && req.body.discountCode) return discountLimiter(req, res, next);
   next();
 };
+
+function floorLabel(floor) {
+  const formatted = formatFloor(floor);
+  if (!formatted) return '';
+  return /^\d+ος$/.test(formatted) ? `${formatted} όροφος` : formatted;
+}
 
 router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => {
   const userId = req.user.id;
@@ -310,7 +316,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
             totalAmount: computedTotal,
             shippingMethod,
             paymentMethod,
-            address: shippingMethod !== 'pickup' ? `${ship.address1}, ${ship.city} ${ship.zip}` : null,
+            address: shippingMethod !== 'pickup' ? [ship.address1, floorLabel(ship.floor), `${ship.city} ${ship.zip}`].filter(Boolean).join(', ') : null,
           });
         }
       } catch (emailErr) {
