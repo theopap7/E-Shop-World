@@ -25,7 +25,7 @@
               class="pill"
               [ngClass]="'pill--' + order.status"
             >
-              {{ statusLabel(order.status) }}
+              {{ statusLabel(order.status, order.shipping_method) }}
             </span>
 
           </div>
@@ -44,7 +44,7 @@
               [disabled]="order.status === 'delivered' || order.status === 'cancelled' || isUpdatingStatus">
               <option value="pending" [disabled]="order.status !== 'pending'">{{ statusLabel('pending') }}</option>
               <option value="processing" [disabled]="order.status !== 'pending'">{{ statusLabel('processing') }}</option>
-              <option value="shipped" [disabled]="order.status !== 'processing'">{{ statusLabel('shipped') }}</option>
+              <option value="shipped" [disabled]="order.status !== 'processing'">{{ statusLabel('shipped', order.shipping_method) }}</option>
               <option value="delivered" [disabled]="order.status !== 'shipped'">{{ statusLabel('delivered') }}</option>
               <option value="cancelled" [disabled]="order.status !== 'pending' && order.status !== 'processing'">{{ statusLabel('cancelled') }}</option>
             </select>

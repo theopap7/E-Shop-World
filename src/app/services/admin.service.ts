@@ -38,6 +38,7 @@ export interface AdminOrder {
   phone: string;
   payment_status: string;
   payment_method: string;
+  shipping_method: string;
   user_email: string;
   first_name: string;
   last_name: string;

@@ -6,14 +6,15 @@ const { sendOrderStatusEmail } = require('../../utils/mailer');
 const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
 const { formatEur, formatDateTime, formatPhone, formatZip, formatFloor } = require('../../utils/format');
-const { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../../utils/labels');
+const { STORE_PICKUP_LOCATION } = require('../../utils/storeLocation');
+const { orderStatusLabel, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../../utils/labels');
 
 router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT
          o.id, o.total_amount, o.status, o.created_at,
-         o.recipient_name, o.phone, o.payment_status, o.payment_method,
+         o.recipient_name, o.phone, o.payment_status, o.payment_method, o.shipping_method,
          u.email as user_email, u.first_name, u.last_name
        FROM orders o
        LEFT JOIN users u ON u.id = o.user_id
@@ -116,7 +117,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
     await conn.beginTransaction();
 
     const [rows] = await conn.query(
-      'SELECT status, payment_method, payment_status FROM orders WHERE id = ? FOR UPDATE',
+      'SELECT status, payment_method, payment_status, shipping_method FROM orders WHERE id = ? FOR UPDATE',
       [orderId]
     );
 
@@ -128,10 +129,11 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
     const currentStatus = rows[0].status;
     const paymentMethod = rows[0].payment_method;
     const currentPaymentStatus = rows[0].payment_status;
+    const shippingMethod = rows[0].shipping_method;
 
     if (!allowedTransitions[currentStatus].includes(status)) {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από «${ORDER_STATUS_LABELS[currentStatus]}» σε «${ORDER_STATUS_LABELS[status]}»` });
+      return res.status(400).json({ success: false, message: `Δεν επιτρέπεται η αλλαγή κατάστασης από «${orderStatusLabel(currentStatus, shippingMethod)}» σε «${orderStatusLabel(status, shippingMethod)}»` });
     }
 
     // COD auto-marks paid on delivery and card_mock is paid at checkout, but a
@@ -186,6 +188,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
             id: orderId,
             status,
             wasRefunded: orderInfo[0].payment_status === 'refunded',
+            shippingMethod,
           });
         }
       } catch (emailErr) {
@@ -267,7 +270,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
     const csvRows = [
       ['Αριθμός', order.id],
       ['Ημερομηνία', date],
-      ['Κατάσταση', ORDER_STATUS_LABELS[order.status] || order.status],
+      ['Κατάσταση', orderStatusLabel(order.status, order.shipping_method)],
       ['Πελάτης', order.recipient_name],
       ['Email', order.email],
       ['Τηλέφωνο', formatPhone(order.phone)],

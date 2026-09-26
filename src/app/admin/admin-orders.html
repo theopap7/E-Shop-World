@@ -122,7 +122,7 @@
                     'pill--cancelled': order.status === 'cancelled'
                   }"
                 >
-                  {{ statusLabel(order.status) }}
+                  {{ statusLabel(order.status, order.shipping_method) }}
                 </span>
               </td>
 
@@ -177,7 +177,7 @@
     value="shipped"
     [disabled]="order.status !== 'processing'"
   >
-    {{ statusLabel('shipped') }}
+    {{ statusLabel('shipped', order.shipping_method) }}
   </option>
 
   <option

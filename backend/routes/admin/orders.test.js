@@ -116,6 +116,34 @@ describe('PATCH /api/admin/orders/:id/status', () => {
     expect(updateCall[0]).toMatch(/payment_status = 'paid'/);
   });
 
+  it('tells the status email that a pickup order is ready for collection', async () => {
+    const mailer = require('../../utils/mailer');
+    const conn = makeStatusConn([{ status: 'processing', payment_method: 'cod', payment_status: 'pending', shipping_method: 'pickup' }]);
+    db.getConnection.mockResolvedValue(conn);
+    db.query.mockResolvedValue([[{ email: 'a@b.com', payment_status: 'pending' }]]);
+
+    const res = await request(app)
+      .patch('/api/admin/orders/1/status')
+      .set('Cookie', admin())
+      .send({ status: 'shipped' });
+
+    expect(res.status).toBe(200);
+    expect(mailer.sendOrderStatusEmail).toHaveBeenCalledWith('a@b.com', expect.objectContaining({ status: 'shipped', shippingMethod: 'pickup' }));
+  });
+
+  it('names a pickup order as ready for collection in a rejected transition', async () => {
+    const conn = makeStatusConn([{ status: 'shipped', payment_method: 'cod', payment_status: 'pending', shipping_method: 'pickup' }]);
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app)
+      .patch('/api/admin/orders/1/status')
+      .set('Cookie', admin())
+      .send({ status: 'processing' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toContain('Έτοιμη για παραλαβή');
+  });
+
   it('restocks items and refunds a paid order on cancellation', async () => {
     const conn = makeStatusConn([{ status: 'pending', payment_method: 'card_mock', payment_status: 'paid' }]);
     db.getConnection.mockResolvedValue(conn);

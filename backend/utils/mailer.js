@@ -244,6 +244,31 @@ async function sendOrderStatusEmail(toEmail, order) {
     `,
   };
 
+  if (order.shippingMethod === 'pickup') {
+    const storeHtml = `
+      <p style="margin:4px 0;"><strong>${STORE_PICKUP_LOCATION.street}, ${STORE_PICKUP_LOCATION.city}</strong></p>
+      <p style="margin:4px 0;color:#555;font-size:13px;">Ωράριο: ${STORE_PICKUP_LOCATION.hours}</p>`;
+
+    subjects.shipped = `Παραγγελία #${order.id} — Έτοιμη για παραλαβή! 🏬`;
+    subjects.delivered = `Παραγγελία #${order.id} — Παραλήφθηκε! ✅`;
+
+    bodies.processing = `
+      <h2 style="color:#2563eb;">Η παραγγελία σου είναι σε επεξεργασία</h2>
+      <p>Ετοιμάζουμε την παραγγελία σου <strong>#${order.id}</strong> για παραλαβή από το κατάστημα.</p>
+      <p>Θα σε ενημερώσουμε μόλις είναι έτοιμη.</p>
+    `;
+    bodies.shipped = `
+      <h2 style="color:#2563eb;">Η παραγγελία σου είναι έτοιμη για παραλαβή! 🏬</h2>
+      <p>Μπορείς να παραλάβεις την παραγγελία σου <strong>#${order.id}</strong> από το κατάστημα:</p>
+      ${storeHtml}
+    `;
+    bodies.delivered = `
+      <h2 style="color:#16a34a;">Παρέλαβες την παραγγελία σου! ✅</h2>
+      <p>Η παραγγελία σου <strong>#${order.id}</strong> παραλήφθηκε από το κατάστημα.</p>
+      <p>Ελπίζουμε να σου αρέσει! Μπορείς να αφήσεις αξιολόγηση για τα προϊόντα σου.</p>
+    `;
+  }
+
   const body = bodies[order.status];
   if (!body) return;
 

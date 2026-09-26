@@ -66,6 +66,7 @@ export interface OrderSummary {
   total_amount: number;
   status: string;
   created_at: string;
+  shipping_method?: string;
   return_statuses?: ReturnItemStatus[];
   return_products?: { name: string; status: ReturnItemStatus }[];
 }

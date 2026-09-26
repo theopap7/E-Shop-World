@@ -65,7 +65,7 @@
               <span class="order-id mono">#{{ o.id }}</span>
 
               <span class="status-badge" [ngClass]="'status-badge--' + o.status">
-                {{ statusLabel(o.status) }}
+                {{ statusLabel(o.status, o.shipping_method) }}
               </span>
 
               <span *ngIf="o.return_statuses?.includes('pending')" class="return-badge">↩ Αίτημα Επιστροφής</span>
@@ -99,7 +99,7 @@
         </div>
 
         <div class="order-timeline-section" *ngIf="o.status !== 'cancelled'">
-          <app-order-timeline [currentStatus]="normalizeStatus(o.status)"></app-order-timeline>
+          <app-order-timeline [currentStatus]="normalizeStatus(o.status)" [shippingMethod]="o.shipping_method ?? null"></app-order-timeline>
         </div>
 
       </div>

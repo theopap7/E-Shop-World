@@ -22,6 +22,7 @@ interface TimelineStep {
 export class OrderTimelineComponent {
   
   @Input() currentStatus: OrderStatus = 'pending';
+  @Input() shippingMethod: string | null = null;
   
   get steps(): TimelineStep[] {
     const statuses: OrderStatus[] = ['pending', 'processing', 'shipped', 'delivered'];
@@ -35,7 +36,7 @@ export class OrderTimelineComponent {
     const isDelivered = this.currentStatus === 'delivered';
 
     return statuses.map((status, index) => ({
-      label: statusLabel(status),
+      label: statusLabel(status, this.shippingMethod),
       status: status,
       icon: this.getIcon(status, index <= currentIndex),
       completed: index < currentIndex || isDelivered,
@@ -50,7 +51,7 @@ export class OrderTimelineComponent {
     const icons: Record<OrderStatus, string> = {
       'pending': '📝',
       'processing': '⚙️',
-      'shipped': '🚚',
+      'shipped': this.shippingMethod === 'pickup' ? '🏬' : '🚚',
       'delivered': '✓',
       'cancelled': '✕'
     };

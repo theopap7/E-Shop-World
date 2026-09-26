@@ -26,4 +26,9 @@ const SHIPPING_METHOD_LABELS = {
   pickup: 'Παραλαβή από κατάστημα',
 };
 
-module.exports = { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS };
+function orderStatusLabel(status, shippingMethod) {
+  if (shippingMethod === 'pickup' && status === 'shipped') return 'Έτοιμη για παραλαβή';
+  return ORDER_STATUS_LABELS[status] || status;
+}
+
+module.exports = { orderStatusLabel, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS };
