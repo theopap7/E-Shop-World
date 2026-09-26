@@ -265,14 +265,14 @@
         <div class="image-block-head">
           <label class="image-title">Συλλογή εικόνων</label>
           <small class="image-hint">
-            {{ isEditMode ? 'Επιπλέον εικόνες προϊόντος' : 'Θα ανέβουν μόλις δημιουργηθεί το προϊόν' }}
+            {{ isEditMode ? 'Οι αλλαγές αποθηκεύονται με το «Ενημέρωση Προϊόντος»' : 'Θα ανέβουν μόλις δημιουργηθεί το προϊόν' }}
           </small>
         </div>
 
-        <div class="gallery-grid" *ngIf="galleryImages.length > 0 || pendingGalleryFiles.length > 0">
-          <div class="gallery-item" *ngFor="let img of galleryImages">
+        <div class="gallery-grid" *ngIf="visibleGalleryImages.length > 0 || pendingGalleryFiles.length > 0">
+          <div class="gallery-item" *ngFor="let img of visibleGalleryImages">
             <img [src]="img.image_url | imageUrl" alt="Gallery" (error)="onImgError($event)" />
-            <button type="button" class="gallery-delete-btn" (click)="deleteGalleryImage(img.id)" title="Διαγραφή" aria-label="Διαγραφή εικόνας">✕</button>
+            <button type="button" class="gallery-delete-btn" (click)="removeGalleryImage(img.id)" [disabled]="isLoading" title="Αφαίρεση" aria-label="Αφαίρεση εικόνας">✕</button>
           </div>
           <div class="gallery-item" *ngFor="let pending of pendingGalleryFiles; let i = index">
             <img [src]="pending.preview" alt="Gallery" />
@@ -280,7 +280,7 @@
           </div>
         </div>
 
-        <p class="muted-text" *ngIf="galleryImages.length === 0 && pendingGalleryFiles.length === 0">Δεν υπάρχουν εικόνες στη συλλογή.</p>
+        <p class="muted-text" *ngIf="visibleGalleryImages.length === 0 && pendingGalleryFiles.length === 0">Δεν υπάρχουν εικόνες στη συλλογή.</p>
 
         <input type="file" #galleryInput accept="image/*" (change)="onGalleryFileSelected($event)" class="file-hidden" />
 
@@ -288,9 +288,9 @@
           type="button"
           class="btn btn-outline"
           style="margin-top:10px"
-          [disabled]="uploadingGallery || isLoading || isLoadingProduct"
+          [disabled]="isLoading || isLoadingProduct"
           (click)="galleryInput.click()">
-          {{ uploadingGallery ? 'Ανέβασμα...' : '+ Προσθήκη εικόνας στη συλλογή' }}
+          + Προσθήκη εικόνας στη συλλογή
         </button>
       </div>
 

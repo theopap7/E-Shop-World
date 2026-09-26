@@ -8,7 +8,6 @@ import { catchError, map, toArray } from 'rxjs/operators';
 import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
-import { ConfirmService } from '../services/confirm.service';
 import { environment } from '../../environments/environment';
 import { Category, ProductImage } from '../services/product.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
@@ -46,7 +45,11 @@ export class ProductFormComponent implements OnInit {
   // gallery
   galleryImages: ProductImage[] = [];
   pendingGalleryFiles: { file: File; preview: string }[] = [];
-  uploadingGallery = false;
+  pendingGalleryDeletes: number[] = [];
+
+  get visibleGalleryImages(): ProductImage[] {
+    return this.galleryImages.filter(img => !this.pendingGalleryDeletes.includes(img.id));
+  }
 
   // sizes
   readonly CLOTHING_SIZES = CLOTHING_SIZE_OPTIONS;
@@ -66,15 +69,12 @@ export class ProductFormComponent implements OnInit {
     return 'none';
   }
 
-  onCategoryChange(): void {
-    this.selectedSizes = [];
-    this.sizeStock = {};
   private sizeModeFor(sizes: string[]): 'clothing' | 'shoes' | 'none' {
     if (sizes.length === 0) return 'none';
     return sizes.some(s => this.SHOE_SIZES.includes(s)) ? 'shoes' : 'clothing';
   }
 
-  }
+  onCategoryChange(): void {
     if (!this.isEditMode && this.selectedSizes.length === 0) {
       this.sizeMode = this.suggestSizeMode();
     }
@@ -83,6 +83,9 @@ export class ProductFormComponent implements OnInit {
   setSizeMode(mode: 'clothing' | 'shoes' | 'none'): void {
     if (mode === this.sizeMode) return;
     this.sizeMode = mode;
+    this.selectedSizes = [];
+    this.sizeStock = {};
+  }
 
   isSizeSelected(s: string): boolean {
     return this.selectedSizes.includes(s);
@@ -124,8 +127,7 @@ export class ProductFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private toastService: ToastService,
-    private confirmService: ConfirmService
+    private toastService: ToastService
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -153,9 +155,10 @@ export class ProductFormComponent implements OnInit {
         this.form.reset({ name: '', description: '', price: 0, stock: 0, category_id: null, image_url: '' });
         this.selectedSizes = [];
         this.sizeStock = {};
+        this.sizeMode = 'none';
         this.galleryImages = [];
         this.pendingGalleryFiles = [];
-        this.sizeMode = 'none';
+        this.pendingGalleryDeletes = [];
       }
     });
   }
@@ -195,10 +198,10 @@ export class ProductFormComponent implements OnInit {
           this.uploading = false;
           this.selectedSizes = Array.isArray(p.sizes) ? [...p.sizes] : [];
           this.sizeStock = { ...(p.sizeStock || {}) };
+          this.sizeMode = this.sizeModeFor(this.selectedSizes);
           this.loadGalleryImages(id);
         }
 
-          this.sizeMode = this.sizeModeFor(this.selectedSizes);
         this.isLoadingProduct = false;
       },
       error: () => {
@@ -253,17 +256,17 @@ export class ProductFormComponent implements OnInit {
         this.adminService.invalidateStatsCache();
         this.toastService.success(this.isEditMode ? 'Προϊόν ενημερώθηκε!' : 'Προϊόν δημιουργήθηκε!');
 
-        const newProductId = res.productId;
-        if (this.isEditMode || !newProductId || this.pendingGalleryFiles.length === 0) {
+        const productId = this.isEditMode ? this.productId : res.productId;
+        if (!productId || (this.pendingGalleryFiles.length === 0 && this.pendingGalleryDeletes.length === 0)) {
           this.isLoading = false;
           this.router.navigate(['/admin/products']);
           return;
         }
 
-        this.uploadPendingGallery(newProductId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(results => {
+        this.savePendingGallery(productId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(results => {
           const failed = results.filter(ok => !ok).length;
           if (failed > 0) {
-            this.toastService.warning(`${failed} από τις εικόνες της συλλογής δεν ανέβηκαν. Μπορείς να τις προσθέσεις από την επεξεργασία.`);
+            this.toastService.warning(`${failed} από τις αλλαγές στη συλλογή εικόνων δεν αποθηκεύτηκαν. Δοκίμασε ξανά από την επεξεργασία.`);
           }
           this.isLoading = false;
           this.router.navigate(['/admin/products']);
@@ -383,11 +386,6 @@ export class ProductFormComponent implements OnInit {
     input.value = '';
     if (!file || !this.isValidGalleryFile(file)) return;
 
-    if (this.productId) {
-      this.uploadGalleryImage(file);
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = () => {
       this.pendingGalleryFiles = [...this.pendingGalleryFiles, { file, preview: String(reader.result || '') }];
@@ -421,50 +419,24 @@ export class ProductFormComponent implements OnInit {
     );
   }
 
-  private uploadPendingGallery(productId: number) {
-    return concat(...this.pendingGalleryFiles.map(({ file }) =>
+  private savePendingGallery(productId: number) {
+    const uploads = this.pendingGalleryFiles.map(({ file }) =>
       this.postGalleryImage(productId, file).pipe(
         map(() => true),
         catchError(() => of(false))
       )
-    )).pipe(toArray());
+    );
+    const deletes = this.pendingGalleryDeletes.map(imageId =>
+      this.http.delete<{ success: boolean }>(`${environment.apiUrl}/admin/products/${productId}/images/${imageId}`).pipe(
+        map(() => true),
+        catchError(() => of(false))
+      )
+    );
+    return concat(...uploads, ...deletes).pipe(toArray());
   }
 
-  uploadGalleryImage(file: File): void {
-    if (!this.productId) return;
-
-    this.uploadingGallery = true;
-    this.postGalleryImage(this.productId, file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.galleryImages = [...this.galleryImages, res.image];
-          this.toastService.success('Εικόνα προστέθηκε στη gallery');
-        }
-        this.uploadingGallery = false;
-      },
-      error: () => {
-        this.toastService.error('Αποτυχία ανεβάσματος εικόνας');
-        this.uploadingGallery = false;
-      }
-    });
-  }
-
-  async deleteGalleryImage(imageId: number): Promise<void> {
-    if (!this.productId) return;
-    const ok = await this.confirmService.confirm('Σίγουρα θέλεις να διαγράψεις αυτή την εικόνα;', { danger: true, confirmText: 'Διαγραφή' });
-    if (!ok) return;
-
-    this.http.delete<{ success: boolean }>(
-      `${environment.apiUrl}/admin/products/${this.productId}/images/${imageId}`
-    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.galleryImages = this.galleryImages.filter(img => img.id !== imageId);
-          this.toastService.success('Εικόνα διαγράφηκε');
-        }
-      },
-      error: () => { this.toastService.error('Αποτυχία διαγραφής εικόνας'); }
-    });
+  removeGalleryImage(imageId: number): void {
+    this.pendingGalleryDeletes = [...this.pendingGalleryDeletes, imageId];
   }
 
   removeImage(): void {
