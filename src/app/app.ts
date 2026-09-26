@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { CartSidebarComponent } from './cart-sidebar/cart-sidebar';
 import { ToastContainerComponent } from './toast/toast';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog';
@@ -42,4 +44,21 @@ import { EmailVerifyBannerComponent } from './email-verify-banner/email-verify-b
     }
   `]
 })
-export class AppComponent {}
+export class AppComponent {
+  private router = inject(Router);
+  private lastPath = '';
+
+  constructor() {
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      takeUntilDestroyed(inject(DestroyRef))
+    ).subscribe(e => {
+      const tree = this.router.parseUrl(e.urlAfterRedirects);
+      const path = tree.root.children['primary']?.segments.map(s => s.path).join('/') ?? '';
+      if (path !== this.lastPath && !tree.fragment) {
+        window.scrollTo(0, 0);
+      }
+      this.lastPath = path;
+    });
+  }
+}
