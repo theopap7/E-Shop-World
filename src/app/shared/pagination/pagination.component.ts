@@ -42,6 +42,7 @@ export class PaginationComponent implements OnChanges {
   go(page: number): void {
     if (page < 1 || page > this.totalPages || page === this.currentPage) return;
     this.pageChange.emit(page);
+    window.scrollTo(0, 0);
   }
 
   get from(): number { return Math.min((this.currentPage - 1) * this.pageSize + 1, this.total); }
