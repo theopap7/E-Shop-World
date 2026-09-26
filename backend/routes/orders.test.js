@@ -79,6 +79,25 @@ describe('POST /api/orders', () => {
     expect(orderItemInsertCall[1]).not.toContain(0.01);
   });
 
+  it('does not store the customer address on a pickup order', async () => {
+    const conn = makeConn({
+      productRows: [{ id: 5, price: 20, stock: 10, name: 'Test Product' }]
+    });
+    db.getConnection.mockResolvedValue(conn);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Cookie', authCookie())
+      .send({ ...basePayload, shipping: { ...basePayload.shipping, floor: '2', notes: 'Ring twice' } });
+
+    expect(res.status).toBe(201);
+    const orderInsertParams = conn.query.mock.calls[2][1];
+    expect(orderInsertParams).not.toContain('Athens');
+    expect(orderInsertParams).not.toContain('Main St 1');
+    expect(orderInsertParams).not.toContain('Ring twice');
+    expect(orderInsertParams).not.toContain('2');
+  });
+
   it('rejects order creation for an unverified email', async () => {
     const conn = makeConn({
       productRows: [{ id: 5, price: 49.99, stock: 10, name: 'Test Product' }],

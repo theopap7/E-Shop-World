@@ -10,6 +10,7 @@ const { restoreStock } = require('../utils/stock');
 const { isDiscountExpired } = require('../utils/discountRules');
 const { formatEur, formatDate } = require('../utils/format');
 const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../utils/labels');
+const { STORE_PICKUP_LOCATION } = require('../utils/storeLocation');
 
 // Only rate-limit checkout attempts that carry a discount code, so a discount-code
 // brute-force can't bypass the /validate-discount limiter by going through /orders instead.
@@ -46,7 +47,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
     return res.status(400).json({ success: false, message: 'Λείπει το τηλέφωνο' });
   }
 
-  const ship = shipping || {};
+  const ship = shippingMethod === 'pickup' ? {} : (shipping || {});
   if (shippingMethod !== 'pickup' && (!ship.city || !ship.zip || !ship.address1)) {
     return res.status(400).json({ success: false, message: 'Λείπει διεύθυνση αποστολής (πόλη/ΤΚ/διεύθυνση)' });
   }
@@ -232,7 +233,7 @@ router.post('/orders', authenticateToken, discountCodeGate, async (req, res) => 
       [
         userId, computedTotal,
         recipientName.trim(), String(phone).trim(),
-        ship.country || 'GR', ship.city, ship.zip, ship.address1, ship.notes || null,
+        ship.country || 'GR', ship.city || '', ship.zip || '', ship.address1 || '', ship.notes || null,
         shippingMethod, shippingCost,
         paymentMethod, paymentStatus, normalizedIban,
         subtotal, ship.floor || null,
@@ -779,13 +780,14 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       doc.font('RobotoBold').fontSize(10).text('Δώρο: Ναι', 50, 211, { width: 230, lineBreak: false });
     }
 
-    doc.font('RobotoBold').fontSize(11).text('ΔΙΕΥΘΥΝΣΗ ΑΠΟΣΤΟΛΗΣ', 300, 120);
+    doc.font('RobotoBold').fontSize(11).text(order.shipping_method === 'pickup' ? 'ΣΗΜΕΙΟ ΠΑΡΑΛΑΒΗΣ' : 'ΔΙΕΥΘΥΝΣΗ ΑΠΟΣΤΟΛΗΣ', 300, 120);
     doc.font('Roboto').fontSize(10)
       .text(`Ονοματεπώνυμο: ${order.recipient_name}`, 300, 136);
 
     if (order.shipping_method === 'pickup') {
-      doc.text(SHIPPING_METHOD_LABELS.pickup, 300, 151, { width: 230 });
-      doc.text(`Τηλέφωνο: ${order.phone}`, 300, 166, { width: 230, lineBreak: false });
+      doc.text(`Διεύθυνση: ${STORE_PICKUP_LOCATION.street}, ${STORE_PICKUP_LOCATION.city}`, 300, 151, { width: 230, lineBreak: false });
+      doc.text(`Ωράριο: ${STORE_PICKUP_LOCATION.hours}`, 300, 166, { width: 230 });
+      doc.text(`Τηλέφωνο: ${order.phone}`, 300, 181, { width: 230, lineBreak: false });
     } else if (order.floor) {
       doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
       doc.text(`Όροφος: ${order.floor}`, 300, 166, { width: 230, lineBreak: false });

@@ -448,7 +448,7 @@ export class CheckoutComponent implements OnInit {
       recipientName: String(v.recipientName).trim(),
       phone: String(v.phone).trim(),
 
-      shipping: {
+      shipping: v.shippingMethod === 'pickup' ? { country: 'ΕΛΛΑΔΑ', city: '', zip: '', address1: '' } : {
         country: String(v.shipping?.country || 'ΕΛΛΑΔΑ'),
         city: String(v.shipping?.city || '').trim(),
         zip: String(v.shipping?.zip || '').trim(),

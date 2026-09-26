@@ -213,6 +213,8 @@ describe('GET /api/admin/orders/:id/csv', () => {
     const res = await request(app).get('/api/admin/orders/1/csv').set('Cookie', admin());
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toMatch(/text\/csv/);
+    expect(res.text).toContain('Σημείο Παραλαβής');
+    expect(res.text).not.toContain('Main St');
     expect(res.text).not.toMatch(/Έκπτωση/);
   });
 

@@ -278,12 +278,16 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
       ['Τρόπος Αποστολής', SHIPPING_METHOD_LABELS[order.shipping_method] || order.shipping_method],
       ['Τρόπος Πληρωμής', PAYMENT_METHOD_LABELS[order.payment_method] || order.payment_method],
       ['Κατάσταση Πληρωμής', PAYMENT_STATUS_LABELS[order.payment_status] || order.payment_status],
-      ['Διεύθυνση', order.ship_address1],
-      ['Πόλη', order.ship_city],
-      ['ΤΚ', formatZip(order.ship_zip)],
-      ['Χώρα', order.ship_country],
-      ['Όροφος', formatFloor(order.floor)],
-      ['Σημειώσεις', order.ship_notes],
+      ...(order.shipping_method === 'pickup'
+        ? [['Σημείο Παραλαβής', `${STORE_PICKUP_LOCATION.street}, ${STORE_PICKUP_LOCATION.city}`]]
+        : [
+            ['Διεύθυνση', order.ship_address1],
+            ['Πόλη', order.ship_city],
+            ['ΤΚ', formatZip(order.ship_zip)],
+            ['Χώρα', order.ship_country],
+            ['Όροφος', formatFloor(order.floor)],
+            ['Σημειώσεις', order.ship_notes],
+          ]),
       ...items.map(({ name, quantity, unit_price, size }, i) =>
         [`Προϊόν ${i + 1}`, `${name}${size ? ` (${size})` : ''} x${quantity} (${eur(unit_price)})`]
       ),
