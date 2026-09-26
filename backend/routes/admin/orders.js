@@ -142,7 +142,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, async (req,
     // "refunded" for money that was never actually received.
     if (status === 'delivered' && requiresManualPaymentConfirmation(paymentMethod) && currentPaymentStatus !== 'paid') {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: 'Επιβεβαιώστε πρώτα την πληρωμή πριν σημειώσετε την παραγγελία ως παραδομένη' });
+      return res.status(400).json({ success: false, message: 'Επιβεβαίωσε πρώτα την πληρωμή πριν σημειώσεις την παραγγελία ως παραδομένη' });
     }
 
     if (status === 'delivered' && paymentMethod === 'cod') {

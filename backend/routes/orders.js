@@ -528,7 +528,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
 
     if (rows[0].status !== 'delivered') {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: 'Μπορείτε να ζητήσετε επιστροφή μόνο για παραδομένες παραγγελίες' });
+      return res.status(400).json({ success: false, message: 'Μπορείς να ζητήσεις επιστροφή μόνο για παραγγελίες που έχουν παραδοθεί' });
     }
 
     const [pendingReturn] = await conn.query(
@@ -537,7 +537,7 @@ router.post('/orders/:id/return', authenticateToken, async (req, res) => {
     );
     if (pendingReturn.length > 0) {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: 'Έχετε ήδη ένα εκκρεμές αίτημα επιστροφής για αυτή την παραγγελία' });
+      return res.status(400).json({ success: false, message: 'Έχεις ήδη ένα εκκρεμές αίτημα επιστροφής για αυτή την παραγγελία' });
     }
 
     const orderSubtotal = Number(rows[0].subtotal);
@@ -859,8 +859,8 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     tableY += 15;
     doc.font('Roboto').fontSize(9)
       .fillColor('#888888')
-      .text('Ευχαριστούμε για την παραγγελία σας!', 50, tableY, { align: 'center', width: 500 })
-      .text('Για οποιαδήποτε απορία επικοινωνήστε μαζί μας στο support@e-shop.example', 50, tableY + 13, { align: 'center', width: 500 });
+      .text('Ευχαριστούμε για την παραγγελία σου!', 50, tableY, { align: 'center', width: 500 })
+      .text('Για οποιαδήποτε απορία, επικοινώνησε μαζί μας στο support@e-shop.example', 50, tableY + 13, { align: 'center', width: 500 });
 
     doc.end();
   } catch (error) {

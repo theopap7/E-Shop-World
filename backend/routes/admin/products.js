@@ -217,7 +217,7 @@ router.delete('/admin/products/:id', authenticateToken, isAdmin, async (req, res
     if (orderItems[0].count > 0) {
       return res.status(400).json({
         success: false,
-        message: `Δεν είναι δυνατή η διαγραφή του "${productName}". Χρησιμοποιείται σε ${orderItems[0].count} παραγγελία(-ές). Μπορείτε να το σημειώσετε ως εξαντλημένο.`
+        message: `Δεν είναι δυνατή η διαγραφή του "${productName}". Χρησιμοποιείται σε ${orderItems[0].count} παραγγελία(-ές). Μπορείς να το σημειώσεις ως εξαντλημένο.`
       });
     }
 
@@ -241,7 +241,7 @@ router.delete('/admin/products/:id', authenticateToken, isAdmin, async (req, res
     if (error.code === 'ER_ROW_IS_REFERENCED_2' || error.errno === 1451) {
       return res.status(400).json({ success: false, message: 'Δεν είναι δυνατή η διαγραφή γιατί το προϊόν χρησιμοποιείται ήδη σε υπάρχουσες παραγγελίες.' });
     }
-    return res.status(500).json({ success: false, message: 'Αποτυχία διαγραφής προϊόντος. Παρακαλώ δοκιμάστε ξανά.' });
+    return res.status(500).json({ success: false, message: 'Αποτυχία διαγραφής προϊόντος. Δοκίμασε ξανά.' });
   }
 });
 

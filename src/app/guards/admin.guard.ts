@@ -21,7 +21,7 @@ export const adminGuard: CanActivateFn = () => {
       if (user.role === 'admin') {
         return true;
       }
-      toast.error('Δεν έχετε δικαίωμα πρόσβασης σε αυτή τη σελίδα');
+      toast.error('Δεν έχεις δικαίωμα πρόσβασης σε αυτή τη σελίδα');
       router.navigate(['/dashboard']);
       return false;
     }),

@@ -335,7 +335,7 @@ export class CheckoutComponent implements OnInit {
     const code = this.discountCode.trim().toUpperCase();
     
     if (!code) {
-      this.discountError = 'Εισάγετε κωδικό έκπτωσης';
+      this.discountError = 'Γράψε κωδικό έκπτωσης';
       return;
     }
 

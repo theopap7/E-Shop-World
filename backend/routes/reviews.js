@@ -102,7 +102,7 @@ router.post('/reviews/:productId', authenticateToken, async (req, res) => {
     `, [userId, productId]);
 
     if (orders.length === 0) {
-      return res.status(403).json({ success: false, message: 'Μπορείτε να αξιολογήσετε μόνο προϊόντα που έχετε αγοράσει και παραλάβει.' });
+      return res.status(403).json({ success: false, message: 'Μπορείς να αξιολογήσεις μόνο προϊόντα που έχεις αγοράσει και παραλάβει.' });
     }
 
     const [existing] = await db.query(
@@ -111,7 +111,7 @@ router.post('/reviews/:productId', authenticateToken, async (req, res) => {
     );
 
     if (existing.length > 0) {
-      return res.status(400).json({ success: false, message: 'Έχετε ήδη αξιολογήσει αυτό το προϊόν.' });
+      return res.status(400).json({ success: false, message: 'Έχεις ήδη αξιολογήσει αυτό το προϊόν.' });
     }
 
     await db.query(
@@ -144,7 +144,7 @@ router.put('/reviews/:reviewId', authenticateToken, async (req, res) => {
     }
 
     if (reviews[0].user_id !== userId) {
-      return res.status(403).json({ success: false, message: 'Δεν έχετε δικαίωμα επεξεργασίας αυτής της κριτικής' });
+      return res.status(403).json({ success: false, message: 'Δεν έχεις δικαίωμα επεξεργασίας αυτής της κριτικής' });
     }
 
     await db.query(
@@ -172,7 +172,7 @@ router.delete('/reviews/:reviewId', authenticateToken, async (req, res) => {
     }
 
     if (reviews[0].user_id !== userId && userRole !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Δεν έχετε δικαίωμα διαγραφής αυτής της κριτικής' });
+      return res.status(403).json({ success: false, message: 'Δεν έχεις δικαίωμα διαγραφής αυτής της κριτικής' });
     }
 
     await db.query('DELETE FROM reviews WHERE id = ?', [reviewId]);
