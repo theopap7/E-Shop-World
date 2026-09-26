@@ -184,11 +184,35 @@ describe('POST /api/verify-email', () => {
   });
 
   it('rejects an invalid or expired token', async () => {
-    db.query.mockResolvedValueOnce([[]]);
+    db.query
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([[]]);
 
     const res = await request(app).post('/api/verify-email').send({ token: 'bad-token' });
 
     expect(res.status).toBe(400);
+  });
+
+  it('rejects an expired token when the user is still unverified', async () => {
+    db.query
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([[{ email_verified: 0 }]]);
+
+    const res = await request(app).post('/api/verify-email').send({ token: 'expired-token' });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('reports an already verified email instead of an error when the link is reused', async () => {
+    db.query
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([[{ email_verified: 1 }]]);
+
+    const res = await request(app).post('/api/verify-email').send({ token: 'used-token' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.alreadyVerified).toBe(true);
+    expect(db.query).toHaveBeenCalledTimes(2);
   });
 
   it('marks the user verified and the token used for a valid token', async () => {

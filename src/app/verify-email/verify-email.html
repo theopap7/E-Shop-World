@@ -7,14 +7,26 @@
   <ng-container *ngIf="status === 'success'">
     <div class="success-box">
       <div class="success-icon">✅</div>
-      <h3>Επιτυχία!</h3>
-      <p>Το email σου επιβεβαιώθηκε.</p>
+      <h3>{{ alreadyVerified ? 'Όλα έτοιμα!' : 'Επιτυχία!' }}</h3>
+      <p>{{ alreadyVerified ? 'Το email σου είναι ήδη επιβεβαιωμένο.' : 'Το email σου επιβεβαιώθηκε.' }}</p>
     </div>
   </ng-container>
 
   <ng-container *ngIf="status === 'error' || status === 'missing-token'">
     <h2>Μη έγκυρος σύνδεσμος</h2>
     <p class="subtitle">{{ status === 'missing-token' ? 'Ο σύνδεσμος επιβεβαίωσης δεν είναι έγκυρος.' : errorMessage }}</p>
+
+    <form *ngIf="!resent" class="resend-form" (ngSubmit)="resend()">
+      <label for="resendEmail">Στείλε μου νέο σύνδεσμο στο:</label>
+      <input id="resendEmail" name="email" type="email" [(ngModel)]="email" placeholder="το email σου" required />
+      <button type="submit" [disabled]="!email.trim() || isSending">
+        {{ isSending ? 'Αποστολή...' : 'Στείλε νέο σύνδεσμο' }}
+      </button>
+    </form>
+
+    <p *ngIf="resent" class="resent-msg">
+      Αν ο λογαριασμός υπάρχει και δεν έχει επιβεβαιωθεί, θα λάβεις νέο σύνδεσμο στο email σου.
+    </p>
   </ng-container>
 
   <p class="back-link">

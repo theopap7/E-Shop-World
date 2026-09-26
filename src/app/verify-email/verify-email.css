@@ -54,3 +54,67 @@ h2 {
 .back-link a:hover {
   text-decoration: underline;
 }
+
+.resend-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.resend-form label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.resend-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background-color: #fafafa;
+  color: #333;
+}
+
+.resend-form input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.resend-form button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.resend-form button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  transform: translateY(-1px);
+}
+
+.resend-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.resent-msg {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--color-primary-tint);
+  color: var(--color-primary-deep);
+  font-size: 14px;
+}

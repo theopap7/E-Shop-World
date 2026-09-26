@@ -86,6 +86,15 @@ router.post('/verify-email', async (req, res) => {
     );
 
     if (rows.length === 0) {
+      const [usedRows] = await db.query(
+        `SELECT u.email_verified FROM email_verification_tokens t
+         JOIN users u ON u.id = t.user_id
+         WHERE t.token = ?`,
+        [token]
+      );
+      if (usedRows.length > 0 && usedRows[0].email_verified) {
+        return res.json({ success: true, alreadyVerified: true, message: 'Το email σου είναι ήδη επιβεβαιωμένο' });
+      }
       return res.status(400).json({ success: false, message: 'Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει' });
     }
 
@@ -452,7 +461,7 @@ router.post('/reset-password', forgotPasswordLimiter, async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return res.status(400).json({ success: false, message: 'Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει' });
+      return res.status(400).json({ success: false, code: 'invalid_token', message: 'Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει' });
     }
 
     const resetRecord = rows[0];

@@ -112,8 +112,8 @@ export class AuthService {
     return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/reset-password`, { token, newPassword });
   }
 
-  verifyEmail(token: string): Observable<{ success: boolean; message: string }> {
-    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/verify-email`, { token });
+  verifyEmail(token: string): Observable<{ success: boolean; message: string; alreadyVerified?: boolean }> {
+    return this.http.post<{ success: boolean; message: string; alreadyVerified?: boolean }>(`${this.apiUrl}/verify-email`, { token });
   }
 
   resendVerification(email: string): Observable<{ success: boolean; message: string }> {
