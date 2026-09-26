@@ -25,7 +25,7 @@ export class ReviewsComponent implements OnInit {
   average = 0;
   total = 0;
   isLoading = false;
-  error = '';
+  loadError = false;
 
   // Form state (για νέο review)
   newRating = 0;
@@ -92,6 +92,7 @@ export class ReviewsComponent implements OnInit {
 
   loadReviews(): void {
     this.isLoading = true;
+    this.loadError = false;
 
     this.reviewService.getReviews(this.productId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
@@ -102,6 +103,7 @@ export class ReviewsComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
+        this.loadError = true;
       }
     });
   }

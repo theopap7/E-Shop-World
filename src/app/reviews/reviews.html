@@ -66,7 +66,12 @@
 
   <div *ngIf="isLoading" class="loading">Φόρτωση κριτικών...</div>
 
-  <div *ngIf="!isLoading && reviews.length === 0" class="empty-state">
+  <div *ngIf="!isLoading && loadError" class="alert alert-error load-error">
+    Δεν ήταν δυνατή η φόρτωση των κριτικών.
+    <button class="btn btn-primary" type="button" (click)="loadReviews()">Ξαναδοκίμασε</button>
+  </div>
+
+  <div *ngIf="!isLoading && !loadError && reviews.length === 0" class="empty-state">
     <div class="empty-icon">⭐</div>
     <h3>Δεν υπάρχουν κριτικές ακόμα</h3>
     <p>Γίνε ο πρώτος που θα αξιολογήσει αυτό το προϊόν.</p>
