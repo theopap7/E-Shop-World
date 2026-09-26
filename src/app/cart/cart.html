@@ -49,7 +49,8 @@
         </div>
 
         <div class="right">
-          <div class="qty">
+          <span *ngIf="item.stock <= 0" class="unavailable-tag">Μη διαθέσιμο</span>
+          <div class="qty" *ngIf="item.stock > 0">
             <select class="qty-select" [ngModel]="item.quantity" (ngModelChange)="setQty(item.productId, $event, item.size)">
               <option *ngFor="let n of qtyOptions(item)" [value]="n">{{ n }}</option>
             </select>
@@ -63,13 +64,17 @@
         </div>
       </div>
 
+      <p *ngIf="hasUnavailable" class="alert alert-error unavailable-note">
+        Κάποια προϊόντα δεν είναι πλέον διαθέσιμα. Αφαίρεσέ τα για να συνεχίσεις.
+      </p>
+
       <div class="summary">
         <div class="summary-left">
           <span>Σύνολο</span>
           <strong>{{ total | currency }}</strong>
         </div>
 
-        <button class="btn btn-primary" type="button" (click)="goToCheckout()">
+        <button class="btn btn-primary" type="button" [disabled]="hasUnavailable" (click)="goToCheckout()">
           Ολοκλήρωση αγοράς
         </button>
       </div>

@@ -68,6 +68,7 @@ function ibanChecksumValidator(): ValidatorFn {
 })
 export class CheckoutComponent implements OnInit {
   items: CartItem[] = [];
+  hasUnavailable = false;
   subtotal = 0;
   shippingCost = 0;
   
@@ -141,6 +142,7 @@ export class CheckoutComponent implements OnInit {
 
     this.cart.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
+      this.hasUnavailable = items.some(i => i.stock <= 0);
       this.subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
       const minOrderAmount = Number(this.appliedDiscount?.minOrderAmount ?? 0);
       if (this.appliedDiscount && this.subtotal < minOrderAmount) {
@@ -401,6 +403,11 @@ export class CheckoutComponent implements OnInit {
 
     if (this.items.length === 0) {
       this.error = 'Το καλάθι είναι άδειο.';
+      return;
+    }
+
+    if (this.hasUnavailable) {
+      this.error = 'Κάποια προϊόντα δεν είναι πλέον διαθέσιμα. Αφαίρεσέ τα από το καλάθι για να συνεχίσεις.';
       return;
     }
 

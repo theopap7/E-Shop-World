@@ -234,7 +234,11 @@
           Πρέπει να αποδεχτείς τους όρους
         </small>
 
-        <button type="submit" [disabled]="isSubmitting || items.length === 0 || !isEmailVerified" class="btn">
+        <p *ngIf="hasUnavailable" class="err">
+          Κάποια προϊόντα δεν είναι πλέον διαθέσιμα. <a routerLink="/cart">Αφαίρεσέ τα από το καλάθι</a> για να συνεχίσεις.
+        </p>
+
+        <button type="submit" [disabled]="isSubmitting || items.length === 0 || !isEmailVerified || hasUnavailable" class="btn">
           {{ isSubmitting ? 'Γίνεται καταχώρηση...' : 'Ολοκλήρωση παραγγελίας' }}
         </button>
       </form>
@@ -248,6 +252,7 @@
           <div>
             <strong>{{ it.name }}</strong>
             <div class="muted">x{{ it.quantity }}<span *ngIf="it.size"> · {{ it.size }}</span></div>
+            <div *ngIf="it.stock <= 0" class="err">Μη διαθέσιμο</div>
           </div>
           <div>{{ (it.price * it.quantity) | currency }}</div>
         </div>

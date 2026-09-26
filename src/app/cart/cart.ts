@@ -18,6 +18,7 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 export class CartComponent implements OnInit {
   items: CartItem[] = [];
   total = 0;
+  hasUnavailable = false;
 
   orderError: string | null = null;
 
@@ -34,6 +35,7 @@ export class CartComponent implements OnInit {
     this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.items = items;
       this.total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      this.hasUnavailable = items.some(i => i.stock <= 0);
     });
     this.cartService.refreshFromServer();
   }
@@ -72,6 +74,8 @@ export class CartComponent implements OnInit {
       this.orderError = 'Το καλάθι είναι άδειο.';
       return;
     }
+
+    if (this.hasUnavailable) return;
 
     this.router.navigate(['/checkout']);
   }

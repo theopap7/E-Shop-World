@@ -40,9 +40,12 @@
         <div *ngIf="item.size" class="item-size">Μέγεθος: {{ item.size }}</div>
         <div class="item-bottom">
           <div class="item-controls">
-            <button class="qty-btn" type="button" (click)="decrease(item.productId, item.size)">−</button>
-            <span class="qty">{{ item.quantity }}</span>
-            <button class="qty-btn" type="button" (click)="increase(item.productId, item.size)">+</button>
+            <span *ngIf="item.stock <= 0" class="unavailable-tag">Μη διαθέσιμο</span>
+            <ng-container *ngIf="item.stock > 0">
+              <button class="qty-btn" type="button" (click)="decrease(item.productId, item.size)">−</button>
+              <span class="qty">{{ item.quantity }}</span>
+              <button class="qty-btn" type="button" (click)="increase(item.productId, item.size)">+</button>
+            </ng-container>
             <button class="remove-btn" type="button" (click)="remove(item.productId, item.size)">🗑️</button>
           </div>
           <div class="item-subtotal">{{ (item.price * item.quantity) | currency }}</div>
@@ -57,9 +60,14 @@
       <strong>{{ total | currency }}</strong>
     </div>
 
+    <p *ngIf="cartService.hasUnavailableItems()" class="unavailable-note">
+      Κάποια προϊόντα δεν είναι πλέον διαθέσιμα. Αφαίρεσέ τα για να συνεχίσεις.
+    </p>
+
     <button
       class="btn btn-primary checkout-btn"
       type="button"
+      [disabled]="cartService.hasUnavailableItems()"
       routerLink="/checkout"
       (click)="close()">
       Ολοκλήρωση αγοράς

@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { CartService } from './cart.service';
 import { ProductDto } from './product.service';
 
@@ -98,5 +98,32 @@ describe('CartService', () => {
 
     expect(service.getItems()[0].quantity).toBe(2);
     expect(fakeToast.info).not.toHaveBeenCalled();
+  });
+  it('refreshFromServer() marks an item unavailable when its stock ran out', () => {
+    service.addToCart(makeProduct({ stock: 5 }), 2);
+    fakeProducts.getProduct.and.returnValue(of({ success: true, product: makeProduct({ stock: 0 }), galleryImages: [] }));
+
+    service.refreshFromServer();
+
+    expect(service.getItems()[0].stock).toBe(0);
+    expect(service.hasUnavailableItems()).toBeTrue();
+  });
+
+  it('refreshFromServer() marks a deleted product unavailable', () => {
+    service.addToCart(makeProduct({ stock: 5 }), 1);
+    fakeProducts.getProduct.and.returnValue(throwError(() => ({ status: 404 })));
+
+    service.refreshFromServer();
+
+    expect(service.hasUnavailableItems()).toBeTrue();
+  });
+
+  it('refreshFromServer() keeps an item available when the server cannot be reached', () => {
+    service.addToCart(makeProduct({ stock: 5 }), 1);
+    fakeProducts.getProduct.and.returnValue(throwError(() => ({ status: 0 })));
+
+    service.refreshFromServer();
+
+    expect(service.hasUnavailableItems()).toBeFalse();
   });
 });

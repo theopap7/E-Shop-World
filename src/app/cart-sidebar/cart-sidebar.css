@@ -298,7 +298,34 @@
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
-.checkout-btn:hover {
+.checkout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.unavailable-tag {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.unavailable-note {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-danger-border);
+  background: #fef2f2;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.checkout-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);

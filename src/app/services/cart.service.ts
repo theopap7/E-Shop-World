@@ -97,6 +97,10 @@ export class CartService implements OnDestroy {
     return this.itemsSubject.value.reduce((sum, i) => sum + i.quantity, 0);
   }
 
+  hasUnavailableItems(): boolean {
+    return this.itemsSubject.value.some(i => i.stock <= 0);
+  }
+
   addToCart(product: ProductDto, qty = 1, size?: string): boolean {
     const availableStock = size ? (product.sizeStock?.[size] ?? 0) : product.stock;
 
@@ -109,6 +113,7 @@ export class CartService implements OnDestroy {
         this.toastService.error(`Δεν υπάρχει μεγαλύτερη διαθεσιμότητα για "${product.name}"`);
         return false;
       }
+      existing.stock = availableStock;
       existing.quantity = Math.min(existing.quantity + qty, availableStock);
     } else {
       items.push({
@@ -197,14 +202,20 @@ export class CartService implements OnDestroy {
     const ids = [...new Set(this.itemsSubject.value.map(i => i.productId))];
     if (ids.length === 0) return;
 
+    const deletedIds = new Set<number>();
+
     forkJoin(ids.map(id => this.productService.getProduct(id).pipe(
       map(res => res.product),
-      catchError(() => of(null))
+      catchError(err => {
+        if (err?.status === 404) deletedIds.add(id);
+        return of(null);
+      })
     ))).subscribe(products => {
       const byId = new Map(products.filter((p): p is ProductDto => !!p).map(p => [p.id, p]));
       let priceChanged = false;
 
       const items = this.itemsSubject.value.map(item => {
+        if (deletedIds.has(item.productId)) return { ...item, stock: 0 };
         const product = byId.get(item.productId);
         if (!product) return item;
 
