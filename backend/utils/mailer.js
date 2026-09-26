@@ -9,6 +9,11 @@ const DELIVERY_ESTIMATES = {
   courier_express: '1-2 εργάσιμες',
 };
 
+const SHIPPED_DELIVERY_ESTIMATES = {
+  courier_standard: 'σε 1-3 εργάσιμες ημέρες',
+  courier_express: 'την επόμενη εργάσιμη ημέρα',
+};
+
 const useSendGrid = !!process.env.SENDGRID_API_KEY;
 if (useSendGrid) {
   require('@sendgrid/mail').setApiKey(process.env.SENDGRID_API_KEY);
@@ -230,7 +235,7 @@ async function sendOrderStatusEmail(toEmail, order) {
     shipped: `
       <h2 style="color:#2563eb;">Η παραγγελία σου απεστάλη! 🚚</h2>
       <p>Η παραγγελία σου <strong>#${order.id}</strong> βρίσκεται καθ' οδόν.</p>
-      <p>Αναμενόμενη παράδοση σε <strong>1-5 εργάσιμες ημέρες</strong>.</p>
+      ${SHIPPED_DELIVERY_ESTIMATES[order.shippingMethod] ? `<p>Θα τη λάβεις <strong>${SHIPPED_DELIVERY_ESTIMATES[order.shippingMethod]}</strong>.</p>` : ''}
     `,
     delivered: `
       <h2 style="color:#16a34a;">Η παραγγελία σου παραδόθηκε! ✅</h2>
