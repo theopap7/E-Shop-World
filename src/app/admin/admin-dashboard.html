@@ -33,6 +33,15 @@
 
     <ng-container *ngIf="!isLoading && !error && stats">
 
+      <a
+        *ngIf="stats.pendingPayments > 0"
+        routerLink="/admin/orders"
+        [queryParams]="{ filter: 'awaiting_payment' }"
+        class="attention-banner">
+        <span>💳 {{ stats.pendingPayments }} {{ stats.pendingPayments === 1 ? 'πληρωμή περιμένει' : 'πληρωμές περιμένουν' }} επιβεβαίωση</span>
+        <span class="attention-link">Δες {{ stats.pendingPayments === 1 ? 'την' : 'τις' }} →</span>
+      </a>
+
       <div class="section">
         <div class="section-head">
           <h2 class="section-title">Γρήγορες Ενέργειες</h2>

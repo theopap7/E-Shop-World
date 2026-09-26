@@ -48,7 +48,7 @@
           *ngFor="let f of filters"
           class="status-tab"
           [class.active]="activeFilter === f.key"
-          [class.tab--pending]="f.key === 'pending' && count('pending') > 0 && activeFilter !== 'pending'"
+          [class.tab--pending]="(f.key === 'pending' || f.key === 'awaiting_payment') && count(f.key) > 0 && activeFilter !== f.key"
           (click)="onFilterChange(f.key)"
           type="button">
           {{ f.label }}
@@ -82,7 +82,7 @@
             <tr
               *ngFor="let order of pagedOrders"
               class="clickable-row"
-              [class.row--pending]="order.status === 'pending'"
+              [class.row--pending]="needsAttention(order)"
               (click)="goToOrder(order.id)"
             >
 

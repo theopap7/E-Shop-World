@@ -2,7 +2,7 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AdminService, AdminOrder } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
@@ -30,6 +30,7 @@ export class AdminOrdersComponent implements OnInit {
 
   readonly filters = [
     { key: 'all', label: 'Όλες' },
+    { key: 'awaiting_payment', label: '💳 Προς επιβεβαίωση' },
     ...(['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const).map(key => ({
       key,
       label: statusLabel(key),
@@ -47,9 +48,22 @@ export class AdminOrdersComponent implements OnInit {
     );
   }
 
+  needsPaymentConfirmation(order: AdminOrder): boolean {
+    return order.payment_method === 'bank_transfer' && order.payment_status === 'pending' && order.status !== 'cancelled';
+  }
+
+  needsAttention(order: AdminOrder): boolean {
+    return order.status === 'pending' || this.needsPaymentConfirmation(order);
+  }
+
+  private matchesFilter(order: AdminOrder, key: string): boolean {
+    if (key === 'all') return true;
+    if (key === 'awaiting_payment') return this.needsPaymentConfirmation(order);
+    return order.status === key;
+  }
+
   get filteredOrders(): AdminOrder[] {
-    if (this.activeFilter === 'all') return this.searchFilteredOrders;
-    return this.searchFilteredOrders.filter(o => o.status === this.activeFilter);
+    return this.searchFilteredOrders.filter(o => this.matchesFilter(o, this.activeFilter));
   }
 
   get pagedOrders(): AdminOrder[] {
@@ -67,8 +81,7 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   count(key: string): number {
-    if (key === 'all') return this.searchFilteredOrders.length;
-    return this.searchFilteredOrders.filter(o => o.status === key).length;
+    return this.searchFilteredOrders.filter(o => this.matchesFilter(o, key)).length;
   }
 
   private destroyRef = inject(DestroyRef);
@@ -76,11 +89,15 @@ export class AdminOrdersComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastService: ToastService,
     private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('filter') === 'awaiting_payment') {
+      this.activeFilter = 'awaiting_payment';
+    }
     this.loadOrders();
   }
 
@@ -116,8 +133,7 @@ export class AdminOrdersComponent implements OnInit {
 
   private sortOrders(orders: AdminOrder[]): AdminOrder[] {
     return orders.sort((a: AdminOrder, b: AdminOrder) =>
-      a.status === 'pending' && b.status !== 'pending' ? -1 :
-      a.status !== 'pending' && b.status === 'pending' ? 1 : 0
+      Number(this.needsAttention(b)) - Number(this.needsAttention(a))
     );
   }
 
