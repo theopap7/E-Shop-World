@@ -100,12 +100,28 @@ describe('POST /api/admin/discount-codes', () => {
   });
 });
 
+describe('POST /api/admin/discount-codes code format', () => {
+  const admin = () => authCookie({ id: 1, role: 'admin' });
+  beforeEach(() => jest.clearAllMocks());
+
+  it('rejects a new code that contains a space', async () => {
+    const res = await request(app)
+      .post('/api/admin/discount-codes')
+      .set('Cookie', admin())
+      .send({ code: 'BLACK FRIDAY', type: 'percentage', value: 20 });
+
+    expect(res.status).toBe(400);
+    expect(db.query).not.toHaveBeenCalled();
+  });
+});
+
 describe('PUT /api/admin/discount-codes/:id', () => {
   const admin = () => authCookie({ id: 1, role: 'admin' });
   beforeEach(() => jest.clearAllMocks());
 
   it('returns 404 when the code does not exist', async () => {
     db.query
+      .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([[]]) // no duplicate
       .mockResolvedValueOnce([{ affectedRows: 0 }]); // update
 
@@ -119,6 +135,7 @@ describe('PUT /api/admin/discount-codes/:id', () => {
 
   it('updates a valid discount code', async () => {
     db.query
+      .mockResolvedValueOnce([[{ code: 'X' }]])
       .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{ affectedRows: 1 }]);
 
@@ -128,6 +145,31 @@ describe('PUT /api/admin/discount-codes/:id', () => {
       .send({ code: 'X', type: 'fixed', value: 5, active: true });
 
     expect(res.status).toBe(200);
+  });
+
+  it('keeps accepting an existing code that already contains a space', async () => {
+    db.query
+      .mockResolvedValueOnce([[{ code: 'BLACK FRIDAY' }]])
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
+
+    const res = await request(app)
+      .put('/api/admin/discount-codes/1')
+      .set('Cookie', admin())
+      .send({ code: 'black friday', type: 'percentage', value: 70, active: false });
+
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects renaming a code to one with a space', async () => {
+    db.query.mockResolvedValueOnce([[{ code: 'SAVE10' }]]);
+
+    const res = await request(app)
+      .put('/api/admin/discount-codes/1')
+      .set('Cookie', admin())
+      .send({ code: 'SAVE 10', type: 'percentage', value: 10 });
+
+    expect(res.status).toBe(400);
   });
 });
 

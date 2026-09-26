@@ -138,6 +138,12 @@ export class AdminDiscountsComponent implements OnInit {
       this.toastService.warning('Συμπλήρωσε όλα τα υποχρεωτικά πεδία');
       return;
     }
+    const code = this.form.code.trim().toUpperCase();
+    const originalCode = this.codes.find(c => c.id === this.editingCodeId)?.code;
+    if (code !== originalCode && !/^[A-Z0-9-]+$/.test(code)) {
+      this.toastService.warning('Ο κωδικός μπορεί να έχει μόνο λατινικά γράμματα, αριθμούς και παύλα, χωρίς κενά');
+      return;
+    }
     if (this.form.value <= 0) {
       this.toastService.warning('Η αξία πρέπει να είναι μεγαλύτερη από 0');
       return;
@@ -154,7 +160,7 @@ export class AdminDiscountsComponent implements OnInit {
     this.isSaving = true;
 
     const payload = {
-      code: this.form.code.trim().toUpperCase(),
+      code,
       type: this.form.type,
       value: this.form.value,
       minOrderAmount: this.form.minOrderAmount || 0,

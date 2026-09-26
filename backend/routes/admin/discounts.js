@@ -3,6 +3,9 @@ const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
 
+const CODE_PATTERN = /^[A-Z0-9-]+$/;
+const CODE_PATTERN_MESSAGE = 'Ο κωδικός μπορεί να έχει μόνο λατινικά γράμματα, αριθμούς και παύλα, χωρίς κενά';
+
 router.get('/admin/discount-codes', authenticateToken, isAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -23,6 +26,10 @@ router.post('/admin/discount-codes', authenticateToken, isAdmin, async (req, res
 
     if (!normalizedCode || !type || value == null) {
       return res.status(400).json({ success: false, message: 'Κωδικός, τύπος και αξία είναι υποχρεωτικά' });
+    }
+
+    if (!CODE_PATTERN.test(normalizedCode)) {
+      return res.status(400).json({ success: false, message: CODE_PATTERN_MESSAGE });
     }
 
     if (!['percentage', 'fixed'].includes(type)) {
@@ -88,6 +95,11 @@ router.put('/admin/discount-codes/:id', authenticateToken, isAdmin, async (req, 
 
     if (type === 'percentage' && valueNum > 100) {
       return res.status(400).json({ success: false, message: 'Ποσοστό πρέπει να είναι 0-100' });
+    }
+
+    const [current] = await db.query('SELECT code FROM discount_codes WHERE id = ?', [id]);
+    if (current.length > 0 && current[0].code !== normalizedCode && !CODE_PATTERN.test(normalizedCode)) {
+      return res.status(400).json({ success: false, message: CODE_PATTERN_MESSAGE });
     }
 
     const [existing] = await db.query(
