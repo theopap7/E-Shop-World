@@ -40,6 +40,7 @@
   font-weight: 800;
   font-size: var(--text-xl);
   letter-spacing: 0.2px;
+  white-space: nowrap;
   background: var(--gradient-brand);
   -webkit-background-clip: text;
   background-clip: text;
@@ -130,20 +131,48 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .topbar {
     border-radius: var(--radius-lg);
-    padding: var(--space-3);
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .brand {
-    justify-content: center;
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
   }
 
   .top-actions {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .action-chip {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
     justify-content: center;
-    width: 100%;
+  }
+
+  .chip-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .chip-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-title {
+    display: none;
   }
 }
