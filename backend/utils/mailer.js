@@ -305,4 +305,50 @@ async function sendOrderStatusEmail(toEmail, order) {
   });
 }
 
-module.exports = { sendPasswordResetEmail, sendVerificationEmail, sendOrderConfirmationEmail, sendOrderStatusEmail };
+async function sendReturnDecisionEmail(toEmail, ret) {
+  const headings = {
+    approved: { text: 'Η επιστροφή σου εγκρίθηκε ✅', color: '#16a34a' },
+    partially_approved: { text: 'Η επιστροφή σου εγκρίθηκε μερικώς', color: BRAND_TEXT },
+    rejected: { text: 'Η επιστροφή σου απορρίφθηκε', color: '#dc2626' },
+  };
+  const heading = headings[ret.status];
+  if (!heading) return;
+
+  const itemRows = ret.items.map(item => {
+    const approved = item.status === 'approved';
+    return `
+      <tr>
+        <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;">${item.name}${item.size ? ` <span style="color:#888;">(${item.size})</span>` : ''} × ${item.quantity}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;text-align:right;color:${approved ? '#16a34a' : '#dc2626'};font-weight:bold;">${approved ? '✓ Εγκρίθηκε' : '✕ Απορρίφθηκε'}</td>
+      </tr>`;
+  }).join('');
+
+  const refundHtml = ret.refundAmount > 0
+    ? `<p>Θα σου επιστραφούν <strong>${formatEur(ret.refundAmount)}</strong> εντός <strong>3-5 εργάσιμων ημερών</strong>.</p>`
+    : '';
+  const noteHtml = ret.adminNote
+    ? `<p style="margin-top:16px;padding:12px 14px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;"><strong>Σχόλιο:</strong> ${ret.adminNote}</p>`
+    : '';
+
+  return send({
+    to: toEmail,
+    subject: `Παραγγελία #${ret.orderId} — Απάντηση στο αίτημα επιστροφής`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;color:#222;">
+        <div style="${BRAND_FILL}padding:20px 32px;border-radius:10px 10px 0 0;">
+          <h1 style="margin:0;color:white;font-size:20px;">E-Shop</h1>
+        </div>
+        <div style="background:#f9fafb;padding:24px 32px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">
+          <h2 style="color:${heading.color};">${heading.text}</h2>
+          <p>Ελέγξαμε το αίτημα επιστροφής για την παραγγελία σου <strong>#${ret.orderId}</strong>.</p>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;margin:12px 0;">${itemRows}</table>
+          ${refundHtml}
+          ${noteHtml}
+          <p style="margin-top:20px;color:#888;font-size:13px;">Δες τις λεπτομέρειες στις επιστροφές σου στον λογαριασμό σου.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+module.exports = { sendPasswordResetEmail, sendVerificationEmail, sendOrderConfirmationEmail, sendOrderStatusEmail, sendReturnDecisionEmail };

@@ -4,9 +4,13 @@ jest.mock('../../db', () => ({
   query: jest.fn(),
   getConnection: jest.fn()
 }));
+jest.mock('../../utils/mailer', () => ({
+  sendReturnDecisionEmail: jest.fn().mockResolvedValue(undefined)
+}));
 
 const request = require('supertest');
 const db = require('../../db');
+const mailer = require('../../utils/mailer');
 const app = require('../../server');
 const { authCookie } = require('../../test-utils/authCookie');
 
@@ -54,10 +58,10 @@ describe('GET /api/admin/returns', () => {
 describe('PATCH /api/admin/returns/:id', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  const pendingRequest = { id: 1, order_id: 10, current_status: 'pending', subtotal: 100, discount_amount: 0, total_amount: 105 };
+  const pendingRequest = { id: 1, order_id: 10, current_status: 'pending', subtotal: 100, discount_amount: 0, total_amount: 105, email: 'customer@test.com' };
   const twoItems = [
-    { id: 7, product_id: 5, quantity: 1, unit_price: 60, size: 'M' },
-    { id: 8, product_id: 6, quantity: 2, unit_price: 20, size: null }
+    { id: 7, product_id: 5, product_name: 'Φούτερ', quantity: 1, unit_price: 60, size: 'M' },
+    { id: 8, product_id: 6, product_name: 'Βιβλίο', quantity: 2, unit_price: 20, size: null }
   ];
 
   it('rejects an invalid decision', async () => {
@@ -161,6 +165,29 @@ describe('PATCH /api/admin/returns/:id', () => {
     expect(conn.query.mock.calls[6][1]).toEqual(['partially_refunded', 10]);
     const stockUpdates = conn.query.mock.calls.filter(([sql]) => sql.startsWith('UPDATE products SET stock'));
     expect(stockUpdates.map(([, params]) => params)).toEqual([[1, 5]]);
+
+    expect(mailer.sendReturnDecisionEmail).toHaveBeenCalledWith('customer@test.com', {
+      orderId: 10,
+      status: 'partially_approved',
+      refundAmount: 54,
+      adminNote: 'Το δεύτερο είναι φορεμένο',
+      items: [
+        { name: 'Φούτερ', size: 'M', quantity: 1, status: 'approved' },
+        { name: 'Βιβλίο', size: null, quantity: 2, status: 'rejected' }
+      ]
+    });
+  });
+
+  it('does not email the customer when the request cannot be processed', async () => {
+    const conn = makeConn({ ...pendingRequest, current_status: 'approved' });
+    db.getConnection.mockResolvedValue(conn);
+
+    await request(app)
+      .patch('/api/admin/returns/1')
+      .set('Cookie', admin())
+      .send({ items: [{ id: 7, status: 'approved' }] });
+
+    expect(mailer.sendReturnDecisionEmail).not.toHaveBeenCalled();
   });
 
   it('rejects every item without touching payment or stock', async () => {

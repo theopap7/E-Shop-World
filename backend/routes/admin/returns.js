@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
 const { restoreStock } = require('../../utils/stock');
+const { sendReturnDecisionEmail } = require('../../utils/mailer');
 
 router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -52,8 +53,10 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
     await conn.beginTransaction();
 
     const [rows] = await conn.query(
-      `SELECT rr.id, rr.order_id, rr.status AS current_status, o.subtotal, o.discount_amount, o.total_amount
-       FROM return_requests rr JOIN orders o ON o.id = rr.order_id
+      `SELECT rr.id, rr.order_id, rr.status AS current_status, o.subtotal, o.discount_amount, o.total_amount, u.email
+       FROM return_requests rr
+       JOIN orders o ON o.id = rr.order_id
+       JOIN users u ON u.id = rr.user_id
        WHERE rr.id = ? FOR UPDATE`,
       [returnId]
     );
@@ -71,7 +74,7 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
     }
 
     const [returnItems] = await conn.query(
-      'SELECT id, product_id, quantity, unit_price, size FROM return_request_items WHERE return_request_id = ?',
+      'SELECT id, product_id, product_name, quantity, unit_price, size FROM return_request_items WHERE return_request_id = ?',
       [returnId]
     );
 
@@ -132,7 +135,22 @@ router.patch('/admin/returns/:id', authenticateToken, isAdmin, async (req, res) 
       partially_approved: 'Το αίτημα εγκρίθηκε μερικώς — το απόθεμα και η επιστροφή χρημάτων ενημερώθηκαν για τα εγκεκριμένα προϊόντα',
       rejected: 'Το αίτημα απορρίφθηκε'
     };
-    return res.json({ success: true, status, message: messages[status] });
+    res.json({ success: true, status, message: messages[status] });
+
+    sendReturnDecisionEmail(returnReq.email, {
+      orderId: returnReq.order_id,
+      status,
+      refundAmount,
+      adminNote: adminNote?.trim() || null,
+      items: returnItems.map(item => ({
+        name: item.product_name,
+        size: item.size,
+        quantity: item.quantity,
+        status: decisionById.get(item.id)
+      }))
+    }).catch((emailErr) => {
+      console.error('Return decision email failed (non-critical):', emailErr.message);
+    });
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Update return error:', error);
