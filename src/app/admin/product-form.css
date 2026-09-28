@@ -43,6 +43,7 @@
 /* ========================= */
 
   .back-button{
+  margin-bottom:0;
   display:inline-flex;
   align-items:center;
   gap:8px;

@@ -36,31 +36,7 @@
 }
 
 .back-button {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 24px;
-  padding: 0;
-  background: transparent;
-  color: var(--ink-muted);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  transition: color .15s ease;
-}
-
-.back-button:hover {
-  color: var(--accent);
-}
-
-.back-icon {
-  font-size: 14px;
-  transition: transform .15s ease;
-}
-
-.back-button:hover .back-icon {
-  transform: translateX(-3px);
+  font-family: var(--font-sans);
 }
 
 /* ===============================

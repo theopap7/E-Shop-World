@@ -7,34 +7,6 @@
 .container {
   padding: 20px 0;
 }
-.back-button{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:24px;
-  padding:8px 14px;
-  border-radius:8px;
-  background:#f3f4f6;
-  color:#374151;
-  text-decoration:none;
-  font-size:14px;
-  font-weight:600;
-  transition:all .2s ease;
-}
-
-.back-button:hover{
-  background:#e5e7eb;
-  transform:translateX(-2px);
-}
-
-.back-icon{
-  font-size:16px;
-  transition:transform .2s ease;
-}
-
-.back-button:hover .back-icon{
-  transform:translateX(-3px);
-}
 .page-header {
   margin-bottom: 20px;
 }
