@@ -245,7 +245,7 @@
           Κάποια προϊόντα δεν είναι πλέον διαθέσιμα. <a routerLink="/cart">Αφαίρεσέ τα από το καλάθι</a> για να συνεχίσεις.
         </p>
 
-        <button type="submit" [disabled]="isSubmitting || items.length === 0 || !isEmailVerified || hasUnavailable" class="btn">
+        <button type="submit" [disabled]="isSubmitting || items.length === 0 || !isEmailVerified || hasUnavailable" class="btn btn-primary submit-btn">
           {{ isSubmitting ? 'Γίνεται καταχώρηση...' : 'Ολοκλήρωση παραγγελίας' }}
         </button>
       </form>
@@ -293,7 +293,7 @@
               type="button"
               (click)="applyDiscount()"
               [disabled]="applyingDiscount || !!appliedDiscount"
-              class="btn">
+              class="btn btn-primary">
               {{ applyingDiscount ? 'Έλεγχος...' : 'Εφαρμογή' }}
             </button>
           </div>

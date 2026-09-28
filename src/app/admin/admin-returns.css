@@ -24,8 +24,6 @@
   transform: translateX(-3px);
 }
 
-
-
 .page-title {
   font-size: var(--page-title-size);
   font-weight: var(--page-title-weight);
@@ -325,19 +323,6 @@
   justify-content: flex-end;
   gap: 10px;
 }
-
-.btn {
-  padding: 9px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.2s;
-}
-
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
 .btn-success {
   background: #10b981;
   color: white;
@@ -348,18 +333,6 @@
   background: #059669;
   border-color: #059669;
 }
-
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-}
-
 .alert-error {
   border: 1px solid #fecaca;
   background: #fef2f2;

@@ -231,30 +231,11 @@ label {
 }
 
 /* ===== Buttons ===== */
-.btn {
+.submit-btn {
   margin-top: 14px;
   width: 100%;
   padding: 12px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: #fff;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-}
-
-.btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  transform: translateY(-1px);
-}
-
-.btn:disabled {
-  background: #c7c9f5;
-  cursor: not-allowed;
-  box-shadow: none;
+  font-size: 15px;
 }
 
 /* ===== Links ===== */
@@ -301,8 +282,6 @@ hr {
 }
 
 .discount-input-group .btn {
-  width: auto;
-  margin: 0;
   padding: 8px 16px;
   white-space: nowrap;
 }

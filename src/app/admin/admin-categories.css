@@ -111,36 +111,6 @@
 }
 
 /* Buttons */
-.btn {
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-}
-
-.btn-outline {
-  background: white;
-  color: #374151;
-  border: 1px solid #e5e7eb;
-}
-
-.btn-outline:hover {
-  background: #f9fafb;
-}
-
 /* Modal */
 .modal-overlay {
   position: fixed;
