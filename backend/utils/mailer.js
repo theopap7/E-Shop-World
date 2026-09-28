@@ -14,6 +14,9 @@ const SHIPPED_DELIVERY_ESTIMATES = {
   courier_express: 'την επόμενη εργάσιμη ημέρα',
 };
 
+const BRAND_TEXT = '#4f46e5';
+const BRAND_FILL = 'background-color:#6366f1;background-image:linear-gradient(135deg,#6366f1,#8b5cf6);';
+
 const useSendGrid = !!process.env.SENDGRID_API_KEY;
 if (useSendGrid) {
   require('@sendgrid/mail').setApiKey(process.env.SENDGRID_API_KEY);
@@ -85,13 +88,13 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
     subject: 'Επαναφορά κωδικού πρόσβασης',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
-        <h2 style="color: #2563eb;">Επαναφορά Κωδικού</h2>
+        <h2 style="color:${BRAND_TEXT};">Επαναφορά Κωδικού</h2>
         <p>Λάβαμε αίτημα για επαναφορά του κωδικού σου.</p>
         <p>Κάνε κλικ στο παρακάτω κουμπί για να ορίσεις νέο κωδικό:</p>
         <a href="${resetLink}" style="
           display: inline-block;
           padding: 12px 24px;
-          background-color: #2563eb;
+          ${BRAND_FILL}
           color: white;
           text-decoration: none;
           border-radius: 8px;
@@ -107,18 +110,26 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
   });
 }
 
-async function sendVerificationEmail(toEmail, verifyLink) {
+async function sendVerificationEmail(toEmail, verifyLink, { emailChange = false } = {}) {
+  const heading = emailChange ? 'Επιβεβαίωσε το νέο σου email' : 'Καλωσήρθες στο E-Shop!';
+  const intro = emailChange
+    ? 'Άλλαξες το email του λογαριασμού σου. Κάνε κλικ στο παρακάτω κουμπί για να επιβεβαιώσεις τη νέα διεύθυνση:'
+    : 'Κάνε κλικ στο παρακάτω κουμπί για να επιβεβαιώσεις το email σου:';
+  const ignoreNote = emailChange
+    ? 'Αν δεν άλλαξες εσύ το email σου, επικοινώνησε μαζί μας.'
+    : 'Αν δεν δημιούργησες εσύ αυτόν τον λογαριασμό, αγνόησε αυτό το email.';
+
   return send({
     to: toEmail,
-    subject: 'Επιβεβαίωση email',
+    subject: emailChange ? 'Επιβεβαίωση νέου email' : 'Επιβεβαίωση email',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
-        <h2 style="color: #2563eb;">Καλωσήρθες στο E-Shop!</h2>
-        <p>Κάνε κλικ στο παρακάτω κουμπί για να επιβεβαιώσεις το email σου:</p>
+        <h2 style="color:${BRAND_TEXT};">${heading}</h2>
+        <p>${intro}</p>
         <a href="${verifyLink}" style="
           display: inline-block;
           padding: 12px 24px;
-          background-color: #2563eb;
+          ${BRAND_FILL}
           color: white;
           text-decoration: none;
           border-radius: 8px;
@@ -127,7 +138,7 @@ async function sendVerificationEmail(toEmail, verifyLink) {
         ">Επιβεβαίωση Email</a>
         <p style="color: #888; font-size: 13px;">
           Ο σύνδεσμος λήγει σε <strong>24 ώρες</strong>.<br>
-          Αν δεν δημιούργησες εσύ αυτόν τον λογαριασμό, αγνόησε αυτό το email.
+          ${ignoreNote}
         </p>
       </div>
     `,
@@ -158,7 +169,7 @@ async function sendOrderConfirmationEmail(toEmail, order) {
   const bankTransferHtml = order.paymentMethod === 'bank_transfer'
     ? `
           <div style="margin-top:20px;padding:14px 16px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;font-size:14px;">
-            <h4 style="margin:0 0 8px;color:#2563eb;">Στοιχεία κατάθεσης</h4>
+            <h4 style="margin:0 0 8px;color:${BRAND_TEXT};">Στοιχεία κατάθεσης</h4>
             <p style="margin:4px 0;">Δικαιούχος: <strong>${STORE_BANK_ACCOUNT.holder}</strong></p>
             <p style="margin:4px 0;">IBAN: <strong>${STORE_BANK_ACCOUNT.iban}</strong> (${STORE_BANK_ACCOUNT.bank})</p>
             <p style="margin:4px 0;">Ποσό: <strong>${formatEur(order.totalAmount)}</strong></p>
@@ -172,14 +183,14 @@ async function sendOrderConfirmationEmail(toEmail, order) {
     subject: `Επιβεβαίωση Παραγγελίας #${order.id}`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:580px;margin:auto;color:#222;">
-        <div style="background:#2563eb;padding:24px 32px;border-radius:10px 10px 0 0;">
+        <div style="${BRAND_FILL}padding:24px 32px;border-radius:10px 10px 0 0;">
           <h1 style="margin:0;color:white;font-size:22px;">✅ Η παραγγελία σου επιβεβαιώθηκε!</h1>
         </div>
         <div style="background:#f9fafb;padding:24px 32px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">
           <p>Γεια σου <strong>${order.recipientName}</strong>,</p>
           <p>Λάβαμε την παραγγελία σου <strong>#${order.id}</strong> και την ετοιμάζουμε.</p>
 
-          <h3 style="margin:20px 0 10px;color:#2563eb;">Προϊόντα</h3>
+          <h3 style="margin:20px 0 10px;color:${BRAND_TEXT};">Προϊόντα</h3>
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <thead>
               <tr style="color:#888;">
@@ -201,12 +212,12 @@ async function sendOrderConfirmationEmail(toEmail, order) {
 
           <div style="margin-top:20px;display:flex;gap:20px;">
             <div style="flex:1;">
-              <h4 style="margin:0 0 6px;color:#2563eb;">Αποστολή</h4>
+              <h4 style="margin:0 0 6px;color:${BRAND_TEXT};">Αποστολή</h4>
               <p style="margin:4px 0;color:#555;font-size:14px;">${shippingMethodLabel}</p>
               ${addressHtml}
             </div>
             <div style="flex:1;">
-              <h4 style="margin:0 0 6px;color:#2563eb;">Πληρωμή</h4>
+              <h4 style="margin:0 0 6px;color:${BRAND_TEXT};">Πληρωμή</h4>
               <p style="margin:4px 0;color:#555;font-size:14px;">${paymentMethodLabel}</p>
             </div>
           </div>
@@ -228,12 +239,12 @@ async function sendOrderStatusEmail(toEmail, order) {
 
   const bodies = {
     processing: `
-      <h2 style="color:#2563eb;">Η παραγγελία σου είναι σε επεξεργασία</h2>
+      <h2 style="color:${BRAND_TEXT};">Η παραγγελία σου είναι σε επεξεργασία</h2>
       <p>Ετοιμάζουμε την παραγγελία σου <strong>#${order.id}</strong> για αποστολή.</p>
       <p>Θα σε ενημερώσουμε μόλις αποσταλεί.</p>
     `,
     shipped: `
-      <h2 style="color:#2563eb;">Η παραγγελία σου απεστάλη! 🚚</h2>
+      <h2 style="color:${BRAND_TEXT};">Η παραγγελία σου απεστάλη! 🚚</h2>
       <p>Η παραγγελία σου <strong>#${order.id}</strong> βρίσκεται καθ' οδόν.</p>
       ${SHIPPED_DELIVERY_ESTIMATES[order.shippingMethod] ? `<p>Θα τη λάβεις <strong>${SHIPPED_DELIVERY_ESTIMATES[order.shippingMethod]}</strong>.</p>` : ''}
     `,
@@ -258,12 +269,12 @@ async function sendOrderStatusEmail(toEmail, order) {
     subjects.delivered = `Παραγγελία #${order.id} — Παραλήφθηκε! ✅`;
 
     bodies.processing = `
-      <h2 style="color:#2563eb;">Η παραγγελία σου είναι σε επεξεργασία</h2>
+      <h2 style="color:${BRAND_TEXT};">Η παραγγελία σου είναι σε επεξεργασία</h2>
       <p>Ετοιμάζουμε την παραγγελία σου <strong>#${order.id}</strong> για παραλαβή από το κατάστημα.</p>
       <p>Θα σε ενημερώσουμε μόλις είναι έτοιμη.</p>
     `;
     bodies.shipped = `
-      <h2 style="color:#2563eb;">Η παραγγελία σου είναι έτοιμη για παραλαβή! 🏬</h2>
+      <h2 style="color:${BRAND_TEXT};">Η παραγγελία σου είναι έτοιμη για παραλαβή! 🏬</h2>
       <p>Μπορείς να παραλάβεις την παραγγελία σου <strong>#${order.id}</strong> από το κατάστημα:</p>
       ${storeHtml}
     `;
@@ -282,7 +293,7 @@ async function sendOrderStatusEmail(toEmail, order) {
     subject: subjects[order.status],
     html: `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;color:#222;">
-        <div style="background:#2563eb;padding:20px 32px;border-radius:10px 10px 0 0;">
+        <div style="${BRAND_FILL}padding:20px 32px;border-radius:10px 10px 0 0;">
           <h1 style="margin:0;color:white;font-size:20px;">E-Shop</h1>
         </div>
         <div style="background:#f9fafb;padding:24px 32px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">

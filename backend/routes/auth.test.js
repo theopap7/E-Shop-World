@@ -143,6 +143,10 @@ describe('PUT /api/me', () => {
 
     const insertTokenCall = db.query.mock.calls[4];
     expect(insertTokenCall[0]).toContain('INSERT INTO email_verification_tokens');
+
+    expect(mailer.sendVerificationEmail).toHaveBeenCalledTimes(1);
+    expect(mailer.sendVerificationEmail.mock.calls[0][0]).toBe('new@test.com');
+    expect(mailer.sendVerificationEmail.mock.calls[0][2]).toEqual({ emailChange: true });
   });
 });
 

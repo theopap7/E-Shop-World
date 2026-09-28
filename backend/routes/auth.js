@@ -336,7 +336,7 @@ router.put('/me', authenticateToken, async (req, res) => {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
       const verifyLink = `${frontendUrl}/verify-email?token=${verifyToken}`;
 
-      sendVerificationEmail(normalizedEmail, verifyLink).catch((emailErr) => {
+      sendVerificationEmail(normalizedEmail, verifyLink, { emailChange: true }).catch((emailErr) => {
         console.error('Verification email failed (non-critical):', emailErr.message);
       });
     }
