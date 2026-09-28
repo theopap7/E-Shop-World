@@ -10,9 +10,8 @@ import { ProductListStateService } from '../services/product-list-state.service'
 import { ActivatedRoute, ParamMap, Params, Router, RouterModule } from '@angular/router';
 import { WishlistService } from '../services/wishlist.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
-import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
-import { STAR_CLASSES, starFill } from '../shared/star-fill';
+import { ProductCardComponent } from '../shared/product-card/product-card';
 
 @Component({
   selector: 'app-product-list',
@@ -22,8 +21,8 @@ import { STAR_CLASSES, starFill } from '../shared/star-fill';
     FormsModule,
     RouterModule ,
     SkeletonComponent,
-    ImageUrlPipe,
-    PaginationComponent
+    PaginationComponent,
+    ProductCardComponent
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
@@ -295,15 +294,12 @@ export class ProductListComponent implements OnInit {
       this.router.navigate(['/products', product.id]);
       return;
     }
-    this.cartService.addToCart(product);
+    if (this.cartService.addToCart(product)) {
+      this.cartService.openSidebar();
+    }
   }
 
-  getStarClass(star: number, rating: number | string | null): string {
-    return STAR_CLASSES[starFill(star, rating)];
-  }
-
-  toggleWishlist(product: ProductDto, event: Event): void {
-    event.stopPropagation();
+  toggleWishlist(product: ProductDto): void {
     this.wishlistService.toggle(product);
   }
 
@@ -312,8 +308,6 @@ export class ProductListComponent implements OnInit {
   }
 
   cartQty(productId: number): number {
-    return this.cartService.getItems()
-      .filter(i => i.productId === productId)
-      .reduce((sum, i) => sum + i.quantity, 0);
+    return this.cartService.quantityOf(productId);
   }
 }

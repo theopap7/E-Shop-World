@@ -39,70 +39,14 @@
       </div>
 
       <div class="wishlist-grid">
-        <article class="wishlist-card" *ngFor="let item of items">
-
-          <button
-            class="remove-btn"
-            type="button"
-            (click)="remove(item.id)"
-            aria-label="Αφαίρεση">
-            ✕
-          </button>
-
-          <a [routerLink]="['/products', item.id]" class="product-link">
-            <img
-              [src]="item.image_url | imageUrl"
-              [alt]="item.name"
-              class="wishlist-image"
-              (error)="$any($event.target).src='no-image.svg'"
-            />
-          </a>
-
-          <div class="wishlist-info">
-
-            <span class="category-badge">
-              {{ item.category_name || 'Χωρίς κατηγορία' }}
-            </span>
-
-            <a [routerLink]="['/products', item.id]" class="product-name-link">
-              <h3 class="product-name">{{ item.name }}</h3>
-            </a>
-
-            <div class="product-reviews" *ngIf="item.review_count > 0">
-              <div class="stars-mini">
-                <span *ngFor="let star of [1,2,3,4,5]"
-                      [class]="starClass(star, item.average_rating)">
-                  ★
-                </span>
-              </div>
-              <span class="rating-text">
-                {{ item.average_rating | number:'1.1-1' }}
-              </span>
-              <span class="review-count">({{ item.review_count }})</span>
-            </div>
-
-            <p class="product-description">
-              {{ item.description }}
-            </p>
-
-            <div class="stock-badge" [class.in-stock]="item.stock > 0">
-              <span *ngIf="item.stock > 0">✅ Διαθέσιμο</span>
-              <span *ngIf="item.stock === 0">❌ Μη διαθέσιμο</span>
-            </div>
-
-            <div class="wishlist-footer">
-              <div class="price">{{ item.price | currency }}</div>
-              <button
-                class="btn btn-primary"
-                type="button"
-                (click)="addToCart(item)"
-                [disabled]="item.stock === 0">
-                {{ item.stock > 0 ? '🛒 Προσθήκη' : 'Μη διαθέσιμο' }}
-              </button>
-            </div>
-
-          </div>
-        </article>
+        <app-product-card
+          *ngFor="let item of items"
+          [product]="item"
+          [inWishlist]="true"
+          [cartQty]="cartQty(item.id)"
+          (addToCart)="addToCart($event)"
+          (toggleWishlist)="remove($event.id)">
+        </app-product-card>
       </div>
     </div>
 

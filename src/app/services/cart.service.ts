@@ -101,6 +101,12 @@ export class CartService implements OnDestroy {
     return this.itemsSubject.value.some(i => i.stock <= 0);
   }
 
+  quantityOf(productId: number): number {
+    return this.itemsSubject.value
+      .filter(i => i.productId === productId)
+      .reduce((sum, i) => sum + i.quantity, 0);
+  }
+
   addToCart(product: ProductDto, qty = 1, size?: string): boolean {
     const availableStock = size ? (product.sizeStock?.[size] ?? 0) : product.stock;
 

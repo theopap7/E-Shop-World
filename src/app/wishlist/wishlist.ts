@@ -8,8 +8,7 @@ import { CartService } from '../services/cart.service';
 import { ConfirmService } from '../services/confirm.service';
 import { ProductDto } from '../services/product.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
-import { ImageUrlPipe } from '../shared/image-url.pipe';
-import { STAR_CLASSES, starFill } from '../shared/star-fill';
+import { ProductCardComponent } from '../shared/product-card/product-card';
 
 @Component({
   selector: 'app-wishlist',
@@ -18,7 +17,7 @@ import { STAR_CLASSES, starFill } from '../shared/star-fill';
     CommonModule,
     RouterModule,
     SkeletonComponent,
-    ImageUrlPipe
+    ProductCardComponent
   ],
   templateUrl: './wishlist.html',
   styleUrl: './wishlist.css'
@@ -56,8 +55,8 @@ export class WishlistComponent implements OnInit {
     this.wishlistService.refreshGuestItems();
   }
 
-  starClass(star: number, rating: number | string | null): string {
-    return STAR_CLASSES[starFill(star, rating)];
+  cartQty(productId: number): number {
+    return this.cartService.quantityOf(productId);
   }
 
   retry(): void {

@@ -50,6 +50,17 @@ describe('CartService', () => {
     expect(fakeToast.error).toHaveBeenCalled();
   });
 
+  it('quantityOf() sums a product across all of its sizes', () => {
+    const shoe = makeProduct({ id: 7, sizeStock: { '42': 5, '43': 5 } });
+    service.addToCart(shoe, 2, '42');
+    service.addToCart(shoe, 1, '43');
+    service.addToCart(makeProduct({ id: 8 }), 1);
+
+    expect(service.quantityOf(7)).toBe(3);
+    expect(service.quantityOf(8)).toBe(1);
+    expect(service.quantityOf(99)).toBe(0);
+  });
+
   it('increase() stops at the item stock limit', () => {
     service.addToCart(makeProduct({ stock: 1 }), 1);
     service.increase(1);

@@ -1,0 +1,69 @@
+<article class="card clickable" [routerLink]="['/products', product.id]">
+
+  <button
+    class="wishlist-btn"
+    type="button"
+    (click)="onToggleWishlist($event)"
+    [class.active]="inWishlist"
+    [attr.aria-label]="inWishlist ? 'Αφαίρεση από αγαπημένα' : 'Προσθήκη στα αγαπημένα'">
+    <span class="heart-icon">{{ inWishlist ? '❤️' : '🤍' }}</span>
+  </button>
+
+  <div class="image-wrap">
+    <img
+      [src]="product.image_url | imageUrl"
+      [alt]="product.name"
+      class="product-image"
+      (error)="$any($event.target).src='no-image.svg'"
+    />
+    <div *ngIf="cartQty > 0" class="in-cart-badge">
+      🛒 {{ cartQty }}
+    </div>
+  </div>
+
+  <div class="product-details">
+    <span class="category-badge">
+      {{ product.category_name || 'Χωρίς κατηγορία' }}
+    </span>
+
+    <h3 class="product-name">{{ product.name }}</h3>
+
+    <div class="product-reviews" *ngIf="product.review_count > 0">
+      <div class="stars-mini">
+        <span *ngFor="let star of [1,2,3,4,5]"
+              [class]="starClass(star, product.average_rating)">
+          ★
+        </span>
+      </div>
+      <span class="rating-text">{{ product.average_rating | number:'1.1-1' }}</span>
+      <span class="review-count">({{ product.review_count }})</span>
+    </div>
+
+    <div class="product-reviews no-reviews" *ngIf="product.review_count === 0">
+      <span class="no-reviews-text">Δεν υπάρχουν κριτικές ακόμα</span>
+    </div>
+
+    <p class="product-description">
+      {{ product.description }}
+    </p>
+
+    <div class="product-footer">
+      <div class="stock-badge" [class.in-stock]="product.stock > 0">
+        {{ product.stock > 0 ? 'Διαθέσιμο' : 'Μη διαθέσιμο' }}
+      </div>
+      <div class="footer-right">
+        <div class="product-price">{{ product.price | currency }}</div>
+        <button
+          *ngIf="product.stock > 0"
+          class="cart-icon-btn"
+          type="button"
+          (click)="onAddToCart($event)"
+          aria-label="Προσθήκη στο καλάθι">
+          🛒
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</article>

@@ -136,78 +136,14 @@
 
   <div *ngIf="!isLoading && !errorMessage && filteredProducts.length > 0" class="grid">
 
-    <article
-      class="card clickable"
+    <app-product-card
       *ngFor="let p of pagedProducts"
-      [routerLink]="['/products', p.id]">
-
-      <button
-        class="wishlist-btn"
-        type="button"
-        (click)="toggleWishlist(p, $event)"
-        [class.active]="isInWishlist(p.id)"
-        [attr.aria-label]="isInWishlist(p.id) ? 'Αφαίρεση από αγαπημένα' : 'Προσθήκη στα αγαπημένα'">
-        <span class="heart-icon">{{ isInWishlist(p.id) ? '❤️' : '🤍' }}</span>
-      </button>
-
-      <div class="image-wrap">
-        <img
-          [src]="p.image_url | imageUrl"
-          [alt]="p.name"
-          class="product-image"
-          (error)="$any($event.target).src='no-image.svg'"
-        />
-        <div *ngIf="cartQty(p.id) > 0" class="in-cart-badge">
-          🛒 {{ cartQty(p.id) }}
-        </div>
-      </div>
-
-      <div class="product-details">
-        <span class="category-badge">
-          {{ p.category_name || 'Χωρίς κατηγορία' }}
-        </span>
-
-        <h3 class="product-name">{{ p.name }}</h3>
-
-        <div class="product-reviews" *ngIf="p.review_count > 0">
-          <div class="stars-mini">
-            <span *ngFor="let star of [1,2,3,4,5]"
-                  [class]="getStarClass(star, p.average_rating)">
-              ★
-            </span>
-          </div>
-          <span class="rating-text">{{ p.average_rating | number:'1.1-1' }}</span>
-          <span class="review-count">({{ p.review_count }})</span>
-        </div>
-
-        <div class="product-reviews no-reviews" *ngIf="p.review_count === 0">
-          <span class="no-reviews-text">Δεν υπάρχουν κριτικές ακόμα</span>
-        </div>
-
-        <p class="product-description">
-          {{ p.description }}
-        </p>
-
-        <div class="product-footer">
-          <div class="stock-badge" [class.in-stock]="p.stock > 0">
-            {{ p.stock > 0 ? 'Διαθέσιμο' : 'Μη διαθέσιμο' }}
-          </div>
-          <div class="footer-right">
-            <div class="product-price">{{ p.price | currency }}</div>
-            <button
-              *ngIf="p.stock > 0"
-              class="cart-icon-btn"
-              type="button"
-              (click)="addToCart(p); $event.stopPropagation()"
-              aria-label="Προσθήκη στο καλάθι">
-              🛒
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-    </article>
+      [product]="p"
+      [inWishlist]="isInWishlist(p.id)"
+      [cartQty]="cartQty(p.id)"
+      (addToCart)="addToCart($event)"
+      (toggleWishlist)="toggleWishlist($event)">
+    </app-product-card>
 
   </div>
 
