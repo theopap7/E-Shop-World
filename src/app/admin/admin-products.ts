@@ -8,6 +8,7 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { PaginationComponent } from '../shared/pagination/pagination';
+import { matchesSearch } from '../shared/search-text';
 
 @Component({
   selector: 'app-admin-products',
@@ -26,12 +27,9 @@ export class AdminProductsComponent implements OnInit {
   readonly pageSize = 20;
 
   get filteredProducts(): Product[] {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return this.products;
+    if (!this.searchTerm.trim()) return this.products;
     return this.products.filter(p =>
-      `#${p.id}`.includes(term) ||
-      p.name?.toLowerCase().includes(term) ||
-      p.category_name?.toLowerCase().includes(term)
+      matchesSearch(this.searchTerm, `#${p.id}`, p.name, p.category_name)
     );
   }
 

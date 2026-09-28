@@ -12,6 +12,7 @@ import { WishlistService } from '../services/wishlist.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { PaginationComponent } from '../shared/pagination/pagination';
 import { ProductCardComponent } from '../shared/product-card/product-card';
+import { matchesSearch } from '../shared/search-text';
 
 @Component({
   selector: 'app-product-list',
@@ -208,11 +209,8 @@ export class ProductListComponent implements OnInit {
     let result = [...this.allProducts];
 
     if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase().trim();
       result = result.filter(p =>
-        p.name.toLowerCase().includes(term) ||
-        p.description?.toLowerCase().includes(term) ||
-        p.category_name?.toLowerCase().includes(term)
+        matchesSearch(this.searchTerm, p.name, p.description, p.category_name)
       );
     }
 

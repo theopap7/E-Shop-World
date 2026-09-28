@@ -9,6 +9,7 @@ import { ConfirmService } from '../services/confirm.service';
 import { PaginationComponent } from '../shared/pagination/pagination';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RatingStarsComponent } from '../shared/rating-stars/rating-stars';
+import { matchesSearch } from '../shared/search-text';
 
 @Component({
   selector: 'app-admin-reviews',
@@ -76,14 +77,9 @@ export class AdminReviewsComponent implements OnInit {
   }
 
   get filteredReviews(): AdminReviewDto[] {
-    const term = this.searchTerm.trim().toLowerCase();
     return this.reviews.filter(r =>
       (this.ratingFilter === 'all' || r.rating === Number(this.ratingFilter)) &&
-      (!term ||
-        r.product_name?.toLowerCase().includes(term) ||
-        `${r.first_name} ${r.last_name}`.toLowerCase().includes(term) ||
-        r.email?.toLowerCase().includes(term) ||
-        r.comment?.toLowerCase().includes(term))
+      matchesSearch(this.searchTerm, r.product_name, `${r.first_name} ${r.last_name}`, r.email, r.comment)
     );
   }
 

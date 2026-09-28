@@ -9,6 +9,7 @@ import { ConfirmService } from '../services/confirm.service';
 import { statusLabel } from '../services/order-status.util';
 import { paymentStatusLabel } from '../services/order-labels.util';
 import { PaginationComponent } from '../shared/pagination/pagination';
+import { matchesSearch } from '../shared/search-text';
 
 @Component({
   selector: 'app-admin-orders',
@@ -38,13 +39,9 @@ export class AdminOrdersComponent implements OnInit {
   ];
 
   get searchFilteredOrders(): AdminOrder[] {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return this.orders;
+    if (!this.searchTerm.trim()) return this.orders;
     return this.orders.filter(o =>
-      `#${o.id}`.includes(term) ||
-      o.first_name?.toLowerCase().includes(term) ||
-      o.last_name?.toLowerCase().includes(term) ||
-      o.user_email?.toLowerCase().includes(term)
+      matchesSearch(this.searchTerm, `#${o.id}`, o.first_name, o.last_name, o.user_email)
     );
   }
 

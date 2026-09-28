@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AdminService, AdminUser } from '../services/admin.service';
 import { PaginationComponent } from '../shared/pagination/pagination';
+import { matchesSearch } from '../shared/search-text';
 
 @Component({
   selector: 'app-admin-users',
@@ -45,12 +46,9 @@ export class AdminUsersComponent implements OnInit {
   }
 
   get filteredUsers(): AdminUser[] {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return this.users;
+    if (!this.searchTerm.trim()) return this.users;
     return this.users.filter(u =>
-      u.first_name?.toLowerCase().includes(term) ||
-      u.last_name?.toLowerCase().includes(term) ||
-      u.email?.toLowerCase().includes(term)
+      matchesSearch(this.searchTerm, u.first_name, u.last_name, u.email)
     );
   }
 
