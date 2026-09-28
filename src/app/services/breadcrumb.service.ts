@@ -21,7 +21,7 @@ export class BreadcrumbService {
         distinctUntilChanged()
       )
       .subscribe(() => {
-        const breadcrumbs = this.buildBreadcrumbsFromUrl(this.router.url);
+        const breadcrumbs = this.buildBreadcrumbsFromUrl(this.router.url.split(/[?#]/)[0]);
         this.breadcrumbsSubject.next(breadcrumbs);
       });
   }
