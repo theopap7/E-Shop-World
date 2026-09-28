@@ -6,7 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { catchError, map, of, switchMap, timer } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
-import { EyeIconComponent } from '../shared/eye-icon/eye-icon.component';
+import { EyeIconComponent } from '../shared/eye-icon/eye-icon';
 
 @Component({
   selector: 'app-register',

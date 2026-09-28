@@ -6,9 +6,9 @@ import { AdminService, AdminReviewDto } from '../services/admin.service';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
-import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
+import { RatingStarsComponent } from '../shared/rating-stars/rating-stars';
 
 @Component({
   selector: 'app-admin-reviews',

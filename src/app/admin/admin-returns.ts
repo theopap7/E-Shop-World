@@ -11,7 +11,7 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { environment } from '../../environments/environment';
 import { returnStatusLabel, returnItemSymbol } from '../services/return-status.util';
 import { ReturnItem, ReturnRequestStatus } from '../services/order.service';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 
 type Decision = 'approved' | 'rejected';
 

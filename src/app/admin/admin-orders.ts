@@ -8,7 +8,7 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { statusLabel } from '../services/order-status.util';
 import { paymentStatusLabel } from '../services/order-labels.util';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 
 @Component({
   selector: 'app-admin-orders',

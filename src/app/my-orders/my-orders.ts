@@ -5,7 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { OrderService, ReturnItemStatus } from '../services/order.service';
 import { OrderTimelineComponent } from '../order-timeline/order-timeline';
 import { SkeletonComponent } from '../skeleton/skeleton';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 import { statusLabel } from '../services/order-status.util';
 import { returnItemSymbol } from '../services/return-status.util';
 

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
+import { RatingStarsComponent } from '../shared/rating-stars/rating-stars';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';

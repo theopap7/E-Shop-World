@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { environment } from '../../environments/environment';
-import { EyeIconComponent } from '../shared/eye-icon/eye-icon.component';
+import { EyeIconComponent } from '../shared/eye-icon/eye-icon';
 
 @Component({
   standalone: true,

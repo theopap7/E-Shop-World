@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { EyeIconComponent } from '../shared/eye-icon/eye-icon.component';
+import { EyeIconComponent } from '../shared/eye-icon/eye-icon';
 
 function passwordsMatch(control: AbstractControl): ValidationErrors | null {
   const password = control.get('newPassword')?.value;

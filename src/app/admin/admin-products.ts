@@ -7,7 +7,7 @@ import { AdminService, Product } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 
 @Component({
   selector: 'app-admin-products',

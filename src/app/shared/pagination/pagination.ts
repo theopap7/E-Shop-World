@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-pagination',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css']
+  templateUrl: './pagination.html',
+  styleUrls: ['./pagination.css']
 })
 export class PaginationComponent implements OnChanges {
   @Input() total = 0;

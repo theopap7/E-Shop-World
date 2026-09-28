@@ -7,7 +7,7 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
-import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
+import { RatingStarsComponent } from '../shared/rating-stars/rating-stars';
 import { ReviewEditorComponent, ReviewDraft } from '../shared/review-editor/review-editor';
 
 @Component({

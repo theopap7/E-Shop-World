@@ -10,7 +10,7 @@ import { ProductListStateService } from '../services/product-list-state.service'
 import { ActivatedRoute, ParamMap, Params, Router, RouterModule } from '@angular/router';
 import { WishlistService } from '../services/wishlist.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 import { ProductCardComponent } from '../shared/product-card/product-card';
 
 @Component({

@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrderService, MyReturnRow } from '../services/order.service';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PaginationComponent } from '../shared/pagination/pagination';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { returnStatusLabel, returnItemSymbol } from '../services/return-status.util';
 
