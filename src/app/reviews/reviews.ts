@@ -9,11 +9,12 @@ import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { starFill } from '../shared/star-fill';
+import { ReviewEditorComponent, ReviewDraft } from '../shared/review-editor/review-editor';
 
 @Component({
   selector: 'app-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RatingStarsComponent],
+  imports: [CommonModule, FormsModule, RouterModule, RatingStarsComponent, ReviewEditorComponent],
   templateUrl: './reviews.html',
   styleUrl: './reviews.css'
 })
@@ -36,9 +37,6 @@ export class ReviewsComponent implements OnInit {
 
   // Edit state
   editingReviewId: number | null = null;
-  editRating = 0;
-  editComment = '';
-  editHoveredRating = 0;
   isUpdating = false;
   updateError = '';
 
@@ -163,38 +161,16 @@ export class ReviewsComponent implements OnInit {
 
   startEdit(review: Review): void {
     this.editingReviewId = review.id;
-    this.editRating = review.rating;
-    this.editComment = review.comment || '';
     this.updateError = '';
   }
 
   cancelEdit(): void {
     this.editingReviewId = null;
-    this.editRating = 0;
-    this.editComment = '';
-    this.editHoveredRating = 0;
     this.updateError = '';
   }
 
-  setEditRating(rating: number): void {
-    this.editRating = rating;
-  }
-
-  setEditHovered(rating: number): void {
-    this.editHoveredRating = rating;
-  }
-
-  clearEditHovered(): void {
-    this.editHoveredRating = 0;
-  }
-
-  getEditStarClass(star: number): string {
-    const activeRating = this.editHoveredRating || this.editRating;
-    return star <= activeRating ? 'star filled' : 'star';
-  }
-
-  updateReview(): void {
-    if (this.editRating === 0) {
+  updateReview(draft: ReviewDraft): void {
+    if (draft.rating === 0) {
       this.updateError = 'Επίλεξε βαθμολογία από 1 έως 5 αστέρια.';
       return;
     }
@@ -206,8 +182,8 @@ export class ReviewsComponent implements OnInit {
 
     this.reviewService.updateReview(
       this.editingReviewId,
-      this.editRating,
-      this.editComment
+      draft.rating,
+      draft.comment
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         if (res.success) {
@@ -218,7 +194,8 @@ export class ReviewsComponent implements OnInit {
         this.isUpdating = false;
       },
       error: (err) => {
-        this.toastService.error(err.error?.message || 'Σφάλμα ενημέρωσης κριτικής');
+        this.updateError = err.error?.message || 'Σφάλμα ενημέρωσης κριτικής';
+        this.toastService.error(this.updateError);
         this.isUpdating = false;
       }
     });

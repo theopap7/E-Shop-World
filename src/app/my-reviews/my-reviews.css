@@ -37,11 +37,6 @@
   margin-top: 10px;
 }
 
-.small-alert {
-  margin-top: 12px;
-  margin-bottom: 0;
-}
-
 .review-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -254,73 +249,6 @@
 .btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-}
-
-.edit-box {
-  margin-top: 8px;
-  border-top: 1px solid #f3f4f6;
-  padding-top: 16px;
-}
-
-.edit-group {
-  margin-bottom: 14px;
-}
-
-.edit-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.edit-textarea {
-  width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 14px;
-  resize: vertical;
-  font-family: inherit;
-  outline: none;
-}
-
-.edit-textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-}
-
-.edit-stars {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.star-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 28px;
-  line-height: 1;
-  color: #d1d5db;
-  padding: 0;
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-
-.star-btn:hover {
-  transform: scale(1.08);
-}
-
-.star-btn.filled {
-  color: #f59e0b;
-}
-
-.edit-rating-value {
-  margin-left: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
 }
 
 @media (max-width: 640px) {

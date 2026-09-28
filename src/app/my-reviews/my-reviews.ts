@@ -2,18 +2,18 @@ import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { EligibleProduct, Review, ReviewService } from '../services/review.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { SkeletonComponent } from '../skeleton/skeleton';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RatingStarsComponent } from '../shared/rating-stars/rating-stars.component';
+import { ReviewEditorComponent, ReviewDraft } from '../shared/review-editor/review-editor';
 
 @Component({
   selector: 'app-my-reviews',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SkeletonComponent, ImageUrlPipe, RatingStarsComponent],
+  imports: [CommonModule, RouterModule, SkeletonComponent, ImageUrlPipe, RatingStarsComponent, ReviewEditorComponent],
   templateUrl: './my-reviews.html',
   styleUrl: './my-reviews.css'
 })
@@ -24,8 +24,6 @@ export class MyReviewsComponent implements OnInit {
   error = '';
 
   editingReviewId: number | null = null;
-  editRating = 0;
-  editComment = '';
   isUpdating = false;
   updateError = '';
   deletingId: number | null = null;
@@ -96,21 +94,17 @@ export class MyReviewsComponent implements OnInit {
 
   startEdit(review: Review): void {
     this.editingReviewId = review.id;
-    this.editRating = review.rating;
-    this.editComment = review.comment || '';
     this.updateError = '';
   }
 
   cancelEdit(): void {
     this.editingReviewId = null;
-    this.editRating = 0;
-    this.editComment = '';
     this.updateError = '';
     this.isUpdating = false;
   }
 
-  updateReview(reviewId: number): void {
-    if (this.editRating < 1 || this.editRating > 5) {
+  updateReview(reviewId: number, draft: ReviewDraft): void {
+    if (draft.rating < 1 || draft.rating > 5) {
       this.updateError = 'Η βαθμολογία πρέπει να είναι από 1 έως 5.';
       return;
     }
@@ -120,8 +114,8 @@ export class MyReviewsComponent implements OnInit {
 
     this.reviewService.updateReview(
       reviewId,
-      this.editRating,
-      this.editComment
+      draft.rating,
+      draft.comment
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toastService.success('Η κριτική ενημερώθηκε επιτυχώς!');
@@ -130,8 +124,8 @@ export class MyReviewsComponent implements OnInit {
           review.id === reviewId
             ? {
                 ...review,
-                rating: this.editRating,
-                comment: this.editComment?.trim() ? this.editComment.trim() : null
+                rating: draft.rating,
+                comment: draft.comment.trim() || null
               }
             : review
         );
@@ -144,10 +138,5 @@ export class MyReviewsComponent implements OnInit {
         this.isUpdating = false;
       }
     });
-  }
-
-
-  setEditRating(rating: number): void {
-    this.editRating = rating;
   }
 }

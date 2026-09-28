@@ -118,52 +118,15 @@
 
       </div>
 
-      <div *ngIf="editingReviewId === review.id" class="edit-mode">
-        
-        <h4>Επεξεργασία Κριτικής</h4>
-
-        <div class="star-input" (mouseleave)="clearEditHovered()">
-          <span
-            *ngFor="let star of starsArray"
-            [class]="getEditStarClass(star)"
-            (mouseenter)="setEditHovered(star)"
-            (click)="setEditRating(star)">
-            ★
-          </span>
-          <span class="rating-label" *ngIf="editRating > 0">
-            {{ editRating }}/5
-          </span>
-        </div>
-
-        <textarea
-          [(ngModel)]="editComment"
-          placeholder="Γράψε την εμπειρία σου... (προαιρετικό)"
-          rows="3"
-          class="comment-input">
-        </textarea>
-
-        <div *ngIf="updateError" class="alert alert-error">
-          {{ updateError }}
-        </div>
-
-        <div class="edit-actions">
-          <button
-            class="btn btn-primary"
-            type="button"
-            (click)="updateReview()"
-            [disabled]="isUpdating || editRating === 0">
-            {{ isUpdating ? 'Αποθήκευση...' : 'Αποθήκευση' }}
-          </button>
-          <button
-            class="btn btn-outline"
-            type="button"
-            (click)="cancelEdit()"
-            [disabled]="isUpdating">
-            Ακύρωση
-          </button>
-        </div>
-
-      </div>
+      <app-review-editor
+        *ngIf="editingReviewId === review.id"
+        [rating]="review.rating"
+        [comment]="review.comment"
+        [saving]="isUpdating"
+        [error]="updateError"
+        (save)="updateReview($event)"
+        (cancel)="cancelEdit()">
+      </app-review-editor>
 
     </div>
   </div>

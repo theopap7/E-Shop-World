@@ -101,59 +101,14 @@
       </ng-container>
 
       <ng-template #editMode>
-        <div class="edit-box">
-          <div class="edit-group">
-            <label class="edit-label">Βαθμολογία</label>
-
-            <div class="edit-stars">
-              <button
-                *ngFor="let star of [1,2,3,4,5]"
-                type="button"
-                class="star-btn"
-                [class.filled]="star <= editRating"
-                (click)="setEditRating(star)"
-              >
-                ★
-              </button>
-
-              <span class="edit-rating-value">{{ editRating }}/5</span>
-            </div>
-          </div>
-
-          <div class="edit-group">
-            <label class="edit-label">Σχόλιο</label>
-            <textarea
-              [(ngModel)]="editComment"
-              class="edit-textarea"
-              rows="4"
-              placeholder="Γράψε το σχόλιό σου..."
-            ></textarea>
-          </div>
-
-          <div *ngIf="updateError" class="alert alert-error small-alert">
-            {{ updateError }}
-          </div>
-
-          <div class="review-actions">
-            <button
-              class="btn btn-primary"
-              type="button"
-              [disabled]="isUpdating"
-              (click)="updateReview(review.id)"
-            >
-              {{ isUpdating ? 'Αποθήκευση...' : 'Αποθήκευση' }}
-            </button>
-
-            <button
-              class="btn btn-outline"
-              type="button"
-              [disabled]="isUpdating"
-              (click)="cancelEdit()"
-            >
-              Ακύρωση
-            </button>
-          </div>
-        </div>
+        <app-review-editor
+          [rating]="review.rating"
+          [comment]="review.comment"
+          [saving]="isUpdating"
+          [error]="updateError"
+          (save)="updateReview(review.id, $event)"
+          (cancel)="cancelEdit()">
+        </app-review-editor>
       </ng-template>
     </div>
   </div>

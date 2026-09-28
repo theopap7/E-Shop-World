@@ -1,0 +1,54 @@
+<div class="edit-box">
+  <div class="edit-group">
+    <span class="edit-label">Βαθμολογία</span>
+
+    <div class="edit-stars" (mouseleave)="hoveredRating = 0">
+      <button
+        *ngFor="let star of stars"
+        type="button"
+        class="star-btn"
+        [class.filled]="isFilled(star)"
+        [attr.aria-label]="star + ' από 5'"
+        (mouseenter)="hoveredRating = star"
+        (click)="draftRating = star">
+        ★
+      </button>
+
+      <span class="edit-rating-value" *ngIf="draftRating > 0">{{ draftRating }}/5</span>
+    </div>
+  </div>
+
+  <div class="edit-group">
+    <label class="edit-label">
+      Σχόλιο
+      <textarea
+        [(ngModel)]="draftComment"
+        class="edit-textarea"
+        rows="4"
+        placeholder="Γράψε την εμπειρία σου... (προαιρετικό)"
+      ></textarea>
+    </label>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div class="edit-actions">
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="saving || draftRating === 0"
+      (click)="submit()">
+      {{ saving ? 'Αποθήκευση...' : 'Αποθήκευση' }}
+    </button>
+
+    <button
+      class="btn btn-outline"
+      type="button"
+      [disabled]="saving"
+      (click)="cancel.emit()">
+      Ακύρωση
+    </button>
+  </div>
+</div>
