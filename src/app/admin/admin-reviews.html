@@ -57,7 +57,7 @@
           <option *ngFor="let r of ratingOptions" [value]="r">{{ r }} ★</option>
         </select>
 
-        <div class="count-info">{{ filteredReviews.length }} κριτικές</div>
+        <div class="count-info">{{ filteredReviews.length }} {{ filteredReviews.length === 1 ? 'κριτική' : 'κριτικές' }}</div>
       </div>
 
       <div *ngIf="filteredReviews.length === 0" class="empty">

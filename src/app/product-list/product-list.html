@@ -104,7 +104,7 @@
   </div>
 
   <div class="results-info" *ngIf="!isLoading && !errorMessage">
-    <span>{{ filteredProducts.length }} προϊόντα βρέθηκαν</span>
+    <span>{{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'προϊόν βρέθηκε' : 'προϊόντα βρέθηκαν' }}</span>
     <span *ngIf="filteredProducts.length !== allProducts.length" class="filter-active">
       (από {{ allProducts.length }} συνολικά)
     </span>

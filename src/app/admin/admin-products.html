@@ -60,7 +60,7 @@
           <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''; onSearchChange()" aria-label="Καθαρισμός αναζήτησης">✕</button>
         </div>
 
-        <div class="count-info">{{ filteredProducts.length }} προϊόντα</div>
+        <div class="count-info">{{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'προϊόν' : 'προϊόντα' }}</div>
 
         <div *ngIf="filteredProducts.length === 0" class="empty">
           <div class="empty-icon">🔍</div>
