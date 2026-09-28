@@ -147,6 +147,10 @@
   .grid {
     grid-template-columns: 1fr;
   }
+
+  .summary-card {
+    order: -1;
+  }
 }
 
 /* ===== Cards ===== */
@@ -238,6 +242,22 @@ label {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.summary-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 
 .row.total {

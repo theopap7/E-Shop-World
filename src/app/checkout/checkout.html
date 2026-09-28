@@ -113,24 +113,26 @@
           ></app-address-map>
         </div>
 
-        <hr />
+        <ng-container *ngIf="form.get('shippingMethod')?.value !== 'pickup'">
+          <hr />
 
-        <label class="terms">
-          <input type="checkbox" formControlName="isGift" />
-          Αποστολή ως δώρο
-        </label>
-
-        <div *ngIf="form.get('isGift')?.value" style="margin-top: 8px;">
-          <label>
-            Μήνυμα δώρου (προαιρετικό)
-            <textarea formControlName="giftMessage" maxlength="500" rows="3"></textarea>
+          <label class="terms">
+            <input type="checkbox" formControlName="isGift" />
+            Αποστολή ως δώρο
           </label>
-          <small class="err" *ngIf="form.get('giftMessage')?.touched && form.get('giftMessage')?.invalid">
-            Το μήνυμα δεν μπορεί να ξεπερνά τους 500 χαρακτήρες
-          </small>
-        </div>
 
-        <hr />
+          <div *ngIf="form.get('isGift')?.value" style="margin-top: 8px;">
+            <label>
+              Μήνυμα δώρου (προαιρετικό)
+              <textarea formControlName="giftMessage" maxlength="500" rows="3"></textarea>
+            </label>
+            <small class="err" *ngIf="form.get('giftMessage')?.touched && form.get('giftMessage')?.invalid">
+              Το μήνυμα δεν μπορεί να ξεπερνά τους 500 χαρακτήρες
+            </small>
+          </div>
+
+          <hr />
+        </ng-container>
 
         <h3>Αποστολή</h3>
         <label>
@@ -248,16 +250,24 @@
         </button>
       </form>
 
-      <div class="card">
+      <div class="card summary-card">
         <h3>Σύνοψη</h3>
 
         <div *ngIf="items.length === 0" class="muted">Δεν υπάρχουν προϊόντα.</div>
 
         <div *ngFor="let it of items" class="row">
-          <div>
-            <strong>{{ it.name }}</strong>
-            <div class="muted">x{{ it.quantity }}<span *ngIf="it.size"> · {{ it.size }}</span></div>
-            <div *ngIf="it.stock <= 0" class="err">Μη διαθέσιμο</div>
+          <div class="summary-item">
+            <img
+              class="summary-thumb"
+              [src]="it.image_url | imageUrl"
+              [alt]="it.name"
+              (error)="$any($event.target).src='no-image.svg'"
+            />
+            <div>
+              <strong>{{ it.name }}</strong>
+              <div class="muted">x{{ it.quantity }}<span *ngIf="it.size"> · {{ it.size }}</span></div>
+              <div *ngIf="it.stock <= 0" class="err">Μη διαθέσιμο</div>
+            </div>
           </div>
           <div>{{ (it.price * it.quantity) | currency }}</div>
         </div>

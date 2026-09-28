@@ -22,6 +22,9 @@ import { AuthService } from '../services/auth.service';
 import { AdminService } from '../services/admin.service';
 import { STORE_BANK_ACCOUNT } from '../shared/store-bank';
 import { STORE_PICKUP_LOCATION } from '../shared/store-location';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
+
+const FORM_INVALID_MESSAGE = 'Διόρθωσε τα λάθη στη φόρμα.';
 
 /** Rejects a MM/YY expiry that has already passed (format is checked separately). */
 function cardNotExpiredValidator(): ValidatorFn {
@@ -63,7 +66,7 @@ function ibanChecksumValidator(): ValidatorFn {
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, AddressMapComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, AddressMapComponent, ImageUrlPipe],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })
@@ -167,6 +170,11 @@ export class CheckoutComponent implements OnInit {
       this.applyShippingValidators();
     });
     this.form.get('paymentMethod')!.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyPaymentValidators());
+    this.form.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((status) => {
+      if (status === 'VALID' && this.error === FORM_INVALID_MESSAGE) {
+        this.error = null;
+      }
+    });
     this.applyPaymentValidators();
     this.applyShippingValidators();
 
@@ -429,13 +437,14 @@ export class CheckoutComponent implements OnInit {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error = 'Διόρθωσε τα λάθη στη φόρμα.';
+      this.error = FORM_INVALID_MESSAGE;
       this.scrollToFirstInvalidField();
       return;
     }
 
     const v = this.form.value as any;
     const details = v.paymentDetails || {};
+    const isGift = !!v.isGift && v.shippingMethod !== 'pickup';
 
     const payload: CreateOrderDto = {
       items: this.items.map((i) => ({
@@ -471,8 +480,8 @@ export class CheckoutComponent implements OnInit {
       discountCode: this.appliedDiscount?.code || undefined,
       discountAmount: this.discountAmount || 0,
 
-      isGift: !!v.isGift,
-      giftMessage: v.isGift ? String(v.giftMessage || '').trim() || undefined : undefined,
+      isGift: isGift,
+      giftMessage: isGift ? String(v.giftMessage || '').trim() || undefined : undefined,
     };
 
     this.isSubmitting = true;
