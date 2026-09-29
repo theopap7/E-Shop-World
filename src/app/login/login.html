@@ -5,8 +5,8 @@
       <label for="email">Email</label>
       <input id="email" formControlName="email" type="email"  />
       <div *ngIf="loginForm.controls['email'].invalid && loginForm.controls['email'].touched">
-        <small class="error" *ngIf="loginForm.controls['email'].hasError('required')">Το email είναι υποχρεωτικό.</small>
-        <small class="error" *ngIf="loginForm.controls['email'].hasError('email')">Πληκτρολόγησε ένα έγκυρο email.</small>
+        <small class="error" *ngIf="loginForm.controls['email'].hasError('required')">Υποχρεωτικό πεδίο</small>
+        <small class="error" *ngIf="loginForm.controls['email'].hasError('email')">Μη έγκυρο email</small>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
         </button>
       </div>
       <div *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched">
-        <small class="error" *ngIf="loginForm.controls['password'].hasError('required')">Ο κωδικός είναι υποχρεωτικός.</small>
+        <small class="error" *ngIf="loginForm.controls['password'].hasError('required')">Υποχρεωτικό πεδίο</small>
       </div>
     </div>
 

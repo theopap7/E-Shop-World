@@ -108,6 +108,13 @@ html {
   }
 }
 
+@media (max-width: 480px) {
+  body.cart-open .toast-container {
+    top: auto;
+    bottom: 200px;
+  }
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);

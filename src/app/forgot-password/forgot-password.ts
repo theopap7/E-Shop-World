@@ -24,7 +24,11 @@ export class ForgotPasswordComponent {
   }
 
   onSubmit() {
-    if (this.form.invalid || this.isSubmitting) return;
+    if (this.isSubmitting) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.isSubmitting = true;
     this.errorMessage = '';
 

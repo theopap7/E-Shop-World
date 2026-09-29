@@ -27,6 +27,7 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
     this.cartService.isOpen$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(open => {
       this.isOpen = open;
       document.body.style.overflow = open ? 'hidden' : '';
+      document.body.classList.toggle('cart-open', open);
     });
 
     this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(items => {
@@ -36,6 +37,7 @@ export class CartSidebarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     document.body.style.overflow = '';
+    document.body.classList.remove('cart-open');
   }
 
   get total(): number {
