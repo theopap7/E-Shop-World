@@ -115,9 +115,10 @@
 /* Comment Input */
 .comment-input {
   width: 100%;
-  padding: 14px;
-  border: 2px solid #e5e7eb;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
+  background: #fff;
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
@@ -129,7 +130,7 @@
 .comment-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 /* Alerts */

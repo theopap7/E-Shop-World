@@ -183,7 +183,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private renderStatusChart(raw: ChartData['statusBreakdown']): void {
     const colors: Record<string, string> = {
-      pending: '#f59e0b', processing: '#3b82f6', shipped: '#8b5cf6',
+      pending: '#f59e0b', processing: '#f97316', shipped: '#3b82f6',
       delivered: '#10b981', cancelled: '#ef4444'
     };
 

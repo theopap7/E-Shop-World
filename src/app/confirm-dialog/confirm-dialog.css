@@ -71,11 +71,11 @@
 }
 
 .confirm-btn-danger {
-  background: var(--color-danger);
+  background: #ef4444;
 }
 
 .confirm-btn-danger:hover {
-  background: #7f1d1d;
+  background: #dc2626;
 }
 
 @keyframes confirmFadeIn {

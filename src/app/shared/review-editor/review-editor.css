@@ -55,8 +55,9 @@
   box-sizing: border-box;
   margin-top: 8px;
   border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 12px;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 12px;
   font-size: 14px;
   font-weight: 400;
   resize: vertical;
@@ -66,7 +67,7 @@
 
 .edit-textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .alert {
