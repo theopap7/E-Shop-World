@@ -57,7 +57,9 @@ export class CartComponent implements OnInit {
   }
 
   remove(productId: number, size?: string): void {
+    const item = this.items.find(i => i.productId === productId && (i.size ?? '') === (size ?? ''));
     this.cartService.removeFromCart(productId, size);
+    this.toastService.info(`${item?.name || 'Προϊόν'} αφαιρέθηκε από το καλάθι`);
   }
 
   async clear(): Promise<void> {

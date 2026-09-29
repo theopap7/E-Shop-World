@@ -10,11 +10,12 @@ import { PaginationComponent } from '../shared/pagination/pagination';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RatingStarsComponent } from '../shared/rating-stars/rating-stars';
 import { matchesSearch } from '../shared/search-text';
+import { ScrollFadeDirective } from '../shared/scroll-fade.directive';
 
 @Component({
   selector: 'app-admin-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, PaginationComponent, ImageUrlPipe, RatingStarsComponent],
+  imports: [CommonModule, FormsModule, RouterModule, PaginationComponent, ImageUrlPipe, RatingStarsComponent, ScrollFadeDirective],
   templateUrl: './admin-reviews.html',
   styleUrl: './admin-reviews.css'
 })

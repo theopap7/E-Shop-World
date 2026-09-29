@@ -32,9 +32,16 @@
       </div>
     </div>
 
-    <div *ngIf="!isLoading && error" class="error-card">
+    <div *ngIf="!isLoading && notFound" class="not-found-card">
+      <div class="not-found-icon">🔍</div>
+      <h2 class="not-found-title">Το προϊόν δεν βρέθηκε</h2>
+      <p class="not-found-text">Μπορεί να έχει αφαιρεθεί ή ο σύνδεσμος να μην είναι σωστός.</p>
+      <a routerLink="/dashboard" class="btn btn-primary">Πίσω στο κατάστημα</a>
+    </div>
+
+    <div *ngIf="!isLoading && error && !notFound" class="error-card">
       <p>{{ error }}</p>
-      <button *ngIf="!notFound" class="btn btn-primary retry-btn" type="button" (click)="retry()">
+      <button class="btn btn-primary retry-btn" type="button" (click)="retry()">
         Ξαναδοκίμασε
       </button>
     </div>

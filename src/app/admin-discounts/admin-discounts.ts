@@ -7,6 +7,7 @@ import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { ScrollFadeDirective } from '../shared/scroll-fade.directive';
 
 interface DiscountCode {
   id: number;
@@ -24,7 +25,7 @@ interface DiscountCode {
 @Component({
   selector: 'app-admin-discounts',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ScrollFadeDirective],
   templateUrl: './admin-discounts.html',
   styleUrl: './admin-discounts.css'
 })

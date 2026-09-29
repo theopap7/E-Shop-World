@@ -9,11 +9,12 @@ import { ConfirmService } from '../services/confirm.service';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { PaginationComponent } from '../shared/pagination/pagination';
 import { matchesSearch } from '../shared/search-text';
+import { ScrollFadeDirective } from '../shared/scroll-fade.directive';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ImageUrlPipe, PaginationComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ImageUrlPipe, PaginationComponent, ScrollFadeDirective],
   templateUrl: './admin-products.html',
   styleUrl: './admin-products.css',
 })

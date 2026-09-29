@@ -35,7 +35,7 @@
     <div class="grid">
       <form [formGroup]="form" (ngSubmit)="submit()" class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3>Στοιχεία παραλήπτη</h3>
+          <h3>Στοιχεία Παραλήπτη</h3>
           <button type="button" class="btn-link" (click)="toggleForOther()">
             {{ orderingForOther ? 'Τα στοιχεία μου' : 'Παραγγελία για άλλον' }}
           </button>
@@ -63,7 +63,7 @@
         <hr />
 
         <div formGroupName="shipping" *ngIf="form.get('shippingMethod')?.value !== 'pickup'">
-          <h3>Διεύθυνση αποστολής</h3>
+          <h3>Διεύθυνση Αποστολής</h3>
 
           <label>
             Χώρα

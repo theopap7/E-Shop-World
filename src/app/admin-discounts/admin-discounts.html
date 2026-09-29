@@ -28,7 +28,7 @@
       </button>
     </div>
 
-    <div *ngIf="!isLoading && !error" class="card table-wrap">
+    <div *ngIf="!isLoading && !error" class="card table-wrap" appScrollFade>
 
       <div *ngIf="codes.length === 0" class="empty-state">
         <div class="empty-icon">🎟️</div>

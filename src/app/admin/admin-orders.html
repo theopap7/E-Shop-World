@@ -63,7 +63,7 @@
         <p>{{ orders.length === 0 ? 'Όταν γίνουν αγορές, θα εμφανιστούν εδώ.' : 'Δοκίμασε διαφορετικά κριτήρια αναζήτησης.' }}</p>
       </div>
 
-      <div *ngIf="filteredOrders.length > 0" class="table-wrap">
+      <div *ngIf="filteredOrders.length > 0" class="table-wrap" appScrollFade>
         <table class="table">
 
           <thead>

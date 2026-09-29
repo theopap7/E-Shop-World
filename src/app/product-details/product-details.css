@@ -279,6 +279,35 @@
   margin-top: 12px;
 }
 
+.not-found-card {
+  max-width: 600px;
+  margin: 20px auto 0;
+  padding: 40px 32px;
+  text-align: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.not-found-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+
+.not-found-title {
+  margin: 0 0 12px;
+  font-size: var(--page-title-size);
+  font-weight: var(--page-title-weight);
+  color: var(--color-text);
+}
+
+.not-found-text {
+  margin: 0 0 24px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .product-detail {
