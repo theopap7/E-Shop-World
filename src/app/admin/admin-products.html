@@ -15,7 +15,7 @@
         </a>
 
         <a routerLink="/admin/products/new" class="btn btn-primary">
-          + Νέο προϊόν
+          + Νέο Προϊόν
         </a>
       </div>
     </header>
@@ -79,7 +79,7 @@
               <th>Κατηγορία</th>
               <th class="right">Τιμή</th>
               <th class="right">Απόθεμα</th>
-              <th class="right">Ενέργειες</th>
+              <th>Ενέργειες</th>
             </tr>
           </thead>
 
@@ -125,7 +125,7 @@
                 </span>
               </td>
 
-              <td class="right">
+              <td>
                 <div class="action-buttons">
                   <a
                     [routerLink]="['/admin/products/edit', product.id]"

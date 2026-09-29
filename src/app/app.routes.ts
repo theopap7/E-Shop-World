@@ -140,7 +140,7 @@ export const routes: Routes = [
 
   {
     path: 'admin/products/new',
-    title: 'Νέο προϊόν – Διαχείριση',
+    title: 'Νέο Προϊόν – Διαχείριση',
     loadComponent: () => import('./admin/product-form').then(m => m.ProductFormComponent),
     canActivate: [adminGuard],
     data: { breadcrumb: 'Νέο Προϊόν' }
