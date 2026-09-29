@@ -28,7 +28,7 @@ export class ReviewsComponent implements OnInit {
   isLoading = false;
   loadError = false;
 
-  // Form state (για νέο review)
+  // Form state (new review)
   newRating = 0;
   hoveredRating = 0;
   newComment = '';

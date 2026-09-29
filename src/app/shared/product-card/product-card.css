@@ -137,13 +137,13 @@
   height: 100%;
 }
 
-/* ===== IMAGE (κλειδώνει μέγεθος, δεν γιγαντώνει) ===== */
+/* ===== IMAGE ===== */
 .product-image {
   width: 100%;
-  height: 210px;          /* ΣΤΑΘΕΡΟ ύψος */
-  object-fit: cover;      /* κόβει/γεμίζει σωστά */
+  height: 210px;
+  object-fit: cover;
   display: block;
-  background: #f3f4f6;    /* αν αργεί να φορτώσει */
+  background: #f3f4f6;
 }
 
 /* ===== DETAILS ===== */

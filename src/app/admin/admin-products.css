@@ -266,7 +266,7 @@
   border-color:#fecaca;
 }
 
-/* Buttons */
+/* Alerts */
 .alert{ display:grid; gap:12px; margin-top:14px; }
 .alert-error{ border-color:#fecaca; background:#fef2f2; color:#991b1b; }
 .alert-text{ font-weight:900; }

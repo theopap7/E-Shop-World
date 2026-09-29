@@ -264,7 +264,7 @@
 .pill--pendingPay{ background:#ffedd5; border-color:#fdba74; color:#9a3412; }
 .pill--partial{ background:#dbeafe; border-color:#93c5fd; color:#1e40af; }
 
-/* Select + arrow (βελάκι όπως πριν) */
+/* Status select */
 .action-cell{
   display:flex;
   align-items:center;

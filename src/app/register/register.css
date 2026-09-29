@@ -1,4 +1,3 @@
-/* Κεντρικό στυλ για την register φόρμα — ίδιο look με login */
 .register-container {
   max-width: 400px;
   margin: max(50px, 13vh) auto;
@@ -9,7 +8,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* ΤΙΤΛΟΣ */
 .register-container h2 {
   font-size: var(--page-title-size);
   font-weight: var(--page-title-weight);
@@ -48,7 +46,6 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
-/* ΚΟΥΜΠΙ */
 .register-container button {
   width: 100%;
   padding: 12px;

@@ -82,5 +82,6 @@ describe('WishlistService', () => {
     service.refreshGuestItems();
 
     http.expectNone(r => r.url.includes('/products/'));
+    expect().nothing();
   });
 });

@@ -1,7 +1,7 @@
-/* Overlay - σκοτεινό background */
+/* Overlay */
 .overlay {
   position: fixed;
-  inset: 0;           /* top:0, right:0, bottom:0, left:0 */
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
   animation: fadeIn 0.2s ease;
@@ -26,12 +26,10 @@
   flex-direction: column;
   box-shadow: -4px 0 20px rgba(0,0,0,0.15);
 
-  /* Animation: Αρχικά κρυμμένο */
   transform: translateX(100%);
   transition: transform 0.3s ease;
 }
 
-/* Όταν έχει class "open" → Εμφανίζεται */
 .sidebar.open {
   transform: translateX(0);
 }

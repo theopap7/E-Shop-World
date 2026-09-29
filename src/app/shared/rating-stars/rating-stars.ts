@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 const MAX_STARS = 5;
 
-// Read-only star rating. Filled and empty stars use the same glyph family (★/☆) so they line up on one row.
+// Read-only star rating. Filled and empty stars use the same ★ glyph in two colors so they line up on one row.
 @Component({
   selector: 'app-rating-stars',
   standalone: true,

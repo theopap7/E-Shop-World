@@ -85,7 +85,6 @@
   gap: var(--space-4);
 }
 
-/* Buttons */
 /* Responsive */
 @media (max-width: 768px) {
   .actions-bar {

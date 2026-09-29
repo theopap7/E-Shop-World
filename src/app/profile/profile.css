@@ -269,7 +269,7 @@
 
 .input-with-toggle .form-input {
   width: 100%;
-  padding-right: 46px; /* χώρος για το κουμπί (ματάκι) */
+  padding-right: 46px;
 }
 
 .toggle-btn {
