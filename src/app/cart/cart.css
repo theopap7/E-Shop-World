@@ -31,6 +31,10 @@
   flex-wrap: wrap;
 }
 
+.top-actions .btn {
+  white-space: nowrap;
+}
+
 /* buttons */
 .qty-select {
   appearance: none;

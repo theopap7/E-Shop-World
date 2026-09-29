@@ -770,9 +770,9 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     const shippingMethod = SHIPPING_METHOD_LABELS[order.shipping_method] || order.shipping_method;
 
     doc.font('RobotoBold').fontSize(24).text('E-Shop', 50, 45);
-    doc.font('Roboto').fontSize(10).text('support@e-shop.example', 50, 70).text('e-shop-world.vercel.app', 50, 85);
+    doc.font('Roboto').fontSize(10).text('support@e-shop.example', 50, 76).text('e-shop-world.vercel.app', 50, 90);
     doc.font('RobotoBold').fontSize(20).text('ΑΠΟΔΕΙΞΗ ΠΑΡΑΓΓΕΛΙΑΣ', 320, 50);
-    doc.moveTo(50, 105).lineTo(550, 105).lineWidth(0.5).stroke();
+    doc.moveTo(50, 108).lineTo(550, 108).lineWidth(0.5).stroke();
 
     doc.font('RobotoBold').fontSize(11).text('ΣΤΟΙΧΕΙΑ ΠΑΡΑΓΓΕΛΙΑΣ', 50, 120);
     doc.font('Roboto').fontSize(10)
