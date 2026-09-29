@@ -209,6 +209,21 @@
   text-align: right;
 }
 
+.row > span:first-child {
+  white-space: nowrap;
+}
+
+.row--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.row--stacked strong {
+  text-align: left;
+  white-space: nowrap;
+}
+
 /* ===============================
    PRODUCTS LIST
 ================================= */
@@ -317,6 +332,7 @@
   border: none;
   background: var(--accent-soft);
   color: var(--accent);
+  white-space: nowrap;
 }
 
 .pill::before {

@@ -1,5 +1,7 @@
 <div class="reviews-section">
 
+  <h3>Κριτικές Πελατών</h3>
+
   <div class="rating-summary" *ngIf="total > 0">
     <div class="big-rating">{{ average | number:'1.1-1' }}</div>
     <div class="rating-info">
@@ -12,8 +14,6 @@
       <div class="total-reviews">{{ total }} {{ reviewsLabel }}</div>
     </div>
   </div>
-
-  <h3>Κριτικές Πελατών</h3>
 
   <div class="review-form" *ngIf="isLoggedIn && !hasExistingReview && canReview">
     <h4>Γράψε κριτική</h4>
