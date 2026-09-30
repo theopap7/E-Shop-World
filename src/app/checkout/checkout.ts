@@ -311,11 +311,10 @@ export class CheckoutComponent implements OnInit {
       ]);
     }
 
-    iban.updateValueAndValidity();
-    cardNumber.updateValueAndValidity();
-    cardHolder.updateValueAndValidity();
-    cardExp.updateValueAndValidity();
-    cardCvv.updateValueAndValidity();
+    for (const control of [iban, cardNumber, cardHolder, cardExp, cardCvv]) {
+      control.markAsUntouched();
+      control.updateValueAndValidity();
+    }
   }
 
   private applyShippingValidators(): void {

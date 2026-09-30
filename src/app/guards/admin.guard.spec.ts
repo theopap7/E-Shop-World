@@ -13,7 +13,7 @@ describe('adminGuard', () => {
   beforeEach(() => {
     authSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'fetchCurrentUser']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    toastSpy = jasmine.createSpyObj('ToastService', ['error']);
+    toastSpy = jasmine.createSpyObj('ToastService', ['error', 'info']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -25,15 +25,16 @@ describe('adminGuard', () => {
   });
 
   async function runGuard(): Promise<boolean> {
-    const result = TestBed.runInInjectionContext(() => adminGuard({} as any, {} as any));
+    const result = TestBed.runInInjectionContext(() => adminGuard({} as any, { url: '/admin/orders' } as any));
     return isObservable(result) ? firstValueFrom(result as any) : (result as any);
   }
 
-  it('redirects to /login when the user is not logged in', async () => {
+  it('redirects to /login with a returnUrl when the user is not logged in', async () => {
     authSpy.isLoggedIn.and.returnValue(false);
 
     expect(await runGuard()).toBeFalse();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    expect(toastSpy.info).toHaveBeenCalled();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login'], { queryParams: { returnUrl: '/admin/orders' } });
     expect(authSpy.fetchCurrentUser).not.toHaveBeenCalled();
   });
 

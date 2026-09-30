@@ -1,16 +1,17 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 
-export const adminGuard: CanActivateFn = () => {
+export const adminGuard: CanActivateFn = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   const toast = inject(ToastService);
 
   if (!auth.isLoggedIn()) {
-    router.navigate(['/login']);
+    toast.info('Συνδέσου για να συνεχίσεις');
+    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }
 
