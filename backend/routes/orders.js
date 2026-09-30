@@ -814,26 +814,42 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     let tableY = order.shipping_method === 'pickup' ? 260 : (order.ship_notes ? 360 : (order.floor ? 320 : 305));
 
     const cols = { product: 60, qty: 330, price: 400, total: 480 };
+    const pageBottom = () => doc.page.height - doc.page.margins.bottom;
 
-    doc.rect(50, tableY - 5, 500, 20).fill('#f2f2f2').fillColor('black');
-    doc.font('RobotoBold')
-      .text('Προϊόν', cols.product, tableY)
-      .text('Ποσότητα', cols.qty, tableY, { width: 60, align: 'right' })
-      .text('Τιμή', cols.price, tableY, { width: 70, align: 'right' })
-      .text('Σύνολο', cols.total, tableY, { width: 70, align: 'right' });
+    const drawTableHeader = () => {
+      doc.rect(50, tableY - 5, 500, 20).fill('#f2f2f2').fillColor('black');
+      doc.font('RobotoBold').fontSize(10)
+        .text('Προϊόν', cols.product, tableY)
+        .text('Ποσότητα', cols.qty, tableY, { width: 60, align: 'right' })
+        .text('Τιμή', cols.price, tableY, { width: 70, align: 'right' })
+        .text('Σύνολο', cols.total, tableY, { width: 70, align: 'right' });
 
-    tableY += 25;
-    doc.moveTo(50, tableY - 5).lineTo(550, tableY - 5).stroke();
+      tableY += 25;
+      doc.moveTo(50, tableY - 5).lineTo(550, tableY - 5).stroke();
+      doc.font('Roboto').fontSize(12);
+    };
 
-    doc.font('Roboto').fontSize(12);
+    drawTableHeader();
+
     items.forEach(({ title, quantity, price, size }) => {
       const label = size ? `${title} (${size})` : title;
+      const rowHeight = Math.max(28, doc.heightOfString(label, { width: 260 }) + 12);
+      if (tableY + rowHeight > pageBottom()) {
+        doc.addPage();
+        tableY = doc.page.margins.top;
+        drawTableHeader();
+      }
       doc.text(label, cols.product, tableY, { width: 260 })
         .text(quantity.toString(), cols.qty, tableY, { width: 60, align: 'right' })
         .text(formatEur(price), cols.price, tableY, { width: 70, align: 'right' })
         .text(formatEur(quantity * price), cols.total, tableY, { width: 70, align: 'right' });
-      tableY += 28;
+      tableY += rowHeight;
     });
+
+    if (tableY + 200 > pageBottom()) {
+      doc.addPage();
+      tableY = doc.page.margins.top;
+    }
 
     tableY += 20;
     doc.moveTo(330, tableY).lineTo(550, tableY).stroke();
