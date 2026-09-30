@@ -796,7 +796,7 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       doc.text(`Τηλέφωνο: ${order.phone}`, 300, 181, { width: 230, lineBreak: false });
     } else if (order.floor) {
       doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
-      doc.text(`Όροφος: ${order.floor}`, 300, 166, { width: 230, lineBreak: false });
+      doc.text(`Όροφος: ${formatFloor(order.floor)}`, 300, 166, { width: 230, lineBreak: false });
       doc.text(`ΤΚ: ${order.ship_zip}`, 300, 181, { width: 230, lineBreak: false });
       doc.text(`Πόλη: ${order.ship_city}`, 300, 196, { width: 230, lineBreak: false });
       doc.text(`Χώρα: ${order.ship_country}`, 300, 211, { width: 230, lineBreak: false });

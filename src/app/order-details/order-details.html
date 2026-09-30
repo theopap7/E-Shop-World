@@ -223,7 +223,7 @@
 
           <div class="row" *ngIf="order.floor">
             <span>Όροφος</span>
-            <strong>{{ order.floor }}</strong>
+            <strong>{{ formatFloor(order.floor) }}</strong>
           </div>
 
           <div class="row" *ngIf="order.ship_notes">
