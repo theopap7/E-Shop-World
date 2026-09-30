@@ -47,11 +47,6 @@ function formatPhone(value) {
   return raw.length > 10 ? `(+30) ${grouped}` : grouped;
 }
 
-function formatZip(value) {
-  const raw = String(value ?? '').replace(/\s+/g, '');
-  return /^\d{5}$/.test(raw) ? `${raw.slice(0, 3)} ${raw.slice(3)}` : String(value ?? '');
-}
-
 function formatFloor(value) {
   const raw = String(value ?? '').trim();
   if (!/^\d+$/.test(raw)) return raw;
@@ -59,4 +54,4 @@ function formatFloor(value) {
   return floor === 0 ? 'Ισόγειο' : `${floor}ος`;
 }
 
-module.exports = { formatEur, formatDate, formatDateTime, formatPhone, formatZip, formatFloor };
+module.exports = { formatEur, formatDate, formatDateTime, formatPhone, formatFloor };

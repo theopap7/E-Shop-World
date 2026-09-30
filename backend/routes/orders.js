@@ -8,7 +8,7 @@ const { discountLimiter } = require('../middleware/rateLimiters');
 const { sendOrderConfirmationEmail } = require('../utils/mailer');
 const { restoreStock } = require('../utils/stock');
 const { isDiscountExpired } = require('../utils/discountRules');
-const { formatEur, formatDate, formatFloor } = require('../utils/format');
+const { formatEur, formatDate, formatFloor, formatPhone } = require('../utils/format');
 const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../utils/labels');
 const { STORE_PICKUP_LOCATION } = require('../utils/storeLocation');
 
@@ -793,21 +793,21 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
     if (order.shipping_method === 'pickup') {
       doc.text(`Διεύθυνση: ${STORE_PICKUP_LOCATION.street}, ${STORE_PICKUP_LOCATION.city}`, 300, 151, { width: 230, lineBreak: false });
       doc.text(`Ωράριο: ${STORE_PICKUP_LOCATION.hours}`, 300, 166, { width: 230 });
-      doc.text(`Τηλέφωνο: ${order.phone}`, 300, 181, { width: 230, lineBreak: false });
+      doc.text(`Τηλέφωνο: ${formatPhone(order.phone)}`, 300, 181, { width: 230, lineBreak: false });
     } else if (order.floor) {
       doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
       doc.text(`Όροφος: ${formatFloor(order.floor)}`, 300, 166, { width: 230, lineBreak: false });
       doc.text(`ΤΚ: ${order.ship_zip}`, 300, 181, { width: 230, lineBreak: false });
       doc.text(`Πόλη: ${order.ship_city}`, 300, 196, { width: 230, lineBreak: false });
       doc.text(`Χώρα: ${order.ship_country}`, 300, 211, { width: 230, lineBreak: false });
-      doc.text(`Τηλέφωνο: ${order.phone}`, 300, 226, { width: 230, lineBreak: false });
+      doc.text(`Τηλέφωνο: ${formatPhone(order.phone)}`, 300, 226, { width: 230, lineBreak: false });
       if (order.ship_notes) doc.text(`Σημειώσεις: ${order.ship_notes}`, 300, 241, { width: 230 });
     } else {
       doc.text(`Διεύθυνση: ${order.ship_address1}`, 300, 151, { width: 230, lineBreak: false });
       doc.text(`ΤΚ: ${order.ship_zip}`, 300, 166, { width: 230, lineBreak: false });
       doc.text(`Πόλη: ${order.ship_city}`, 300, 181, { width: 230, lineBreak: false });
       doc.text(`Χώρα: ${order.ship_country}`, 300, 196, { width: 230, lineBreak: false });
-      doc.text(`Τηλέφωνο: ${order.phone}`, 300, 211, { width: 230, lineBreak: false });
+      doc.text(`Τηλέφωνο: ${formatPhone(order.phone)}`, 300, 211, { width: 230, lineBreak: false });
       if (order.ship_notes) doc.text(`Σημειώσεις: ${order.ship_notes}`, 300, 226, { width: 230 });
     }
 

@@ -156,7 +156,7 @@
           </div>
           <div class="row" *ngIf="order.customer_phone">
             <span>Τηλέφωνο</span>
-            <strong>{{ order.customer_phone }}</strong>
+            <strong>{{ formatPhone(order.customer_phone) }}</strong>
           </div>
         </div>
 
@@ -171,7 +171,7 @@
 
           <div class="row">
             <span>Τηλέφωνο</span>
-            <strong>{{ order.phone }}</strong>
+            <strong>{{ formatPhone(order.phone) }}</strong>
           </div>
 
           <div class="row" *ngIf="order.is_gift">

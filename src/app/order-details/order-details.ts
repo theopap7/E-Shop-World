@@ -18,6 +18,7 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { STORE_BANK_ACCOUNT, formatIban } from '../shared/store-bank';
 import { STORE_PICKUP_LOCATION } from '../shared/store-location';
 import { formatFloor } from '../shared/format-floor';
+import { formatPhone } from '../shared/format-contact';
 
 type OrderDto = {
   id: number;
@@ -258,6 +259,7 @@ export class OrderDetailsComponent implements OnInit {
   statusLabel = statusLabel;
   formatIban = formatIban;
   formatFloor = formatFloor;
+  formatPhone = formatPhone;
   readonly storeBank = STORE_BANK_ACCOUNT;
   readonly storeLocation = STORE_PICKUP_LOCATION;
 

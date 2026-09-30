@@ -5,7 +5,7 @@ const { authenticateToken, isAdmin } = require('../../middleware/auth');
 const { sendOrderStatusEmail } = require('../../utils/mailer');
 const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
-const { formatEur, formatDateTime, formatPhone, formatZip, formatFloor } = require('../../utils/format');
+const { formatEur, formatDateTime, formatPhone, formatFloor } = require('../../utils/format');
 const { STORE_PICKUP_LOCATION } = require('../../utils/storeLocation');
 const { orderStatusLabel, PAYMENT_STATUS_LABELS, PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../../utils/labels');
 
@@ -283,7 +283,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
         : [
             ['Διεύθυνση', order.ship_address1],
             ['Πόλη', order.ship_city],
-            ['ΤΚ', formatZip(order.ship_zip)],
+            ['ΤΚ', order.ship_zip],
             ['Χώρα', order.ship_country],
             ['Όροφος', formatFloor(order.floor)],
             ['Σημειώσεις', order.ship_notes],

@@ -1,4 +1,4 @@
-const { formatEur, formatDate, formatDateTime, formatPhone, formatZip, formatFloor } = require('./format');
+const { formatEur, formatDate, formatDateTime, formatPhone, formatFloor } = require('./format');
 
 describe('formatEur', () => {
   it('uses Greek grouping, decimal comma and a trailing euro sign', () => {
@@ -41,18 +41,6 @@ describe('formatPhone', () => {
   it('leaves numbers it does not recognise unchanged', () => {
     expect(formatPhone('+44 20 7946 0958')).toBe('+44 20 7946 0958');
     expect(formatPhone(null)).toBe('');
-  });
-});
-
-describe('formatZip', () => {
-  it('splits a five-digit postcode the way Greek addresses write it', () => {
-    expect(formatZip('26442')).toBe('264 42');
-    expect(formatZip('264 42')).toBe('264 42');
-  });
-
-  it('leaves other values unchanged', () => {
-    expect(formatZip('SW1A 1AA')).toBe('SW1A 1AA');
-    expect(formatZip(null)).toBe('');
   });
 });
 

@@ -7,6 +7,8 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { environment } from '../../environments/environment';
 import { EyeIconComponent } from '../shared/eye-icon/eye-icon';
+import { formatFloor } from '../shared/format-floor';
+import { formatPhone } from '../shared/format-contact';
 
 @Component({
   standalone: true,
@@ -31,6 +33,8 @@ export class ProfileComponent {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
+  formatFloor = formatFloor;
+  formatPhone = formatPhone;
 
   constructor(
     private auth: AuthService,
