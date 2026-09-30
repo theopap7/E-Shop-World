@@ -36,19 +36,19 @@
 
   <div class="edit-actions">
     <button
-      class="btn btn-primary"
-      type="button"
-      [disabled]="saving || draftRating === 0"
-      (click)="submit()">
-      {{ saving ? 'Αποθήκευση...' : 'Αποθήκευση' }}
-    </button>
-
-    <button
       class="btn btn-outline"
       type="button"
       [disabled]="saving"
       (click)="cancel.emit()">
       Ακύρωση
+    </button>
+
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="saving || draftRating === 0"
+      (click)="submit()">
+      {{ saving ? 'Αποθήκευση...' : 'Αποθήκευση' }}
     </button>
   </div>
 </div>
