@@ -119,7 +119,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     if (this.selectedRange === 'all') {
       const sorted = [...raw].sort((a, b) => a.day.localeCompare(b.day));
-      labels = sorted.map(r => r.day.slice(0, 10));
+      labels = sorted.map(r => this.formatDayLabel(r.day, true));
       revenueData = sorted.map(r => Number(r.revenue));
       ordersData = sorted.map(r => Number(r.orders));
     } else {
@@ -132,7 +132,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         ordersMap[key] = Number(row.orders);
       }
 
-      labels = days.map(d => d.slice(5));
+      labels = days.map(d => this.formatDayLabel(d, false));
       revenueData = days.map(d => revenueMap[d] ?? 0);
       ordersData = days.map(d => ordersMap[d] ?? 0);
     }
@@ -179,6 +179,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  private formatDayLabel(day: string, withYear: boolean): string {
+    const [year, month, date] = day.slice(0, 10).split('-');
+    return withYear ? `${date}/${month}/${year}` : `${date}/${month}`;
   }
 
   private renderStatusChart(raw: ChartData['statusBreakdown']): void {
