@@ -87,24 +87,29 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
     to: toEmail,
     subject: 'Επαναφορά κωδικού πρόσβασης',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
-        <h2 style="color:${BRAND_TEXT};">Επαναφορά Κωδικού</h2>
-        <p>Λάβαμε αίτημα για επαναφορά του κωδικού σου.</p>
-        <p>Κάνε κλικ στο παρακάτω κουμπί για να ορίσεις νέο κωδικό:</p>
-        <a href="${resetLink}" style="
-          display: inline-block;
-          padding: 12px 24px;
-          ${BRAND_FILL}
-          color: white;
-          text-decoration: none;
-          border-radius: 8px;
-          font-weight: bold;
-          margin: 16px 0;
-        ">Επαναφορά Κωδικού</a>
-        <p style="color: #888; font-size: 13px;">
-          Ο σύνδεσμος λήγει σε <strong>1 ώρα</strong>.<br>
-          Αν δεν ζήτησες επαναφορά, αγνόησε αυτό το email.
-        </p>
+      <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;color:#222;">
+        <div style="${BRAND_FILL}padding:20px 32px;border-radius:10px 10px 0 0;">
+          <h1 style="margin:0;color:white;font-size:20px;">E-Shop</h1>
+        </div>
+        <div style="background:#f9fafb;padding:24px 32px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">
+          <h2 style="color:${BRAND_TEXT};">Επαναφορά Κωδικού</h2>
+          <p>Λάβαμε αίτημα για επαναφορά του κωδικού σου.</p>
+          <p>Κάνε κλικ στο παρακάτω κουμπί για να ορίσεις νέο κωδικό:</p>
+          <a href="${resetLink}" style="
+            display: inline-block;
+            padding: 12px 24px;
+            ${BRAND_FILL}
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 16px 0;
+          ">Επαναφορά Κωδικού</a>
+          <p style="color: #888; font-size: 13px;">
+            Ο σύνδεσμος λήγει σε <strong>1 ώρα</strong>.<br>
+            Αν δεν ζήτησες επαναφορά, αγνόησε αυτό το email.
+          </p>
+        </div>
       </div>
     `,
   });
@@ -123,23 +128,28 @@ async function sendVerificationEmail(toEmail, verifyLink, { emailChange = false 
     to: toEmail,
     subject: emailChange ? 'Επιβεβαίωση νέου email' : 'Επιβεβαίωση email',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
-        <h2 style="color:${BRAND_TEXT};">${heading}</h2>
-        <p>${intro}</p>
-        <a href="${verifyLink}" style="
-          display: inline-block;
-          padding: 12px 24px;
-          ${BRAND_FILL}
-          color: white;
-          text-decoration: none;
-          border-radius: 8px;
-          font-weight: bold;
-          margin: 16px 0;
-        ">Επιβεβαίωση Email</a>
-        <p style="color: #888; font-size: 13px;">
-          Ο σύνδεσμος λήγει σε <strong>24 ώρες</strong>.<br>
-          ${ignoreNote}
-        </p>
+      <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;color:#222;">
+        <div style="${BRAND_FILL}padding:20px 32px;border-radius:10px 10px 0 0;">
+          <h1 style="margin:0;color:white;font-size:20px;">E-Shop</h1>
+        </div>
+        <div style="background:#f9fafb;padding:24px 32px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">
+          <h2 style="color:${BRAND_TEXT};">${heading}</h2>
+          <p>${intro}</p>
+          <a href="${verifyLink}" style="
+            display: inline-block;
+            padding: 12px 24px;
+            ${BRAND_FILL}
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 16px 0;
+          ">Επιβεβαίωση Email</a>
+          <p style="color: #888; font-size: 13px;">
+            Ο σύνδεσμος λήγει σε <strong>24 ώρες</strong>.<br>
+            ${ignoreNote}
+          </p>
+        </div>
       </div>
     `,
   });
