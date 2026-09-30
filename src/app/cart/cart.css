@@ -53,16 +53,6 @@
 
 .qty-select:hover { border-color: var(--color-primary); }
 .qty-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241,0.1); }
-.btn-danger-outline {
-  background: #fff;
-  border-color: #ef4444;
-  color: #ef4444;
-}
-
-.btn-danger-outline:hover {
-  background: #fee2e2;
-}
-
 .alert {
   border-radius: 12px;
   padding: 12px 14px;

@@ -280,13 +280,13 @@
           <div class="row" *ngIf="isAdminPage && order.payment_status === 'pending' && order.payment_method === 'bank_transfer' && order.status !== 'cancelled'">
             <span></span>
             <button class="btn btn-primary" (click)="confirmPayment()" [disabled]="isConfirmingPayment">
-              {{ isConfirmingPayment ? 'Επιβεβαίωση...' : '✅ Επιβεβαίωση Πληρωμής' }}
+              {{ isConfirmingPayment ? 'Επιβεβαίωση...' : '✅ Επιβεβαίωση πληρωμής' }}
             </button>
           </div>
 
         </div>
 
-        <div class="card">
+        <div class="card" [class.full]="isAdminPage">
 
           <h3 class="h3">Σύνοψη Παραγγελίας</h3>
 
@@ -322,7 +322,7 @@
           <div class="cancel-section" *ngIf="canCancel">
 
             <button class="btn btn-danger btn-block" (click)="cancelOrder()" [disabled]="isCancelling">
-              <span *ngIf="!isCancelling">✕ Ακύρωση Παραγγελίας</span>
+              <span *ngIf="!isCancelling">✕ Ακύρωση παραγγελίας</span>
               <span *ngIf="isCancelling">Ακύρωση...</span>
             </button>
           </div>
@@ -341,7 +341,7 @@
             </div>
             <div *ngIf="canReturn && !showReturnForm">
               <button class="btn btn-warning" (click)="initReturnForm()">
-                ↩ Αίτημα Επιστροφής
+                ↩ Αίτημα επιστροφής
               </button>
             </div>
           </div>
@@ -399,7 +399,7 @@
                 <button class="btn btn-warning" type="button"
                   (click)="submitReturn()"
                   [disabled]="isSubmittingReturn || missingReturnReason || selectedReturnItems.length === 0">
-                  <span *ngIf="!isSubmittingReturn">Υποβολή Αιτήματος</span>
+                  <span *ngIf="!isSubmittingReturn">Υποβολή αιτήματος</span>
                   <span *ngIf="isSubmittingReturn">Υποβολή...</span>
                 </button>
               </div>
