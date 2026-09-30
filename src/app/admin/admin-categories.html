@@ -36,7 +36,26 @@
         <p>Πρόσθεσε την πρώτη κατηγορία με το «+ Νέα Κατηγορία».</p>
       </div>
 
-      <table *ngIf="categories.length > 0" class="table">
+      <div *ngIf="categories.length > 0" class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Αναζήτηση με όνομα..."
+            [(ngModel)]="searchTerm"
+          />
+          <button *ngIf="searchTerm" class="search-clear" type="button" (click)="searchTerm = ''" aria-label="Καθαρισμός αναζήτησης">✕</button>
+        </div>
+        <div class="count-info">{{ filteredCategories.length }} {{ filteredCategories.length === 1 ? 'κατηγορία' : 'κατηγορίες' }}</div>
+      </div>
+
+      <div *ngIf="categories.length > 0 && filteredCategories.length === 0" class="empty-state">
+        <div class="empty-icon">🏷️</div>
+        <h3>Δεν βρέθηκαν κατηγορίες</h3>
+      </div>
+
+      <table *ngIf="filteredCategories.length > 0" class="table">
         <thead>
           <tr>
             <th>Όνομα</th>
@@ -45,7 +64,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let category of categories">
+          <tr *ngFor="let category of filteredCategories">
 
             <td><strong>{{ category.name }}</strong></td>
 

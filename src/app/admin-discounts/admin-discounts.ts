@@ -8,6 +8,7 @@ import { ConfirmService } from '../services/confirm.service';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { ScrollFadeDirective } from '../shared/scroll-fade.directive';
+import { matchesSearch } from '../shared/search-text';
 
 interface DiscountCode {
   id: number;
@@ -33,6 +34,7 @@ export class AdminDiscountsComponent implements OnInit {
   codes: DiscountCode[] = [];
   isLoading = false;
   error = false;
+  searchTerm = '';
 
   showModal = false;
   isEditMode = false;
@@ -82,6 +84,10 @@ export class AdminDiscountsComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  get filteredCodes(): DiscountCode[] {
+    return this.codes.filter(c => matchesSearch(this.searchTerm, c.code));
   }
 
   openCreateModal(): void {

@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { AdminService, AdminCategory } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
 import { ConfirmService } from '../services/confirm.service';
+import { matchesSearch } from '../shared/search-text';
 
 @Component({
   selector: 'app-admin-categories',
@@ -17,6 +18,7 @@ import { ConfirmService } from '../services/confirm.service';
 export class AdminCategoriesComponent implements OnInit {
   categories: AdminCategory[] = [];
   isLoading = false;
+  searchTerm = '';
 
   showModal = false;
   error = false;
@@ -54,6 +56,10 @@ export class AdminCategoriesComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  get filteredCategories(): AdminCategory[] {
+    return this.categories.filter(c => matchesSearch(this.searchTerm, c.name));
   }
 
   openCreateModal(): void {
