@@ -9,8 +9,10 @@ router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
       SELECT
         u.id, u.first_name, u.last_name, u.email, u.role, u.created_at,
         COUNT(o.id) AS order_count,
-        COALESCE(SUM(CASE WHEN o.payment_status IN ('paid', 'partially_refunded')
-          THEN o.total_amount - COALESCE(ref.refunded, 0) ELSE 0 END), 0) AS total_spent,
+        COALESCE(SUM(CASE WHEN o.status = 'cancelled' THEN 0
+          WHEN o.payment_status = 'refunded' THEN o.shipping_cost
+          WHEN o.payment_status IN ('paid', 'partially_refunded') THEN o.total_amount - COALESCE(ref.refunded, 0)
+          ELSE 0 END), 0) AS total_spent,
         MAX(o.created_at) AS last_order_at
       FROM users u
       LEFT JOIN orders o ON o.user_id = u.id

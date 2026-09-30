@@ -12,14 +12,15 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
     ] = await Promise.all([
       db.query('SELECT COUNT(*) as total FROM orders'),
       db.query(`
-        SELECT SUM(o.total_amount - COALESCE(ref.refunded, 0)) as total
+        SELECT SUM(CASE WHEN o.payment_status = 'refunded' THEN o.shipping_cost
+          ELSE o.total_amount - COALESCE(ref.refunded, 0) END) as total
         FROM orders o
         LEFT JOIN (
           SELECT order_id, SUM(refund_amount) AS refunded
           FROM return_requests WHERE status IN ('approved', 'partially_approved')
           GROUP BY order_id
         ) ref ON ref.order_id = o.id
-        WHERE o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded')
+        WHERE o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded', 'refunded')
       `),
       db.query('SELECT COUNT(*) as total FROM users'),
       db.query('SELECT COUNT(*) as total FROM products'),
@@ -28,8 +29,10 @@ router.get('/admin/stats', authenticateToken, isAdmin, async (req, res) => {
       db.query(`SELECT COUNT(*) as total FROM return_requests WHERE status = 'pending'`),
       db.query(`
         SELECT DATE_FORMAT(o.created_at, '%Y-%m-%d') AS day, COUNT(*) AS orders,
-          ROUND(SUM(CASE WHEN o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded')
-            THEN o.total_amount - COALESCE(ref.refunded, 0) ELSE 0 END), 2) AS revenue
+          ROUND(SUM(CASE WHEN o.status = 'cancelled' THEN 0
+            WHEN o.payment_status = 'refunded' THEN o.shipping_cost
+            WHEN o.payment_status IN ('paid', 'partially_refunded') THEN o.total_amount - COALESCE(ref.refunded, 0)
+            ELSE 0 END), 2) AS revenue
         FROM orders o
         LEFT JOIN (
           SELECT order_id, SUM(refund_amount) AS refunded
@@ -91,8 +94,10 @@ router.get('/admin/stats/charts', authenticateToken, isAdmin, async (req, res) =
         SELECT
           DATE_FORMAT(o.created_at, '%Y-%m-%d') AS day,
           COUNT(*) AS orders,
-          ROUND(SUM(CASE WHEN o.status != 'cancelled' AND o.payment_status IN ('paid', 'partially_refunded')
-            THEN o.total_amount - COALESCE(ref.refunded, 0) ELSE 0 END), 2) AS revenue
+          ROUND(SUM(CASE WHEN o.status = 'cancelled' THEN 0
+            WHEN o.payment_status = 'refunded' THEN o.shipping_cost
+            WHEN o.payment_status IN ('paid', 'partially_refunded') THEN o.total_amount - COALESCE(ref.refunded, 0)
+            ELSE 0 END), 2) AS revenue
         FROM orders o
         LEFT JOIN (
           SELECT order_id, SUM(refund_amount) AS refunded
