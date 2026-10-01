@@ -362,9 +362,11 @@
                     {{ blockedStatusLabel(item.blockedStatus) }}
                   </span>
                   <div class="return-item-qty" *ngIf="item.selected && !item.blockedStatus">
-                    <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty > 1 ? item.selectedQty - 1 : 1">−</button>
-                    <span class="qty-val">{{ item.selectedQty }}</span>
-                    <button type="button" class="qty-btn" (click)="item.selectedQty = item.selectedQty < item.maxQty ? item.selectedQty + 1 : item.maxQty">+</button>
+                    <ng-container *ngIf="item.maxQty > 1">
+                      <button type="button" class="qty-btn" [disabled]="item.selectedQty <= 1" (click)="item.selectedQty = item.selectedQty > 1 ? item.selectedQty - 1 : 1">−</button>
+                      <span class="qty-val">{{ item.selectedQty }}</span>
+                      <button type="button" class="qty-btn" [disabled]="item.selectedQty >= item.maxQty" (click)="item.selectedQty = item.selectedQty < item.maxQty ? item.selectedQty + 1 : item.maxQty">+</button>
+                    </ng-container>
                     <span class="return-item-price">{{ refundFor(item) | currency }}</span>
                   </div>
                   <div class="return-item-qty" *ngIf="!item.selected && !item.blockedStatus">

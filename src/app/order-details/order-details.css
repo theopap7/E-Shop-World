@@ -740,9 +740,14 @@
   transition: all 0.15s;
 }
 
-.qty-btn:hover {
+.qty-btn:hover:not(:disabled) {
   background: var(--surface-2);
   border-color: var(--accent);
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .qty-val {
