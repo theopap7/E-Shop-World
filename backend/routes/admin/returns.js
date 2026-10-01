@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
+const { maskForDemo } = require('../../utils/demoMask');
 const { restoreStock } = require('../../utils/stock');
 const { sendReturnDecisionEmail } = require('../../utils/mailer');
 
@@ -30,7 +31,7 @@ router.get('/admin/returns', authenticateToken, isAdmin, async (req, res) => {
       itemsByRequest[item.return_request_id].push(item);
     }
 
-    const returns = rows.map(r => ({ ...r, items: itemsByRequest[r.id] || [] }));
+    const returns = maskForDemo(req, rows).map(r => ({ ...r, items: itemsByRequest[r.id] || [] }));
     return res.json({ success: true, returns });
   } catch (error) {
     console.error('Admin returns error:', error);

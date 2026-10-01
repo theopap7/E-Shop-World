@@ -7,6 +7,7 @@ const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
 const { authLimiter, passwordLimiter, forgotPasswordLimiter, checkEmailLimiter, resendVerificationLimiter } = require('../middleware/rateLimiters');
 const { sendPasswordResetEmail, sendVerificationEmail } = require('../utils/mailer');
+const { DEMO_ROLE } = require('../utils/demoMask');
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const PASSWORD_MESSAGE = 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, ένα κεφαλαίο, ένα πεζό και έναν αριθμό';
@@ -406,10 +407,10 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const [users] = await db.query('SELECT id FROM users WHERE email = ?', [normalizedEmail]);
+    const [users] = await db.query('SELECT id, role FROM users WHERE email = ?', [normalizedEmail]);
 
     // Always respond success to prevent email enumeration
-    if (users.length === 0) {
+    if (users.length === 0 || users[0].role === DEMO_ROLE) {
       return res.json({ success: true, message: 'Αν το email υπάρχει, θα λάβεις σύνδεσμο επαναφοράς.' });
     }
 

@@ -9,17 +9,19 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb';
 import { HeaderComponent } from './header/header';
 import { FooterComponent } from './footer/footer';
 import { EmailVerifyBannerComponent } from './email-verify-banner/email-verify-banner';
+import { DemoBannerComponent } from './demo-banner/demo-banner';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ RouterModule, CartSidebarComponent, ToastContainerComponent, ConfirmDialogComponent, BreadcrumbComponent, HeaderComponent, FooterComponent, EmailVerifyBannerComponent ],
+  imports: [ RouterModule, CartSidebarComponent, ToastContainerComponent, ConfirmDialogComponent, BreadcrumbComponent, HeaderComponent, FooterComponent, EmailVerifyBannerComponent, DemoBannerComponent ],
   template: `
     <app-cart-sidebar></app-cart-sidebar>
     <app-toast-container></app-toast-container>
     <app-confirm-dialog></app-confirm-dialog>
     <div class="app-shell">
       <app-email-verify-banner></app-email-verify-banner>
+      <app-demo-banner></app-demo-banner>
       <div class="layout-wrapper">
         <app-header></app-header>
         <app-breadcrumb></app-breadcrumb>

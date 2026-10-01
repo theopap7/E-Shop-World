@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
+const { maskForDemo } = require('../../utils/demoMask');
 
 router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -24,7 +25,7 @@ router.get('/admin/users', authenticateToken, isAdmin, async (req, res) => {
       GROUP BY u.id
       ORDER BY total_spent DESC, u.created_at DESC
     `);
-    res.json({ success: true, users });
+    res.json({ success: true, users: maskForDemo(req, users) });
   } catch (error) {
     console.error('Admin users error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });

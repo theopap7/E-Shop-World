@@ -29,6 +29,10 @@
           ⭐ Διαχειριστής
         </div>
 
+        <div class="role-badge" *ngIf="user.role === 'demo'">
+          👁️ Demo – μόνο προβολή
+        </div>
+
       </div>
 
       <div class="profile-actions">
@@ -72,9 +76,9 @@
             <span class="action-arrow">→</span>
           </a>
 
-          <div *ngIf="user.role === 'admin'" class="divider"></div>
+          <div *ngIf="user.role === 'admin' || user.role === 'demo'" class="divider"></div>
 
-          <a *ngIf="user.role === 'admin'" routerLink="/admin" class="action-link admin-link">
+          <a *ngIf="user.role === 'admin' || user.role === 'demo'" routerLink="/admin" class="action-link admin-link">
             <span class="action-icon">⚙️</span>
             <div class="action-content">
               <div class="action-title">Πίνακας Διαχειριστή</div>

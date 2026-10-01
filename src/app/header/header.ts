@@ -49,7 +49,7 @@ export class HeaderComponent implements OnInit {
 
     this.authService.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.isLoggedIn = this.authService.isLoggedIn();
-      this.isAdmin = this.isLoggedIn && this.authService.isAdmin();
+      this.isAdmin = this.isLoggedIn && this.authService.hasAdminAccess();
     });
 
     this.wishlistService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {

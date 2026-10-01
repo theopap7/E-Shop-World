@@ -49,6 +49,36 @@ describe('authenticateToken', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
   });
+
+  it('lets a demo user through on read requests', () => {
+    const req = { cookies: { token: 'demo-token' }, method: 'GET' };
+    const res = mockRes();
+    const next = jest.fn();
+    const payload = { id: 9, role: 'demo' };
+    jwt.verify.mockImplementation((token, secret, cb) => cb(null, payload));
+
+    authenticateToken(req, res, next);
+
+    expect(req.user).toEqual(payload);
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['POST', 'PUT', 'PATCH', 'DELETE'])('blocks a demo user on %s requests', (method) => {
+    const req = { cookies: { token: 'demo-token' }, method };
+    const res = mockRes();
+    const next = jest.fn();
+    jwt.verify.mockImplementation((token, secret, cb) => cb(null, { id: 9, role: 'demo' }));
+
+    authenticateToken(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      code: 'demo_read_only',
+      message: 'Ο demo λογαριασμός είναι μόνο για προβολή'
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
 });
 
 describe('isAdmin', () => {
@@ -73,6 +103,17 @@ describe('isAdmin', () => {
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Δεν έχεις δικαίωμα πρόσβασης.' });
     expect(next).not.toHaveBeenCalled();
+  });
+
+  it('calls next() for a user with the demo role', () => {
+    const req = { user: { id: 9, role: 'demo' } };
+    const res = mockRes();
+    const next = jest.fn();
+
+    isAdmin(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
   });
 
   it('calls next() for a user with the admin role', () => {

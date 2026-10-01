@@ -145,3 +145,31 @@ describe('DELETE /api/admin/categories/:id', () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe('demo account on admin routes', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('can read the category list', async () => {
+    db.query.mockResolvedValueOnce([[{ id: 1, name: 'Ηλεκτρονικά', product_count: 3 }]]);
+    const res = await request(app)
+      .get('/api/admin/categories')
+      .set('Cookie', authCookie({ id: 9, role: 'demo' }));
+
+    expect(res.status).toBe(200);
+    expect(res.body.categories).toHaveLength(1);
+  });
+
+  it.each([
+    ['post', '/api/admin/categories'],
+    ['put', '/api/admin/categories/1'],
+    ['delete', '/api/admin/categories/1'],
+  ])('cannot %s %s', async (method, url) => {
+    const res = await request(app)[method](url)
+      .set('Cookie', authCookie({ id: 9, role: 'demo' }))
+      .send({ name: 'Νέα' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('demo_read_only');
+    expect(db.query).not.toHaveBeenCalled();
+  });
+});

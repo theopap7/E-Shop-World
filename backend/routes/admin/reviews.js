@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
+const { maskForDemo } = require('../../utils/demoMask');
 
 router.get('/admin/reviews', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -17,7 +18,7 @@ router.get('/admin/reviews', authenticateToken, isAdmin, async (req, res) => {
       JOIN users u ON u.id = r.user_id
       ORDER BY r.created_at DESC
     `);
-    res.json({ success: true, reviews });
+    res.json({ success: true, reviews: maskForDemo(req, reviews) });
   } catch (error) {
     console.error('Admin get all reviews error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });

@@ -19,7 +19,7 @@ export const adminGuard: CanActivateFn = (_route: ActivatedRouteSnapshot, state:
   // cached localStorage copy can be edited client-side and isn't trustworthy.
   return auth.fetchCurrentUser().pipe(
     map((user) => {
-      if (user.role === 'admin') {
+      if (user.role === 'admin' || user.role === 'demo') {
         return true;
       }
       toast.error('Δεν έχεις δικαίωμα πρόσβασης σε αυτή τη σελίδα');

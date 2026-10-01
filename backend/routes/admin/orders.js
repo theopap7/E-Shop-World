@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { authenticateToken, isAdmin } = require('../../middleware/auth');
+const { maskForDemo } = require('../../utils/demoMask');
 const { sendOrderStatusEmail } = require('../../utils/mailer');
 const { restoreStock } = require('../../utils/stock');
 const { requiresManualPaymentConfirmation } = require('../../utils/paymentRules');
@@ -20,7 +21,7 @@ router.get('/admin/orders', authenticateToken, isAdmin, async (req, res) => {
        LEFT JOIN users u ON u.id = o.user_id
        ORDER BY o.created_at DESC`
     );
-    res.json({ success: true, orders: rows });
+    res.json({ success: true, orders: maskForDemo(req, rows) });
   } catch (error) {
     console.error('Admin get orders error:', error);
     res.status(500).json({ success: false, message: 'Σφάλμα διακομιστή. Δοκίμασε ξανά.' });
@@ -51,7 +52,7 @@ router.get('/admin/orders/:id', authenticateToken, isAdmin, async (req, res) => 
       return res.status(404).json({ success: false, message: 'Η παραγγελία δεν βρέθηκε' });
     }
 
-    const order = orders[0];
+    const order = maskForDemo(req, orders[0]);
 
     const [items] = await db.query(
       `SELECT
@@ -249,7 +250,7 @@ router.get('/admin/orders/:id/csv', authenticateToken, isAdmin, async (req, res)
 
     if (!rows.length) return res.status(404).json({ message: 'Η παραγγελία δεν βρέθηκε' });
 
-    const order = rows[0];
+    const order = maskForDemo(req, rows[0]);
 
     const [items] = await db.query(`
       SELECT p.name, oi.quantity, oi.unit_price, oi.size

@@ -94,9 +94,9 @@ export class AuthService {
     return expiresAt > Date.now();
   }
 
-  isAdmin(): boolean {
-    const user = this.getUser();
-    return user?.role === 'admin';
+  hasAdminAccess(): boolean {
+    const role = this.getUser()?.role;
+    return role === 'admin' || role === 'demo';
   }
 
   updateUser(user: AuthUser): void {

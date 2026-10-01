@@ -55,6 +55,14 @@ describe('adminGuard', () => {
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
+  it('allows navigation for a read-only demo account', async () => {
+    authSpy.isLoggedIn.and.returnValue(true);
+    authSpy.fetchCurrentUser.and.returnValue(of({ role: 'demo' } as AuthUser));
+
+    expect(await runGuard()).toBeTrue();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
+
   it('keeps the admin on the current page when the server is unreachable', async () => {
     authSpy.isLoggedIn.and.returnValue(true);
     authSpy.fetchCurrentUser.and.returnValue(throwError(() => ({ status: 0 })));

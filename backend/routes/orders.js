@@ -11,6 +11,7 @@ const { isDiscountExpired } = require('../utils/discountRules');
 const { formatEur, formatDate, formatFloor, formatPhone } = require('../utils/format');
 const { PAYMENT_METHOD_LABELS, SHIPPING_METHOD_LABELS } = require('../utils/labels');
 const { STORE_PICKUP_LOCATION } = require('../utils/storeLocation');
+const { DEMO_ROLE, maskForDemo } = require('../utils/demoMask');
 
 // Only rate-limit checkout attempts that carry a discount code, so a discount-code
 // brute-force can't bypass the /validate-discount limiter by going through /orders instead.
@@ -744,12 +745,12 @@ router.get('/orders/:id/pdf', authenticateToken, async (req, res) => {
       WHERE o.id = ?
     `;
     const params = [orderId];
-    if (role !== 'admin') { query += ' AND o.user_id = ?'; params.push(userId); }
+    if (role !== 'admin' && role !== DEMO_ROLE) { query += ' AND o.user_id = ?'; params.push(userId); }
 
     const [orders] = await db.query(query, params);
     if (!orders.length) return res.status(403).json({ message: 'Δεν επιτρέπεται η πρόσβαση σε αυτή την παραγγελία' });
 
-    const order = orders[0];
+    const order = maskForDemo(req, orders[0]);
 
     const [items] = await db.query(`
       SELECT oi.quantity, oi.unit_price AS price, oi.size, p.name AS title

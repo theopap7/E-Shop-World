@@ -13,7 +13,7 @@ CREATE TABLE users (
   address_zip VARCHAR(20),
   address1 VARCHAR(255),
   address_floor VARCHAR(50),
-  role ENUM('user', 'admin') DEFAULT 'user',
+  role ENUM('user', 'admin', 'demo') DEFAULT 'user',
   email_verified BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -198,4 +198,6 @@ CREATE TABLE wishlists (
 );
 
 -- To create an admin: register normally, then run:
--- UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+-- UPDATE users SET role = 'admin', email_verified = TRUE WHERE email = 'your@email.com';
+-- Use role = 'demo' instead for a read-only account: it can open the admin panel,
+-- cannot change anything, and sees customer details masked.

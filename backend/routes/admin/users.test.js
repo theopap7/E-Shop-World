@@ -33,5 +33,16 @@ describe('GET /api/admin/users', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].email).toBe('a@b.com');
+  });
+
+  it('returns the user list with names and emails masked for a demo user', async () => {
+    db.query.mockResolvedValueOnce([[{ id: 1, first_name: 'Maria', last_name: 'Pappa', email: 'maria@b.com', order_count: 2 }]]);
+    const res = await request(app)
+      .get('/api/admin/users')
+      .set('Cookie', authCookie({ id: 9, role: 'demo' }));
+
+    expect(res.status).toBe(200);
+    expect(res.body.users[0]).toEqual({ id: 1, first_name: 'M***', last_name: 'P***', email: 'm***@b.com', order_count: 2 });
   });
 });
